@@ -7,24 +7,6 @@ class System:
         self.background_path = background_path
 
 
-class Cameras(System):
-    def __init__(self):
-        super().__init__("Cameras", 'resources/background/test.png')
-        self.camera_list = []
-
-    @staticmethod
-    def load_cameras(load_path: str):
-        cameras = []
-        with open(load_path, 'r') as f:
-            cameras_list = json.load(f)
-            for camera in cameras_list:
-                cameras.append(Camera(camera[0], camera[1]))
-            return cameras
-
-    def activate_camera(self, camera_index: int):
-        pass
-
-
 class Camera:
     def __init__(self, name: str, background_path: str):
         self.name = name
@@ -32,14 +14,34 @@ class Camera:
         self.active = False
 
 
+class Cameras(System):
+    def __init__(self):
+        super().__init__("Cameras", 'resources/background/test.png')
+        self.camera_list = Cameras.load_cameras('Appdata/GameData/cameras.json')
+        self.enabled = True
+        self.active = False
+
+    @staticmethod
+    def load_cameras(load_path: str) -> list[Camera]:
+        cameras = []
+        with open(load_path, 'r') as f:
+            cameras_list = json.load(f)
+            for camera in cameras_list:
+                cameras.append(Camera(camera[0], camera[1]))
+            return cameras
+
+    def disable_cameras(self):
+        for camera in self.camera_list:
+            camera.active = False
+
+    def activate_camera(self, camera_index: int):
+        self.disable_cameras()
+        self.camera_list[camera_index].active = True
+
+
 class Vents(System):
     def __init__(self):
         super().__init__("Vents", 'resources/background/test.png')
-
-
-class Ducts(System):
-    def __init__(self):
-        super().__init__("Ducts", 'resources/background/test.png')
 
 
 class Repairs(System):
