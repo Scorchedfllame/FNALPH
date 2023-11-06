@@ -5,6 +5,7 @@ class System:
     def __init__(self, name: str, background_path: str):
         self.name = name
         self.background_path = background_path
+        self.buttons = []
 
 
 class Camera:
@@ -16,7 +17,7 @@ class Camera:
 
 class Cameras(System):
     def __init__(self):
-        super().__init__("Cameras", 'resources/background/test.png')
+        super().__init__("Cams System", 'resources/background/test.png')
         self.camera_list = Cameras.load_cameras('Appdata/GameData/cameras.json')
         self.enabled = True
         self.active = False
@@ -41,9 +42,37 @@ class Cameras(System):
 
 class Vents(System):
     def __init__(self):
-        super().__init__("Vents", 'resources/background/test.png')
+        super().__init__("Vent System", 'resources/background/test.png')
 
 
 class Repairs(System):
     def __init__(self):
-        super().__init__("Repairs", 'resources/background/test.png')
+        super().__init__("Maintenance Panel", 'resources/background/test.png')
+
+
+class Lure:
+    def __init__(self, position: tuple[int], radius: int):
+        self.position = position
+        self.radius = radius
+
+
+class Ducts(System):
+    def __init__(self):
+        super().__init__("Duct System", 'resources/background/test.png')
+        self.lures = []
+        self.open_duct = 0
+        self.closed_duct = 1
+
+    def open_ducts(self, duct: int(1 | 0)) -> None:
+        self.open_duct = duct
+        self.closed_duct = int(not duct)
+
+    def new_lure(self, position: tuple[int], radius: int) -> Lure:
+        new_lure = Lure(position, radius)
+        self.lures.append(new_lure)
+        return new_lure
+
+    def del_lure(self, index: int) -> Lure:
+        del_lure = self.lures[index]
+        del self.lures[index]
+        return del_lure
