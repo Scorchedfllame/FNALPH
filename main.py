@@ -1,3 +1,6 @@
+from gameplay import *
+
+
 def main():
     pass
 

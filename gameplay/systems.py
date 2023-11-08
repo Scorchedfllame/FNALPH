@@ -1,4 +1,5 @@
 import json
+from .game import Game
 
 
 class System:
@@ -13,6 +14,12 @@ class Camera:
         self.name = name
         self.background_path = background_path
         self.active = False
+        self.shocked = False
+
+    def shock(self, game: Game):
+        self.shocked = True
+        game.global_update()
+        self.shocked = False
 
 
 class Cameras(System):
@@ -46,7 +53,7 @@ class Vents(System):
 
 
 class Repairs(System):
-    def __init__(self):
+    def __init__(self, game: Game):
         super().__init__("Maintenance Panel", 'resources/background/test.png')
 
 

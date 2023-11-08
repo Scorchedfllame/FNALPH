@@ -1,6 +1,7 @@
 from .systems import (
     Cameras,
     Vents,
-    Ducts,
     Repairs
 )
+from .buttons import *
+from .animatronics import *
