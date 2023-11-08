@@ -1,5 +1,6 @@
 import json
 from .game import Game
+from .buttons import Button
 
 
 class System:
@@ -14,18 +15,26 @@ class Camera:
         self.name = name
         self.background_path = background_path
         self.active = False
-        self.shocked = False
+        self._buttons = []
+        self._shocked = False
+
+    @property
+    def buttons(self):
+        return self._buttons
+
+    def add_button(self, button: Button):
+        self._buttons.append(button)
 
     def shock(self, game: Game):
-        self.shocked = True
+        self._shocked = True
         game.global_update()
-        self.shocked = False
+        self._shocked = False
 
 
 class Cameras(System):
     def __init__(self):
         super().__init__("Cams System", 'resources/background/test.png')
-        self.camera_list = Cameras.load_cameras('Appdata/GameData/cameras.json')
+        self._camera_list = Cameras.load_cameras('Appdata/GameData/cameras.json')
         self.enabled = True
         self.active = False
 
