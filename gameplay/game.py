@@ -3,6 +3,7 @@ class Game:
         self.timer = 0
         self.utils = {}
         self.animatronics = []
+        self.update_animatronics = []
         self.systems = {}
         self._win = False
         self._killed = False
@@ -11,7 +12,7 @@ class Game:
         pass
 
     def global_update(self):
-        for animatronic in self.animatronics:
+        for animatronic in self.update_animatronics:
             animatronic.update()
 
     def kill(self):
