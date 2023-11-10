@@ -79,3 +79,16 @@ class ThePuppet(Animatronic):
 
     def add_time(self, amount: int) -> None:
         self._music_box_time = min(amount + self.MAX_MUSIC_TIME, self.MAX_MUSIC_TIME)
+
+
+class Bonnie(Animatronic):
+    def __init__(self, game: Game, difficulty: int):
+        super().__init__('Bonnie', difficulty)
+        self._game = game
+        self._location = 0
+
+    def draw(self):
+        camera_location = self.get_cam_from_location()
+        camera = self.game.systems["Cams System"].camera_list[self._location]
+
+    def get_cam_from_location()
