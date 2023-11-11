@@ -48,12 +48,12 @@ class Cameras(System):
             return cameras
 
     def disable_cameras(self):
-        for camera in self.camera_list:
+        for camera in self._camera_list:
             camera.active = False
 
     def activate_camera(self, camera_index: int):
         self.disable_cameras()
-        self.camera_list[camera_index].active = True
+        self._camera_list[camera_index].active = True
 
 
 class Vents(System):
@@ -62,7 +62,7 @@ class Vents(System):
 
 
 class Repairs(System):
-    def __init__(self, game: Game):
+    def __init__(self):
         super().__init__("Maintenance Panel", 'resources/background/test.png')
 
 

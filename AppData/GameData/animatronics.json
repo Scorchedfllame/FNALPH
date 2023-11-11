@@ -5,6 +5,18 @@
   },
   "Bonnie": {
     "description": "Comes at you from the right side of the school.",
-    "image_path": "resources/sprites/animatronics/bonnie.png"
+    "image_path": "resources/sprites/animatronics/bonnie.png",
+    "cameras": {
+      "0": 1,
+      "1": 2,
+      "2": 3,
+      "3": 4,
+      "5": 5
+    },
+    "movements": {
+            "0": [1, 2],
+            "1": [2, 3],
+            "2": [4]
+    }
   }
 }
