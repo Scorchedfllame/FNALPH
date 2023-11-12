@@ -1,3 +1,7 @@
+from .office import Office
+import pygame
+
+
 class Game:
     def __init__(self):
         self.timer = 0
@@ -5,15 +9,20 @@ class Game:
         self.animatronics = []
         self.update_animatronics = []
         self.systems = {}
+        self.office = Office()
         self._win = False
         self._killed = False
 
     def start(self):
         pass
 
-    def global_update(self):
-        for animatronic in self.update_animatronics:
-            animatronic.update()
+    def global_tick(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit(0)
+            for animatronic in self.update_animatronics:
+                animatronic.tick(event)
 
     def kill(self):
         if not self._win:

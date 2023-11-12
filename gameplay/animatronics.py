@@ -31,7 +31,6 @@ class Animatronic:
         self._difficulty = difficulty
         self._aggression = self._difficulty
         self.description, self.image_path = self.load_data(('description', 'image_path'))
-        self.kill_event = pygame.event.Event(pygame.USEREVENT + KILL)
         self.jumpscare = jumpscare
 
     def load_data(self, info: tuple) -> tuple:
@@ -48,8 +47,19 @@ class Animatronic:
     def start(self) -> None:
         pass
 
+    def stop(self) -> None:
+        pass
+
     def tick(self, event: pygame.event.Event) -> None:
         pass
+
+    def draw(self, screen) -> None:
+        pass
+
+    def kill(self):
+        pygame.event.post(KILL)
+        if self.jumpscare is not None:
+            self.jumpscare.activate()
 
     def update_aggression(self, delta: int) -> None:
         self._aggression = max(min(self._aggression + delta, 20), 0)
@@ -68,21 +78,26 @@ class ThePuppet(Animatronic):
         self._music_box_time = 0
         self._game = game
         self._camera = game.systems['Cams System'].camera_list[5]
-        self._timer = pygame.USEREVENT + PUPPET_TIMER
         self._camera.add_button()
 
-    def start(self):
-        pygame.time.set_timer(self._timer, (25 - self._aggression) * 500)
+    def start(self) -> None:
+        pygame.time.set_timer(PUPPET_TIMER, (20 - self._aggression) * 500)
         self._music_box_time = self.MAX_MUSIC_TIME
 
+    def stop(self) -> None:
+        pygame.time.set_timer(PUPPET_TIMER, 0)
+
     def tick(self, event: pygame.event.Event) -> None:
-        if event.type == self._timer:
+        if event.type == PUPPET_TIMER:
             if self._game.utils['GMB'].active:
                 self.add_time(self._game.utils["GMB"].puppet_amount)
             elif self._charging:
                 self.add_time(self.CHARGE_AMOUNT)
             else:
                 self.subtract_time(10)
+        if self._music_box_time <= 0:
+            pygame.time.delay(random.randint(1000, 3000))
+            self.kill()
 
     def stop_charge(self):
         self._charging = False
@@ -100,29 +115,44 @@ class ThePuppet(Animatronic):
 class Bonnie(Animatronic):
     def __init__(self, game: Game, difficulty: int):
         super().__init__('Bonnie', difficulty)
-        self.MOVEMENT_TIMER = 15
         self.OFFICE_LOCATION = 5
-        self._timer = pygame.USEREVENT + self.MOVEMENT_TIMER
+        self._office = game.office
         self._cameras = game.systems["Cams System"].camera_list
-        self._location = 0
-        self._kill_primed = False
+        self._location = -1
+        self._kill_locked = False
         self._camera_key, self._movement_key = self.load_data(('cameras', 'movements'))
+        self.movement_timer = 5100
 
     def start(self) -> None:
-        pygame.time.set_timer(self._timer, self.MOVEMENT_TIMER * 1000)
+        pygame.time.set_timer(BONNIE_TIMER, self.movement_timer)
         self._location = 0
 
+    def stop(self) -> None:
+        pygame.time.set_timer(BONNIE_TIMER, 0)
+        self._location = -1
+
     def tick(self, event: pygame.event.Event) -> None:
-        if event.type == self._timer:
-            rng = random.randint(0, 20)
-            if self._location == self.OFFICE_LOCATION and rng < self._aggression + 5:
-                self._kill_primed = True
-            elif rng < self._aggression:
+        if event.type == BONNIE_TIMER:
+            if self._kill_locked:
+                self.kill()
+            # Movement Opportunities
+            rng = random.randint(1, 20)
+            if self._location == self.OFFICE_LOCATION and rng < self._aggression:
+                # Get whether door is closed
+                if self._office.door_left:
+                    self.blocked()
+                else:
+                    self._office.lock()
+                    self._kill_locked = True
+                    pygame.time.set_timer(BONNIE_TIMER, random.randint(15000, 25000))
+            elif rng <= self._aggression:
                 self.move()
-        if event.type == pygame.USEREVENT + CAMERA_FLIPPED_UP and self._kill_primed:
-            pygame.event.post(pygame.USEREVENT + KILL)
-        # no logic for putting Bonnie back after you close door
-        # need door logic stored somewhere in game object
+        if event.type == CAMERA_FLIPPED_UP and self._kill_locked:
+            self.kill()
+
+    def blocked(self):
+        self._kill_locked = False
+        self._location = random.randint(0, 1)
 
     def move(self) -> None:
         movements = self._movement_key
@@ -130,14 +160,18 @@ class Bonnie(Animatronic):
         self._location = moves[random.randint(0, len(moves)-1)]
 
     def draw(self, screen) -> None:
-        camera_location = self._get_cam_index_from_location()
-        camera = self._cameras[camera_location]
-        if camera.active:
-            screen.blit(self._get_image)
+        if self._location == self.OFFICE_LOCATION:
+            if self._office.active:
+                screen.blit(self._get_image())
+        else:
+            camera_location = self._get_cam_index_from_location()
+            camera = self._cameras[camera_location]
+            if camera.active:
+                screen.blit(self._get_image())
 
     # Some sort of dictionary with all the images and stages that bonnie possesses
     def _get_image(self) -> any:
-        pass
+        return pygame.image.load('resources/sprites/animatronics/bonnie/bonnie' + str(self._location)).convert_alpha()
 
     def _get_cam_index_from_location(self) -> int:
         cameras = self._camera_key

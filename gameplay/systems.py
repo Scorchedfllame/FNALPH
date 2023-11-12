@@ -1,6 +1,8 @@
 import json
 from .game import Game
 from .buttons import Button
+from .animatronics import Animatronic
+import pygame
 
 
 class System:
@@ -14,6 +16,7 @@ class Camera:
     def __init__(self, name: str, background_path: str):
         self.name = name
         self.background_path = background_path
+        self.background = pygame.image.load(self.background_path).convert()
         self.active = False
         self._buttons = []
         self._shocked = False
@@ -29,6 +32,11 @@ class Camera:
         self._shocked = True
         game.global_update()
         self._shocked = False
+
+    def draw(self, screen, animatronics: list[Animatronic]) -> None:
+        screen.blit(self.background)
+        for animatronic in animatronics:
+            animatronic.draw(screen)
 
 
 class Cameras(System):
@@ -54,6 +62,11 @@ class Cameras(System):
     def activate_camera(self, camera_index: int):
         self.disable_cameras()
         self._camera_list[camera_index].active = True
+
+    def draw_cameras(self, screen, game):
+        for camera in self._camera_list:
+            if camera.active:
+                camera.draw(screen, game.animatronics)
 
 
 class Vents(System):
