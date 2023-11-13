@@ -22,7 +22,7 @@ def main():
                 x_pos = 0
 
         screen.fill('black')
-        screen.blit(test_surface,(x_pos,0))
+        screen.blit(test_surface, (x_pos, 0))
         x_pos += 4
 
         pygame.display.update()

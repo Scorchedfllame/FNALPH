@@ -4,8 +4,11 @@
     "image_path": "resourcs/sprites/animatronics/puppet.png"
   },
   "Bonnie": {
-    "description": "Comes at you from the right side of the school.",
-    "image_path": "resources/sprites/animatronics/bonnie.png",
+    "menu_label": {
+      "description": "Comes at you from the right side of the school.",
+      "image_path": "resources/sprites/animatronics/bonnie.png"
+    },
+
     "cameras": {
       "0": 1,
       "1": 2,

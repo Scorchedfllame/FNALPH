@@ -25,12 +25,29 @@ class Jumpscare:
         pass
 
 
+class MenuLabel:
+    """
+    The thing being affected when using custom night functionality.
+    """
+    def __init__(self, name: str, difficulty: int, description: str, image_path: str, can_edit: bool = True):
+        self.name = name
+        self._difficulty = difficulty
+        self.description = description
+        self.image_path = image_path
+        self.can_edit = can_edit
+
+
 class Animatronic:
+    """
+    General class for all animatronics.
+    Creating from this will make an empty animatronic with no functionality.
+    """
     def __init__(self, name: str, difficulty: int, jumpscare: Jumpscare = None):
         self.name = name
         self._difficulty = difficulty
         self._aggression = self._difficulty
-        self.description, self.image_path = self.load_data(('description', 'image_path'))
+        description, image_path = self.load_data(('description', 'image_path'))
+        self.menu_label = MenuLabel(self.name, self._difficulty, description, image_path)
         self.jumpscare = jumpscare
 
     def load_data(self, info: tuple) -> tuple:
@@ -113,6 +130,9 @@ class ThePuppet(Animatronic):
 
 
 class Bonnie(Animatronic):
+    """
+    Starts in the lunchroom, moves around the left side and attacks at the left door.
+    """
     def __init__(self, game: Game, difficulty: int):
         super().__init__('Bonnie', difficulty)
         self.OFFICE_LOCATION = 5
@@ -147,7 +167,7 @@ class Bonnie(Animatronic):
                     pygame.time.set_timer(BONNIE_TIMER, random.randint(15000, 25000))
             elif rng <= self._aggression:
                 self.move()
-        if event.type == CAMERA_FLIPPED_UP and self._kill_locked:
+        if event.type == CAMERA_FLIPPED_DOWN and self._kill_locked:
             self.kill()
 
     def blocked(self):
