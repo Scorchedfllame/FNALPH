@@ -10,7 +10,7 @@ def main():
     clock = pygame.time.Clock()
     test_surface = pygame.image.load('resources/backgrounds/offices/test.png').convert()
     jumpscare_timer = pygame.USEREVENT + 1
-    pygame.time.set_timer(jumpscare_timer, 1000)
+    pygame.time.set_timer(jumpscare_timer, 4000)
     x_pos = 0
 
     while True:
@@ -23,7 +23,7 @@ def main():
 
         screen.fill('black')
         screen.blit(test_surface, (x_pos, 0))
-        x_pos += 4
+        x_pos += 1
 
         pygame.display.update()
         clock.tick(60)
