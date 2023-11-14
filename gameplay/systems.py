@@ -19,7 +19,13 @@ class Camera:
         self.background = pygame.image.load(self.background_path).convert()
         self.active = False
         self._buttons = []
-        self._shocked = False
+
+    @classmethod
+    def generate_cameras(cls, cameras: list) -> list:
+        final = []
+        for name, background_path in cameras:
+            final.append(cls(name, background_path))
+        return final
 
     @property
     def buttons(self):
@@ -27,11 +33,6 @@ class Camera:
 
     def add_button(self, button: Button):
         self._buttons.append(button)
-
-    def shock(self, game: Game):
-        self._shocked = True
-        game.global_update()
-        self._shocked = False
 
     def draw(self, screen, animatronics: list[Animatronic]) -> None:
         screen.blit(self.background)
@@ -42,18 +43,20 @@ class Camera:
 class Cameras(System):
     def __init__(self):
         super().__init__("Cams System", 'resources/background/test.png')
-        self._camera_list = Cameras.load_cameras('Appdata/GameData/cameras.json')
+        self._camera_list = Camera.generate_cameras(self.load_data('objects'))
         self.enabled = True
         self.active = False
+        camera_buttons = self.load_data('Camera_Buttons')
+        camera_font = pygame.font.Font('arial', 32)
+        for i in range(len(self._camera_list)):
+            text = camera_font.render(self._camera_list[i].name, True, 'white')
+            self.buttons.append(Button(text, tuple(camera_buttons['Positions'][str(i)])))
 
     @staticmethod
-    def load_cameras(load_path: str) -> list[Camera]:
-        cameras = []
-        with open(load_path, 'r') as f:
+    def load_data(data: str) -> any:
+        with open('Appdata/GameData/cameras.json', 'r') as f:
             cameras_list = json.load(f)
-            for camera in cameras_list:
-                cameras.append(Camera(camera[0], camera[1]))
-            return cameras
+            return cameras_list[data]
 
     def disable_cameras(self):
         for camera in self._camera_list:
@@ -63,10 +66,18 @@ class Cameras(System):
         self.disable_cameras()
         self._camera_list[camera_index].active = True
 
-    def draw_cameras(self, screen, game):
+    def draw_cameras(self, game):
         for camera in self._camera_list:
             if camera.active:
-                camera.draw(screen, game.animatronics)
+                camera.draw(game.animatronics)
+        for button in self.buttons:
+            button.draw()
+
+    def tick(self, event: pygame.event.Event):
+        if self.active:
+            self.draw_cameras()
+            for button in self.buttons:
+                button.tick(event)
 
 
 class Vents(System):
