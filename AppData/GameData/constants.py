@@ -10,6 +10,7 @@ BONNIE_TIMER = pygame.USEREVENT + 5
 #   General
 CAMERA_FLIPPED_UP = pygame.USEREVENT + 3
 CAMERA_FLIPPED_DOWN = pygame.USEREVENT + 4
+ACTIVATE_CAMERA = pygame.USEREVENT + 8
 
 #   Game States
 KILL = pygame.USEREVENT + 2
