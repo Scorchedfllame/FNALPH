@@ -1,5 +1,4 @@
 import json
-from .game import Game
 from AppData.GameData.constants import *
 import pygame
 import random
@@ -86,7 +85,7 @@ class Animatronic:
 
 
 class ThePuppet(Animatronic):
-    def __init__(self, game: Game, difficulty: int):
+    def __init__(self, game: any, difficulty: int):
         super().__init__("The Puppet", difficulty)
         self.CHARGE_AMOUNT = 20
         self.MAX_MUSIC_TIME = 100
@@ -133,7 +132,7 @@ class Bonnie(Animatronic):
     """
     Starts in the lunchroom, moves around the left side and attacks at the left door.
     """
-    def __init__(self, game: Game, difficulty: int):
+    def __init__(self, game: any, difficulty: int):
         super().__init__('Bonnie', difficulty)
         self.OFFICE_LOCATION = 5
         self._office = game.office
@@ -179,15 +178,16 @@ class Bonnie(Animatronic):
         moves = movements[str(self._location)]
         self._location = moves[random.randint(0, len(moves)-1)]
 
-    def draw(self, screen) -> None:
+    def draw(self) -> None:
+        screen = pygame.display.get_surface()
         if self._location == self.OFFICE_LOCATION:
             if self._office.active:
-                screen.blit(self._get_image())
+                screen.blit(self._get_image(), (0, 0))
         else:
             camera_location = self._get_cam_index_from_location()
             camera = self._cameras[camera_location]
             if camera.active:
-                screen.blit(self._get_image())
+                screen.blit(self._get_image(), (0, 0))
 
     # Some sort of dictionary with all the images and stages that bonnie possesses
     def _get_image(self) -> any:
