@@ -3,6 +3,7 @@ from .systems import Cameras, Vents
 from AppData.GameData.constants import *
 from .buttons import *
 import pygame
+from AppData.GameData.constants import *
 
 
 class Game:
@@ -16,6 +17,10 @@ class Game:
         self.office = Office()
         self._win = False
         self._killed = False
+        self.power = 100
+        self.power_remaining = 10000
+        self.power_usage = 1
+        self.POWER_DIFFICULTY = 7
         self.events = self.init_events()
         self.init_buttons()
 
@@ -34,7 +39,13 @@ class Game:
         self.buttons.append(camera_flick)
 
     def start(self):
-        pass
+        pygame.time.set_timer(UPDATE_POWER, 1000)
+
+    def update_power(self):
+        self.power_remaining -= self.POWER_DIFFICULTY * (2 ** self.power_usage)
+        self.power = round(self.power_remaining / 100)
+        if self.power_remaining <= 0:
+            pygame.event.post(BLACKOUT)
 
     def global_tick(self, event: pygame.event.Event):
         if event.type == pygame.QUIT:
@@ -46,6 +57,8 @@ class Game:
             system.tick(event)
         for button in self.buttons:
             button.tick()
+        if event.type == UPDATE_POWER:
+            self.update_power()
 
     def global_draw(self):
         for system in self.systems.values():
