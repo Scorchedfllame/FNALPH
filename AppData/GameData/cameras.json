@@ -1,0 +1,14 @@
+{
+  "Camera_Buttons": {
+    "Positions": {
+      "0": [120, 150],
+      "1": [210, 240]
+    }
+  },
+  "objects": [
+    ["Lunchroom",
+    "resources/backgrounds/cameras/lunchroom.png"],
+    ["Hallway",
+    "resources/backgrounds/cameras/hallway.png"]
+  ]
+}
