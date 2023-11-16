@@ -46,6 +46,7 @@ class Cameras(System):
         self.enabled = True
         self.active = False
         self._last_camera = 0
+        self.buttons = []
         self.generate_buttons()
         self.activate_camera_event = pygame.event.Event(ACTIVATE_CAMERA)
 
@@ -102,8 +103,6 @@ class Cameras(System):
             self.deactivate()
         if event.type == CAMERA_FLIPPED_UP:
             self.activate()
-        if event.type == ACTIVATE_CAMERA:
-            self.activate_camera()
         for button in self.buttons:
             button.tick(event)
 

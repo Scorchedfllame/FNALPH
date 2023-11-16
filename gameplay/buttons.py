@@ -1,12 +1,11 @@
 import pygame
-from typing import Callable
 
 
 class Button:
     def __init__(self, base: pygame.Rect | pygame.surface.Surface,
                  pos: tuple[int, int] = None,
-                 activate: pygame.event.Event | Callable = None,
-                 deactivate: pygame.event.Event | Callable = None,
+                 activate: any = None,
+                 deactivate: any = None,
                  draw_type: str = None,
                  **kwargs):
         if type(base) == pygame.Rect:
@@ -29,20 +28,19 @@ class Button:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos):
                 if self.activate is not None:
-                    if activate_type == Callable:
-                        self.activate(**self.kwargs)
-                    elif activate_type == pygame.event.Event:
+                    if activate_type == pygame.event.Event:
                         pygame.event.post(self.activate)
+                    else:
+                        self.activate(**self.kwargs)
         if event.type == pygame.MOUSEBUTTONUP:
             if not self.rect.collidepoint(event.pos):
                 if self.deactivate is not None:
-                    if deactivate_type == Callable:
-                        self.deactivate(**self.kwargs)
-                    elif deactivate_type == pygame.event.Event:
+                    if deactivate_type == pygame.event.Event:
                         pygame.event.post(self.deactivate)
+                    else:
+                        self.deactivate(**self.kwargs)
 
     def draw(self):
-        print('draw')
         if self.surface:
             if self.draw_type is not None:
                 try:
@@ -56,8 +54,8 @@ class Button:
 class Flick(Button):
     def __init__(self, base: pygame.Rect | pygame.surface.Surface,
                  pos: tuple[int, int] = None,
-                 activate: Callable | pygame.event.Event = None,
-                 deactivate: Callable | pygame.event.Event = None,
+                 activate: any = None,
+                 deactivate: any = None,
                  **kwargs):
         super().__init__(base, pos=pos, **kwargs)
         self.activate = activate
@@ -74,16 +72,16 @@ class Flick(Button):
             if self.rect.collidepoint(event.pos):
                 if self.mouse_y < pygame.mouse.get_pos()[1] and not self.activated:
                     if not self.hovering:
-                        if activate_type == Callable:
-                            self.activate(**self.kwargs)
-                        elif activate_type == pygame.event.Event:
+                        if activate_type == pygame.event.Event:
                             pygame.event.post(self.activate)
+                        else:
+                            self.activate(**self.kwargs)
                         self.hovering = True
                     else:
-                        if deactivate_type == Callable:
-                            self.deactivate(**self.kwargs)
-                        elif deactivate_type == pygame.event.Event:
+                        if deactivate_type == pygame.event.Event:
                             pygame.event.post(self.deactivate)
+                        else:
+                            self.deactivate(**self.kwargs)
                         self.hovering = False
                     self.activated = True
             else:

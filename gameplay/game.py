@@ -1,7 +1,7 @@
-from .office import Office
-from .systems import Cameras, Vents
+from gameplay.office import Office
+from gameplay.systems import Cameras, Vents
 from AppData.GameData.constants import *
-from .buttons import *
+from gameplay.buttons import *
 import pygame
 from AppData.GameData.constants import *
 
@@ -35,7 +35,7 @@ class Game:
         camera_flick = Flick(flick_button,
                              (300, 400),
                              self.events['camera_up_event'],
-                             self.events['camera_down_events'])
+                             self.events['camera_down_event'])
         self.buttons.append(camera_flick)
 
     def start(self):
@@ -56,7 +56,7 @@ class Game:
         for system in self.systems.values():
             system.tick(event)
         for button in self.buttons:
-            button.tick()
+            button.tick(event)
         if event.type == UPDATE_POWER:
             self.update_power()
 
