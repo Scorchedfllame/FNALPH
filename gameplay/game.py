@@ -47,6 +47,10 @@ class Game:
         if self.power_remaining <= 0:
             pygame.event.post(BLACKOUT)
 
+    def tick(self, event: pygame.event.Event):
+        if event.type == UPDATE_POWER:
+            self.update_power()
+
     def global_tick(self, event: pygame.event.Event):
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -57,10 +61,11 @@ class Game:
             system.tick(event)
         for button in self.buttons:
             button.tick(event)
-        if event.type == UPDATE_POWER:
-            self.update_power()
+        self.office.tick(event)
+        self.tick(event)
 
     def global_draw(self):
+        self.office.draw()
         for system in self.systems.values():
             system.draw()
         for animatronic in self.animatronics:
