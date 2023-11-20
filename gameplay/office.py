@@ -21,7 +21,7 @@ class Office:
     def draw(self):
         if self.active:
             screen = pygame.display.get_surface()
-            screen.blit(pygame.image.load('resources/backgrounds/offices/test.png').convert(), (0, 0))
+            screen.blit(pygame.image.load('resources/backgrounds/offices/office.png').convert(), (0, 0))
 
     def lock(self):
         self._locked = True

@@ -32,6 +32,7 @@ class Game:
 
     def init_buttons(self):
         flick_button = pygame.image.load('resources/ui/flick.png').convert_alpha()
+        pygame.transform.scale(flick_button, 2, flick_button)
         camera_flick = Flick(flick_button,
                              (300, 400),
                              self.events['camera_up_event'],

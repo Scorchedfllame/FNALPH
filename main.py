@@ -1,4 +1,3 @@
-import pygame
 from sys import exit
 from gameplay import *
 
