@@ -4,7 +4,7 @@ from gameplay import *
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((1080, 720))
+    screen = pygame.display.set_mode((1920, 1080))
     pygame.display.set_caption('Five Nights At Lone Peak')
     clock = pygame.time.Clock()
     test_surface = pygame.image.load('resources/backgrounds/offices/test.png').convert()

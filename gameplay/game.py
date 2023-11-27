@@ -31,12 +31,14 @@ class Game:
         return {"camera_up_event": camera_up_event, "camera_down_event": camera_down_event}
 
     def init_buttons(self):
+        screen = pygame.display.get_surface()
         flick_button = pygame.image.load('resources/ui/flick.png').convert_alpha()
-        pygame.transform.scale(flick_button, 2, flick_button)
+        flick_button = pygame.transform.scale(flick_button, (600, 100))
         camera_flick = Flick(flick_button,
-                             (300, 400),
+                             (int(screen.get_size()[0]/4), (screen.get_size()[1]) - 100),
                              self.events['camera_up_event'],
-                             self.events['camera_down_event'])
+                             self.events['camera_down_event'],
+                             draw_type='center')
         self.buttons.append(camera_flick)
 
     def start(self):

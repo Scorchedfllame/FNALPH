@@ -1,5 +1,5 @@
 import json
-from .buttons import Button
+from .buttons import Button, CameraButton
 from .animatronics import Animatronic
 from AppData.GameData.constants import *
 import pygame
@@ -31,6 +31,12 @@ class Camera:
     def buttons(self):
         return self._buttons
 
+    def activate(self):
+        self.active = True
+
+    def deactivate(self):
+        self.active = False
+
     def add_button(self, button: Button):
         self._buttons.append(button)
 
@@ -47,6 +53,8 @@ class Cameras(System):
         self.active = False
         self._last_camera = 0
         self.buttons = []
+        self.active_icons = []
+        self.inactive_icons = []
         self.generate_buttons()
         self.activate_camera_event = pygame.event.Event(ACTIVATE_CAMERA)
 
@@ -58,11 +66,15 @@ class Cameras(System):
 
     def generate_buttons(self):
         camera_buttons = self.load_data('Camera_Buttons')
+        for i in camera_buttons["Icons"].keys():
+            self.active_icons.append(camera_buttons['Icons'][i]["Active"])
+            self.inactive_icons.append(camera_buttons["Icons"][i]["Deactivate"])
         camera_font = pygame.font.SysFont('Arial', 32)
         for i in range(len(self._camera_list)):
             text = camera_font.render(self._camera_list[i].name, True, 'white')
             pos = tuple(camera_buttons['Positions'][str(i)])
-            self.buttons.append(Button(text,
+            icon = pygame.image.load(self.inactive_icons[i]).convert()
+            self.buttons.append(CameraButton(icon,
                                 pos,
                                 self.activate_camera,
                                 camera_index=i))
@@ -78,7 +90,7 @@ class Cameras(System):
 
     def disable_cameras(self):
         for camera in self._camera_list:
-            camera.active = False
+            camera.deactivate()
 
     def get_active_camera(self):
         for i in range(len(self._camera_list)):
@@ -88,7 +100,8 @@ class Cameras(System):
     def activate_camera(self, camera_index: int):
         self.disable_cameras()
         camera = self._camera_list[camera_index]
-        camera.active = True
+        camera.activate()
+        camera.surface =
         self._last_camera = camera_index
 
     def draw(self):

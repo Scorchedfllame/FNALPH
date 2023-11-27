@@ -3,7 +3,7 @@ import pygame
 
 class Button:
     def __init__(self, base: pygame.Rect | pygame.surface.Surface,
-                 pos: tuple[int, int] = None,
+                 pos: tuple[int, int],
                  activate: any = None,
                  deactivate: any = None,
                  draw_type: str = None,
@@ -14,10 +14,12 @@ class Button:
         elif type(base) == pygame.surface.Surface:
             self.rect = base.get_rect()
             self.surface = base
-        if pos is not None:
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
+        if draw_type is not None:
+            pos = self.rect.__getattribute__(draw_type)
             self.rect.x = pos[0]
             self.rect.y = pos[1]
-        self.draw_type = draw_type
         self.activate = activate
         self.deactivate = deactivate
         self.kwargs = kwargs
@@ -42,13 +44,7 @@ class Button:
 
     def draw(self):
         if self.surface:
-            if self.draw_type is not None:
-                try:
-                    pygame.display.get_surface().blit(self.surface, self.rect.__getattribute__(self.draw_type))
-                except TypeError:
-                    pass
-            else:
-                pygame.display.get_surface().blit(self.surface, self.rect)
+            pygame.display.get_surface().blit(self.surface, self.rect)
 
 
 class Flick(Button):
@@ -87,3 +83,17 @@ class Flick(Button):
             else:
                 self.activated = False
             self.mouse_y = event.pos[1]
+
+
+class CameraButton(Button):
+    def __init__(self, base: pygame.Rect | pygame.surface.Surface,
+                 pos: tuple[int, int],
+                 active_icon_path: str,
+                 inactive_icon_path: str,
+                 activate: any = None,
+                 deactivate: any = None,
+                 draw_type: str = None,
+                 **kwargs):
+        super().__init__(self, base, pos, activate, deactivate, draw_type, **kwargs)
+
+    def draw(self):
