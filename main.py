@@ -11,11 +11,7 @@ def main():
     game = Game()
 
     while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            game.global_tick(event)
+        game.global_tick()
 
         screen.fill('black')
         game.global_draw()

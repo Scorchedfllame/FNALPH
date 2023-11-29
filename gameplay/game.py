@@ -54,18 +54,23 @@ class Game:
         if event.type == UPDATE_POWER:
             self.update_power()
 
-    def global_tick(self, event: pygame.event.Event):
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit(0)
-        for animatronic in self.update_animatronics:
-            animatronic.tick(event)
-        for system in self.systems.values():
-            system.tick(event)
-        for button in self.buttons:
-            button.tick(event)
-        self.office.tick(event)
-        self.tick(event)
+    def global_tick(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit(0)
+            for animatronic in self.update_animatronics:
+                animatronic.tick(event)
+            for system in self.systems.values():
+                system.tick(event)
+            for button in self.buttons:
+                button.tick(event)
+            self.office.tick(event)
+            self.tick(event)
+        self.office.frame()
 
     def global_draw(self):
         self.office.draw()

@@ -1,5 +1,6 @@
 import pygame
 from AppData.GameData.constants import *
+import random
 
 
 class Office:
@@ -13,7 +14,7 @@ class Office:
         self.image = pygame.image.load('resources/backgrounds/offices/office.png').convert()
         self.image = pygame.transform.scale_by(self.image, self.IMAGE_SCALE_SIZE)
         self.surface = pygame.surface.Surface(self.image.get_size())
-        self.rot_x = 45
+        self.rot_x = 0
         self.MAX_ROTATION = 45
         self.active = True
         self._locked = False
@@ -23,6 +24,21 @@ class Office:
             self.active = False
         if event.type == CAMERA_FLIPPED_DOWN:
             self.active = True
+
+    def frame(self):
+        if self.active:
+            self.rot_x += self.get_rot_from_mouse(pygame.mouse.get_pos())
+            self.rot_x = max(-self.MAX_ROTATION, self.rot_x)
+            self.rot_x = min(self.MAX_ROTATION, self.rot_x)
+
+    @staticmethod
+    def get_rot_from_mouse(mouse_pos):
+        mouse_x, _ = mouse_pos
+        screen_x, _ = pygame.display.get_surface().get_size()
+        normalized = (2 * mouse_x/screen_x - 1)
+        if screen_x * 2/5 > mouse_x or mouse_x > screen_x * 3/5:
+            return normalized * 5
+        return 0
 
     def get_pos_from_rot(self):
         screen_x, _ = pygame.display.get_surface().get_size()

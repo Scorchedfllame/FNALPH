@@ -18,6 +18,9 @@ class Camera:
         self.background_path = background_path
         self.background = pygame.image.load(self.background_path).convert()
         self.active = False
+        self.font = pygame.sysfont.SysFont('Arial', 30)
+        self.font_color = 'White'
+        self.FONT_POS = (200, 300)
         self._buttons = []
 
     @classmethod
@@ -42,21 +45,30 @@ class Camera:
 
     def draw(self) -> None:
         if self.active:
-            pygame.display.get_surface().blit(self.background, (0, 10))
+            screen = pygame.display.get_surface()
+            screen.blit(self.background, (0, 10))
+            text = self.font.render(self.name, True, self.font_color)
+            screen.blit(text, self.FONT_POS)
 
 
 class Cameras(System):
     def __init__(self):
         super().__init__("Cams System", 'resources/background/test.png')
         self._camera_list = Camera.generate_cameras(self.load_data('Camera_Buttons')['objects'])
+        self.font = pygame.font.SysFont('Arial', 32)
         self.enabled = True
         self.active = False
         self._last_camera = 0
-        self.buttons = []
         self.active_icons = []
         self.inactive_icons = []
         self.generate_buttons()
         self.activate_camera_event = pygame.event.Event(ACTIVATE_CAMERA)
+
+    def load_camera_buttons(self, data):
+        icons = data["Icons"]
+        for icon in icons:
+            self.active_icons.append(pygame.image.load(icon['Active']).convert())
+            self.inactive_icons.append(pygame.image.load(icon['Inactive']).convert())
 
     @staticmethod
     def load_data(data: str) -> any:
@@ -66,14 +78,10 @@ class Cameras(System):
 
     def generate_buttons(self):
         camera_buttons = self.load_data('Camera_Buttons')
-        for i in camera_buttons["Icons"].keys():
-            self.active_icons.append(camera_buttons['Icons'][i]["Active"])
-            self.inactive_icons.append(camera_buttons["Icons"][i]["Deactivate"])
-        camera_font = pygame.font.SysFont('Arial', 32)
+        self.load_camera_buttons(camera_buttons)
         for i in range(len(self._camera_list)):
-            text = camera_font.render(self._camera_list[i].name, True, 'white')
             pos = tuple(camera_buttons['Positions'][str(i)])
-            icon = pygame.image.load(self.inactive_icons[i]).convert()
+            icon = pygame.transform.scale_by(self.inactive_icons[i], .5)
             self.buttons.append(Button(icon,
                                 pos,
                                 self.activate_camera,
@@ -90,7 +98,7 @@ class Cameras(System):
 
     def disable_cameras(self):
         for i, camera in enumerate(self._camera_list):
-            self.buttons[i].surface = self.inactive_icons[i]
+            self.buttons[i].change_surface(self.inactive_icons[i])
             camera.deactivate()
 
     def get_active_camera(self):
@@ -101,7 +109,7 @@ class Cameras(System):
     def activate_camera(self, camera_index: int):
         self.disable_cameras()
         camera = self._camera_list[camera_index]
-        self.buttons[camera_index].surface = self.active_icons[camera_index]
+        self.buttons[camera_index].change_surface(self.active_icons[camera_index])
         camera.activate()
         self._last_camera = camera_index
 

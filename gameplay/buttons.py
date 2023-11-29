@@ -24,6 +24,9 @@ class Button:
         self.deactivate = deactivate
         self.kwargs = kwargs
 
+    def change_surface(self, surface: pygame.surface.Surface):
+        self.surface = pygame.transform.scale(surface, self.rect.size)
+
     def tick(self, event: pygame.event.Event):
         activate_type = type(self.activate)
         deactivate_type = type(self.deactivate)

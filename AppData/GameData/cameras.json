@@ -10,12 +10,15 @@
         240
       ]
     },
-    "Icons": {
-      "0": {
+    "Icons": [{
         "Active": "resources/ui/buttons/camera_icons/active/1a.png",
-        "Deactivate": "resources/ui/buttons/camera_icons/deactivate/1a.png"
+        "Inactive": "resources/ui/buttons/camera_icons/deactive/1a.png"
+      },
+      {
+        "Active": "resources/ui/buttons/camera_icons/active/1b.png",
+        "Inactive": "resources/ui/buttons/camera_icons/deactive/1b.png"
       }
-    },
+    ],
     "objects": [
       [
         "Lunchroom",
