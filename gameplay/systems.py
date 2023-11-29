@@ -1,5 +1,5 @@
 import json
-from .buttons import Button, CameraButton
+from .buttons import Button
 from .animatronics import Animatronic
 from AppData.GameData.constants import *
 import pygame
@@ -48,7 +48,7 @@ class Camera:
 class Cameras(System):
     def __init__(self):
         super().__init__("Cams System", 'resources/background/test.png')
-        self._camera_list = Camera.generate_cameras(self.load_data('objects'))
+        self._camera_list = Camera.generate_cameras(self.load_data('Camera_Buttons')['objects'])
         self.enabled = True
         self.active = False
         self._last_camera = 0
@@ -74,7 +74,7 @@ class Cameras(System):
             text = camera_font.render(self._camera_list[i].name, True, 'white')
             pos = tuple(camera_buttons['Positions'][str(i)])
             icon = pygame.image.load(self.inactive_icons[i]).convert()
-            self.buttons.append(CameraButton(icon,
+            self.buttons.append(Button(icon,
                                 pos,
                                 self.activate_camera,
                                 camera_index=i))
@@ -89,7 +89,8 @@ class Cameras(System):
         self.disable_cameras()
 
     def disable_cameras(self):
-        for camera in self._camera_list:
+        for i, camera in enumerate(self._camera_list):
+            self.buttons[i].surface = self.inactive_icons[i]
             camera.deactivate()
 
     def get_active_camera(self):
@@ -100,13 +101,13 @@ class Cameras(System):
     def activate_camera(self, camera_index: int):
         self.disable_cameras()
         camera = self._camera_list[camera_index]
+        self.buttons[camera_index].surface = self.active_icons[camera_index]
         camera.activate()
-        camera.surface =
         self._last_camera = camera_index
 
     def draw(self):
         if self.active:
-            for camera in self._camera_list:
+            for i, camera in enumerate(self._camera_list):
                 camera.draw()
             for button in self.buttons:
                 button.draw()

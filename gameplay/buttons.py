@@ -83,17 +83,3 @@ class Flick(Button):
             else:
                 self.activated = False
             self.mouse_y = event.pos[1]
-
-
-class CameraButton(Button):
-    def __init__(self, base: pygame.Rect | pygame.surface.Surface,
-                 pos: tuple[int, int],
-                 active_icon_path: str,
-                 inactive_icon_path: str,
-                 activate: any = None,
-                 deactivate: any = None,
-                 draw_type: str = None,
-                 **kwargs):
-        super().__init__(self, base, pos, activate, deactivate, draw_type, **kwargs)
-
-    def draw(self):
