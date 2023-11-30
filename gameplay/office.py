@@ -19,6 +19,13 @@ class Office:
         self.active = True
         self._locked = False
 
+    def get_power_usage(self):
+        power_usage = 0
+        for i in [self.door_left, self.door_right, self.light_left, self.light_right]:
+            if i:
+                power_usage += 1
+        return power_usage
+
     def tick(self, event: pygame.event.Event):
         if event.type == CAMERA_FLIPPED_UP:
             self.active = False
