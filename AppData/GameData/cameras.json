@@ -1,0 +1,33 @@
+{
+  "Camera_Buttons": {
+    "Positions": {
+      "0": [
+        120,
+        150
+      ],
+      "1": [
+        210,
+        240
+      ]
+    },
+    "Icons": [{
+        "Active": "resources/ui/buttons/camera_icons/active/1a.png",
+        "Inactive": "resources/ui/buttons/camera_icons/deactive/1a.png"
+      },
+      {
+        "Active": "resources/ui/buttons/camera_icons/active/1b.png",
+        "Inactive": "resources/ui/buttons/camera_icons/deactive/1b.png"
+      }
+    ],
+    "objects": [
+      [
+        "Lunchroom",
+        "resources/backgrounds/cameras/lunchroom.png"
+      ],
+      [
+        "Hallway",
+        "resources/backgrounds/cameras/hallway.png"
+      ]
+    ]
+  }
+}
