@@ -33,13 +33,12 @@ class Game:
 
     def init_buttons(self):
         screen = pygame.display.get_surface()
-        flick_button = pygame.image.load('resources/ui/flick.png').convert_alpha()
-        flick_button = pygame.transform.scale(flick_button, (600, 100))
+        flick_button = pygame.image.load('resources/ui/buttons/camera_flick.png').convert_alpha()
         camera_flick = Flick(flick_button,
-                             (int(screen.get_size()[0]/4), (screen.get_size()[1]) - 100),
+                             (int(screen.get_width()/2), screen.get_height() - 100),
                              self.events['camera_up_event'],
                              self.events['camera_down_event'],
-                             draw_type='center')
+                             draw_type='midbottom')
         self.buttons.append(camera_flick)
 
     def start(self):
@@ -91,7 +90,7 @@ class Game:
         for animatronic in self.animatronics:
             animatronic.draw()
         for button in self.buttons:
-            button.draw()
+            button.draw(screen)
         self.draw_power(screen)
 
     def draw_power(self, screen):
@@ -101,7 +100,7 @@ class Game:
     def draw_power_usage(self, surface):
         print(self.power_usage)
         for i in range(self.power_usage):
-            pygame.draw.rect(surface, 'red', pygame.Rect(5*i + 5, surface.get_height() - 35, 15, 30))
+            pygame.draw.rect(surface, 'Green', pygame.Rect(5*i + 5, surface.get_height() - 35, 15, 30))
 
     def draw_power_percentage(self, surface):
         text = self.GLOBAL_FONT.render(str(self.power), True, 'White')

@@ -43,18 +43,18 @@ class Camera:
     def add_button(self, button: Button):
         self._buttons.append(button)
 
-    def draw(self) -> None:
+    def draw(self, surface) -> None:
         if self.active:
-            screen = pygame.display.get_surface()
-            screen.blit(self.background, (0, 10))
+            surface.blit(self.background, (0, 10))
             text = self.font.render(self.name, True, self.font_color)
-            screen.blit(text, self.FONT_POS)
+            surface.blit(text, self.FONT_POS)
 
 
 class Cameras(System):
     def __init__(self):
         super().__init__("Cams System", 'resources/background/test.png')
         self._camera_list = Camera.generate_cameras(self.load_data('Camera_Buttons')['objects'])
+        self.map_image = self.init_images()
         self.font = pygame.font.SysFont('Arial', 32)
         self.enabled = True
         self.active = False
@@ -63,6 +63,13 @@ class Cameras(System):
         self.inactive_icons = []
         self.generate_buttons()
         self.activate_camera_event = pygame.event.Event(ACTIVATE_CAMERA)
+
+    def init_images(self):
+        screen = pygame.display.get_surface()
+        map_image = pygame.image.load('resources/ui/map/map.png').convert_alpha()
+        scale_factor = Cameras.get_scaler(screen, map_image)
+        map_image = pygame.transform.scale_by(map_image, scale_factor)
+        return map_image
 
     def load_camera_buttons(self, data):
         icons = data["Icons"]
@@ -113,12 +120,23 @@ class Cameras(System):
         camera.activate()
         self._last_camera = camera_index
 
+    @staticmethod
+    def get_scaler(surface: pygame.Surface, rect: pygame.Surface | pygame.Rect):
+        return surface.get_width()/(2*rect.get_width())
+
+    def draw_map(self, surface: pygame.surface.Surface):
+        rect = self.map_image.get_rect()
+        rect.bottomright = surface.get_size()
+        surface.blit(self.map_image, rect)
+
     def draw(self):
         if self.active:
+            screen = pygame.display.get_surface()
             for i, camera in enumerate(self._camera_list):
-                camera.draw()
+                camera.draw(screen)
+            self.draw_map(screen)
             for button in self.buttons:
-                button.draw()
+                button.draw(screen)
 
     def tick(self, event: pygame.event.Event):
         if event.type == CAMERA_FLIPPED_DOWN:

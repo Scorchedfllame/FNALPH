@@ -6,9 +6,8 @@ class Button:
                  pos: tuple[int, int],
                  activate: any = None,
                  deactivate: any = None,
-                 draw_type: str = None,
+                 draw_type: str = "topleft",
                  **kwargs):
-
         if type(base) == pygame.Rect:
             self.rect = base
             self.surface = None
@@ -17,12 +16,7 @@ class Button:
             self.surface = base
         self.rect.x = pos[0]
         self.rect.y = pos[1]
-
-        if draw_type is not None:
-            pos = self.rect.__getattribute__(draw_type)
-            self.rect.x = pos[0]
-            self.rect.y = pos[1]
-
+        self.draw_type = draw_type
         self.activate = activate
         self.deactivate = deactivate
         self.kwargs = kwargs
@@ -50,9 +44,9 @@ class Button:
         if event.type == pygame.MOUSEBUTTONUP:
             self.check_deactivate(event)
 
-    def draw(self):
+    def draw(self, surface):
         if self.surface:
-            pygame.display.get_surface().blit(self.surface, self.rect)
+            surface.blit(self.surface, self.rect.__getattribute__(self.draw_type))
 
 
 class Flick(Button):
@@ -61,7 +55,7 @@ class Flick(Button):
                  activate: any = None,
                  deactivate: any = None,
                  **kwargs):
-        super().__init__(base, pos=pos, **kwargs)
+        super().__init__(base, pos, **kwargs)
         self.activate = activate
         self.deactivate = deactivate
         self.mouse_y = 0

@@ -15,7 +15,7 @@ class Office:
         self.image = pygame.transform.scale_by(self.image, self.IMAGE_SCALE_SIZE)
         self.surface = pygame.surface.Surface(self.image.get_size())
         self.rot_x = 0
-        self.MAX_ROTATION = 45
+        self.MAX_ROTATION = 90
         self.active = True
         self._locked = False
 
@@ -51,7 +51,7 @@ class Office:
         screen_x, _ = pygame.display.get_surface().get_size()
         image_x, _ = self.image.get_size()
         # normalization 0-1
-        normalized = (self.rot_x + 45)/90
+        normalized = (self.rot_x + self.MAX_ROTATION)/(2*self.MAX_ROTATION)
 
         # turn into other stuff
         return normalized * (screen_x - image_x)
