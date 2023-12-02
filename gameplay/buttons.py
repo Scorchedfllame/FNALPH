@@ -7,21 +7,31 @@ class Button:
                  activate: any = None,
                  deactivate: any = None,
                  draw_type: str = "topleft",
+                 scale: float = 1,
                  **kwargs):
-        if type(base) == pygame.Rect:
-            self.rect = base
-            self.surface = None
-        elif type(base) == pygame.surface.Surface:
-            self.rect = base.get_rect()
-            self.surface = base
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
+        self._base = base
+        self.scale = scale
+        self.base = base
+        self.rect = None
+        self.surface = None
         self.draw_type = draw_type
         self.activate = activate
         self.deactivate = deactivate
         self.kwargs = kwargs
+        self.resize(pos, scale)
+
+    def resize(self, pos: tuple[int, int], scale: float = 1):
+        self.base = pygame.transform.scale_by(self._base, scale)
+        if type(self.base) == pygame.Rect:
+            self.rect = self.base
+            self.surface = None
+        elif type(self.base) == pygame.surface.Surface:
+            self.rect = self.base.get_rect()
+            self.surface = self.base
+        self.rect.__setattr__(self.draw_type, pos)
 
     def change_surface(self, surface: pygame.surface.Surface):
+        self._base = surface
         self.surface = pygame.transform.scale(surface, self.rect.size)
 
     def check_type(self, action: any):
@@ -46,7 +56,7 @@ class Button:
 
     def draw(self, surface):
         if self.surface:
-            surface.blit(self.surface, self.rect.__getattribute__(self.draw_type))
+            surface.blit(self.surface, self.rect)
 
 
 class Flick(Button):

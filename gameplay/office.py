@@ -44,7 +44,7 @@ class Office:
         screen_x, _ = pygame.display.get_surface().get_size()
         normalized = (2 * mouse_x/screen_x - 1)
         if screen_x * 2/5 > mouse_x or mouse_x > screen_x * 3/5:
-            return normalized * 5
+            return normalized * 10
         return 0
 
     def get_pos_from_rot(self):

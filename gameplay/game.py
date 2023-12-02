@@ -1,8 +1,6 @@
 from gameplay.office import Office
-from gameplay.systems import Cameras, Vents
-from AppData.GameData.constants import *
+from gameplay.systems import Cameras
 from gameplay.buttons import *
-import pygame
 from AppData.GameData.constants import *
 
 
@@ -14,11 +12,11 @@ class Game:
         self.power_usage = 1
         self.utils = {}
         self.animatronics = []
-        self.update_animatronics = []
         self.systems = {"Cameras": Cameras()}
         self.buttons = []
         self.POWER_DIFFICULTY = 7
-        self.GLOBAL_FONT = pygame.font.SysFont('Arial', 30, True)
+        self.GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 55)
+        self.BIGGER_GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
         self.office = Office()
         self.events = self.init_events()
         self.init_buttons()
@@ -35,10 +33,11 @@ class Game:
         screen = pygame.display.get_surface()
         flick_button = pygame.image.load('resources/ui/buttons/camera_flick.png').convert_alpha()
         camera_flick = Flick(flick_button,
-                             (int(screen.get_width()/2), screen.get_height() - 100),
+                             (int(screen.get_width()/2), screen.get_height() - 25),
                              self.events['camera_up_event'],
                              self.events['camera_down_event'],
-                             draw_type='midbottom')
+                             draw_type='midbottom',
+                             scale=screen.get_width()/(screen.get_width()*1.2))
         self.buttons.append(camera_flick)
 
     def start(self):
@@ -57,22 +56,27 @@ class Game:
         for system in self.systems.values():
             if system.active:
                 power_usage += 2
-        print(power_usage)
-        return power_usage
+        return min(power_usage, 5)
 
     def tick(self, event: pygame.event.Event):
         if event.type == UPDATE_POWER:
             self.update_power()
+
+    def resize(self):
+        screen = pygame.display.get_surface()
+        for i in self.buttons:
+            i.resize((int(screen.get_width()/2), screen.get_height() - 25), screen.get_width()/(screen.get_width()*2))
 
     def global_tick(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit(0)
-            for animatronic in self.update_animatronics:
+            if event.type == pygame.WINDOWRESIZED:
+                for system in self.systems.values():
+                    system.resize()
+                self.resize()
+            for animatronic in self.animatronics:
                 animatronic.tick(event)
             for system in self.systems.values():
                 system.tick(event)
@@ -95,16 +99,60 @@ class Game:
 
     def draw_power(self, screen):
         self.draw_power_percentage(screen)
-        self.draw_power_percentage(screen)
+        self.draw_power_usage(screen)
 
     def draw_power_usage(self, surface):
-        print(self.power_usage)
+        width = 25
+        height = 40
+        y_offset = 30
+        padding = 3
+        text = self.GLOBAL_FONT.render("Usage: ", True, 'white')
+        text_rect = text.get_rect()
+        text_rect.topleft = (y_offset,
+                             surface.get_height() - (30 + height + padding + self.BIGGER_GLOBAL_FONT.size('100')[1]))
+        surface.blit(text, text_rect)
         for i in range(self.power_usage):
-            pygame.draw.rect(surface, 'Green', pygame.Rect(5*i + 5, surface.get_height() - 35, 15, 30))
+            usage_bar = pygame.Rect(text_rect.midright[0] + i*(width + padding),
+                                    text_rect.topright[1] - (text_rect.height - height)/2,
+                                    width,
+                                    height)
+            shader = pygame.Rect(0, 0, int(width/4), height)
+            shader.midright = usage_bar.midright
+            if i <= 1:
+                color = (35, 235, 31)
+                shade_color = (16, 131, 27)
+            elif i == 2:
+                color = (255, 243, 0)
+                shade_color = (225, 128, 9)
+            else:
+                color = (255, 35, 35)
+                shade_color = (198, 0, 0)
+            pygame.draw.rect(surface, color, usage_bar)
+            pygame.draw.rect(surface, shade_color, shader)
 
     def draw_power_percentage(self, surface):
-        text = self.GLOBAL_FONT.render(str(self.power), True, 'White')
-        surface.blit(text, (0, 0))
+        screen_y = pygame.display.get_surface().get_height()
+
+        # Get text
+        power_left_text = self.GLOBAL_FONT.render(f"Power Left: ", True, 'White')
+        power_percentage = self.BIGGER_GLOBAL_FONT.render(f"{self.power}", True, 'White')
+        power_percent = self.GLOBAL_FONT.render(f"%", True, 'White')
+
+        # Creating rectangles
+        power_left_text_rect = power_left_text.get_rect()
+        power_percentage_rect = power_percentage.get_rect()
+        power_percent_rect = power_percent.get_rect()
+
+        # Setting rectangles
+        power_left_text_rect.bottomleft = (30, screen_y - 30)
+        power_percentage_rect.bottomleft = power_left_text_rect.bottomright
+        power_percent_rect.bottomleft = (power_percentage_rect.width + power_left_text_rect.bottomright[0],
+                                         power_left_text_rect.bottomright[1])
+
+        # Drawing
+        surface.blit(power_left_text, power_left_text_rect)
+        surface.blit(power_percentage, (power_percentage_rect.x, power_left_text_rect.y - 3))
+        surface.blit(power_percent, power_percent_rect)
 
     def kill(self):
         if not self._win:
@@ -113,5 +161,3 @@ class Game:
 
     def stop_timer(self):
         pass
-
-
