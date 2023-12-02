@@ -1,33 +1,22 @@
 {
-  "Camera_Buttons": {
-    "Positions": {
-      "0": [
-        645,
-        328
-      ],
-      "1": [
-        210,
-        240
-      ]
+  "cameras": [
+    {
+      "label": "1a",
+      "position": [450, 150],
+      "name": "Lunchroom",
+      "background": "resources/backgrounds/cameras/lunchroom.png"
     },
-    "Icons": [{
-        "Active": "resources/ui/buttons/camera_icons/active/1a.png",
-        "Inactive": "resources/ui/buttons/camera_icons/deactive/1a.png"
-      },
-      {
-        "Active": "resources/ui/buttons/camera_icons/active/1b.png",
-        "Inactive": "resources/ui/buttons/camera_icons/deactive/1b.png"
-      }
-    ],
-    "objects": [
-      [
-        "Lunchroom",
-        "resources/backgrounds/cameras/lunchroom.png"
-      ],
-      [
-        "Hallway",
-        "resources/backgrounds/cameras/hallway.png"
-      ]
-    ]
-  }
+    {
+      "label": "2a",
+      "position": [303, 200],
+      "name": "Hallway",
+      "background": "resources/backgrounds/cameras/hallway.png"
+    },
+    {
+      "label": "3",
+      "position": [853, 278],
+      "name": "Birrell",
+      "background": "resources/backgrounds/cameras/test.png"
+    }
+  ]
 }

@@ -30,10 +30,10 @@ class Camera:
         self.font_pos[1] = int(screen.get_width()/2 * (850/1290))
 
     @classmethod
-    def generate_cameras(cls, cameras: list) -> list:
+    def generate_cameras(cls, cameras: list[dict]) -> list:
         final = []
-        for name, background_path in cameras:
-            final.append(cls(name, background_path))
+        for camera in cameras:
+            final.append(cls(camera['name'], camera['background']))
         return final
 
     @property
@@ -59,9 +59,9 @@ class Camera:
 class Cameras(System):
     def __init__(self):
         super().__init__("Cams System", 'resources/background/test.png')
-        self._camera_list = Camera.generate_cameras(self.load_data('Camera_Buttons')['objects'])
+        self._camera_list = Camera.generate_cameras(self.load_data('cameras'))
         self.map_image = self.init_images()
-        self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 45)
+        self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 90)
         self.enabled = True
         self.active = False
         self._last_camera = 0
@@ -78,11 +78,12 @@ class Cameras(System):
         map_image = pygame.transform.scale_by(map_image, scale_factor)
         return map_image
 
-    def load_camera_buttons(self, data):
-        icons = data["Icons"]
-        for icon in icons:
-            self.active_icons.append(pygame.image.load(icon['Active']).convert())
-            self.inactive_icons.append(pygame.image.load(icon['Inactive']).convert())
+    def load_camera_buttons(self, data: list[dict]):
+        active_path = "resources/ui/buttons/camera_icons/active"
+        inactive_path = "resources/ui/buttons/camera_icons/inactive"
+        for camera in data:
+            self.active_icons.append(pygame.image.load(active_path + "/" + camera['label'] + ".png").convert())
+            self.inactive_icons.append(pygame.image.load(inactive_path + "/" + camera['label'] + ".png").convert())
 
     @staticmethod
     def load_data(data: str) -> any:
@@ -92,10 +93,9 @@ class Cameras(System):
 
     def resize(self):
         self.map_image = self.init_images()
-        camera_buttons = self.load_data('Camera_Buttons')
+        camera_data = self.load_data('cameras')
         for i in range(len(self._camera_list)):
-            print(i)
-            x, y = tuple(camera_buttons['Positions'][str(i)])
+            x, y = tuple(camera_data[i]["position"])
             regular_size = (1290, 655)
             rect = self.map_image.get_rect()
             rect.bottomright = pygame.display.get_surface().get_size()
@@ -105,7 +105,7 @@ class Cameras(System):
             self.buttons[i].resize((pos_x, pos_y), pygame.display.get_surface().get_width() / 4500)
 
     def generate_buttons(self):
-        camera_buttons = self.load_data('Camera_Buttons')
+        camera_buttons = self.load_data('cameras')
         self.load_camera_buttons(camera_buttons)
         for i in range(len(self._camera_list)):
             self.buttons.append(Button(self.inactive_icons[i],

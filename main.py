@@ -10,7 +10,6 @@ def main():
     clock = pygame.time.Clock()
     game_round = Game()
     debugger = True
-    print(pygame.font.get_fonts())
     game_round.start()
 
     while True:

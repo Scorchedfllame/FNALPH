@@ -9,13 +9,13 @@
       "image_path": "resources/sprites/animatronics/bonnie.png"
     },
 
-    "cameras": {
-      "0": 1,
-      "1": 2,
-      "2": 3,
-      "3": 4,
-      "5": 5
-    },
+    "cameras": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
     "movements": {
             "0": [1, 2],
             "1": [2, 3],
