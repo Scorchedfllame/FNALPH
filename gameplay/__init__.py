@@ -11,3 +11,4 @@ from .buttons import *
 from .animatronics import *
 from .office import *
 from .game import *
+from .menu import MainMenu

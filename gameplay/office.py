@@ -11,7 +11,7 @@ class Office:
         self.light_left = False
         self.light_right = False
         self.IMAGE_SCALE_SIZE = 2
-        self.image = pygame.image.load('resources/backgrounds/offices/office.png').convert()
+        self.image = pygame.image.load('resources/backgrounds/office.png').convert()
         self.image = pygame.transform.scale_by(self.image, self.IMAGE_SCALE_SIZE)
         self.surface = pygame.surface.Surface(self.image.get_size())
         self.rot_x = 0

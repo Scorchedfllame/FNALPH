@@ -18,6 +18,7 @@ class Game:
         self.office = Office()
         self.events = self.init_events()
         self.init_buttons()
+        self.debugger = True
         self._win = False
         self._killed = False
 
@@ -31,7 +32,7 @@ class Game:
         screen = pygame.display.get_surface()
         flick_button = pygame.image.load('resources/ui/buttons/camera_flick.png').convert_alpha()
         camera_flick = Flick(flick_button,
-                             (int(screen.get_width()/2), screen.get_height() - 25),
+                             (int(screen.get_width()/2), screen.get_height()),
                              self.events['camera_up_event'],
                              self.events['camera_down_event'],
                              draw_type='midbottom',
