@@ -2,7 +2,7 @@ from gameplay.office import Office
 from gameplay.systems import Cameras
 from gameplay.power import PowerManager
 from gameplay.buttons import *
-from AppData.GameData.constants import *
+from data.game.constants import *
 
 
 class Game:
@@ -76,6 +76,8 @@ class Game:
             self.office.tick(event)
             self.tick(event)
         self.office.frame()
+        for system in self.systems.values():
+            system.frame()
 
     def global_draw(self):
         screen = pygame.display.get_surface()

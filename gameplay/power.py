@@ -1,4 +1,5 @@
-from AppData.GameData.constants import *
+from data.game.constants import *
+from math import ceil
 
 
 class PowerManager:
@@ -17,11 +18,12 @@ class PowerManager:
     def update_power(self, usage: int):
         self.usage.usage = usage
         self.power_remaining -= self.DIFFICULTY * (2 ** int(self.usage))
-        self.percentage = round(self.power_remaining / 1000)
+        self.percentage = ceil(self.power_remaining / 1000)
         if self.power_remaining <= 0:
-            pygame.event.post(BLACKOUT)
+            pygame.event.post(pygame.event.Event(BLACKOUT))
 
     def draw_power_percentage(self, surface):
+        LINEUP_OFFSET = 5
         screen_y = pygame.display.get_surface().get_height()
 
         # Get text
@@ -42,7 +44,7 @@ class PowerManager:
 
         # Drawing
         surface.blit(power_left_text, power_left_text_rect)
-        surface.blit(power_percentage, (power_percentage_rect.x, power_left_text_rect.y - 3))
+        surface.blit(power_percentage, (power_percentage_rect.x, power_left_text_rect.y - LINEUP_OFFSET))
         surface.blit(power_percent, power_percent_rect)
 
 

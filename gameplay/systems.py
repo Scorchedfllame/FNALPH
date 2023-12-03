@@ -1,8 +1,9 @@
 import json
 from .buttons import Button
 from .animatronics import Animatronic
-from AppData.GameData.constants import *
+from data.game.constants import *
 import pygame
+import math
 
 
 class System:
@@ -65,6 +66,9 @@ class Cameras(System):
         self.enabled = True
         self.active = False
         self._last_camera = 0
+        self._animation_counter = 0
+        self._animating_direction = 0
+        self.MAX_FRAMES = 5
         self.active_icons = []
         self.inactive_icons = []
         self.generate_buttons()
@@ -87,7 +91,7 @@ class Cameras(System):
 
     @staticmethod
     def load_data(data: str) -> any:
-        with open('Appdata/GameData/cameras.json', 'r') as f:
+        with open('data/game/cameras.json', 'r') as f:
             cameras_list = json.load(f)
             return cameras_list[data]
 
@@ -113,6 +117,18 @@ class Cameras(System):
                                 self.activate_camera,
                                 camera_index=i))
         self.resize()
+
+    def frame(self):
+        if self._animating_direction != 0:
+            self._animation_counter += self._animating_direction
+            self._animation_counter = max(0, min(self.MAX_FRAMES, self._animation_counter))
+            if self._animation_counter == self.MAX_FRAMES:
+                self.activate()
+                self._animating_direction = 0
+            elif self._animation_counter == self.MAX_FRAMES - 1 and self._animating_direction == -1:
+                self.deactivate()
+            if self._animation_counter == 0:
+                self._animating_direction = 0
 
     def activate(self):
         self.active = True
@@ -152,6 +168,13 @@ class Cameras(System):
     def draw(self):
         if self.active:
             screen = pygame.display.get_surface()
+            if self._animating_direction != 0:
+                print(self._animating_direction)
+                path = f"resources/animations/camera/{self._animation_counter}.png"
+                animation_frame = pygame.image.load(path).convert_alpha()
+                frame_rect = animation_frame.get_rect()
+                frame_rect.midbottom = (screen.get_width()/2, screen.get_height)
+                screen.blit(animation_frame, frame_rect)
             for i, camera in enumerate(self._camera_list):
                 camera.draw(screen)
             self.draw_map(screen)
@@ -160,9 +183,9 @@ class Cameras(System):
 
     def tick(self, event: pygame.event.Event):
         if event.type == CAMERA_FLIPPED_DOWN:
-            self.deactivate()
+            self._animating_direction = -1
         if event.type == CAMERA_FLIPPED_UP:
-            self.activate()
+            self._animating_direction = 1
         for button in self.buttons:
             button.tick(event)
 

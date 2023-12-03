@@ -1,5 +1,6 @@
 import pygame.display
 from gameplay import *
+from data.saves.save import SaveManager
 
 
 def main():
@@ -11,6 +12,7 @@ def main():
     game_round = Game()
     debugger = True
     game_round.start()
+    save_manager = SaveManager()
 
     while True:
         game_round.global_tick()
@@ -18,7 +20,8 @@ def main():
         game_round.global_draw()
         if debugger:
             screen.blit(pygame.font.SysFont('minecraftten', 25).render("%.1f" % clock.get_fps(),
-                                                                       True, 'pink'),
+                                                                       True,
+                                                                       'pink'),
                         (0, 0))
         pygame.display.update()
         clock.tick(60)

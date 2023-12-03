@@ -1,5 +1,5 @@
 import pygame
-from AppData.GameData.constants import *
+from data.game.constants import *
 import random
 
 
