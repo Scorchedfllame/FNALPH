@@ -1,25 +1,28 @@
-from sys import exit
+import pygame.display
 from gameplay import *
+from data.saves.save import SaveManager
 
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((1920, 1080))
-    pygame.display.set_caption('Five Nights At Lone Peak')
+    info = pygame.display.Info()
+    screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.FULLSCREEN)
+    pygame.display.set_caption('Five Nights At Lone Peak High')
     clock = pygame.time.Clock()
-    test_surface = pygame.image.load('resources/backgrounds/offices/test.png').convert()
-    game = Game()
+    game_round = Game()
+    debugger = True
+    game_round.start()
+    save_manager = SaveManager()
 
     while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            game.global_tick(event)
-
+        game_round.global_tick()
         screen.fill('black')
-        game.global_draw()
-
+        game_round.global_draw()
+        if debugger:
+            screen.blit(pygame.font.SysFont('minecraftten', 25).render("%.1f" % clock.get_fps(),
+                                                                       True,
+                                                                       'pink'),
+                        (0, 0))
         pygame.display.update()
         clock.tick(60)
 

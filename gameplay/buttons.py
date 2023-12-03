@@ -6,45 +6,57 @@ class Button:
                  pos: tuple[int, int],
                  activate: any = None,
                  deactivate: any = None,
-                 draw_type: str = None,
+                 draw_type: str = "topleft",
+                 scale: float = 1,
                  **kwargs):
-        if type(base) == pygame.Rect:
-            self.rect = base
-            self.surface = None
-        elif type(base) == pygame.surface.Surface:
-            self.rect = base.get_rect()
-            self.surface = base
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
-        if draw_type is not None:
-            pos = self.rect.__getattribute__(draw_type)
-            self.rect.x = pos[0]
-            self.rect.y = pos[1]
+        self._base = base
+        self.scale = scale
+        self.base = base
+        self.rect = None
+        self.surface = None
+        self.draw_type = draw_type
         self.activate = activate
         self.deactivate = deactivate
         self.kwargs = kwargs
+        self.resize(pos, scale)
+
+    def resize(self, pos: tuple[int, int], scale: float = 1):
+        self.base = pygame.transform.scale_by(self._base, scale)
+        if type(self.base) == pygame.Rect:
+            self.rect = self.base
+            self.surface = None
+        elif type(self.base) == pygame.surface.Surface:
+            self.rect = self.base.get_rect()
+            self.surface = self.base
+        self.rect.__setattr__(self.draw_type, pos)
+
+    def change_surface(self, surface: pygame.surface.Surface):
+        self._base = surface
+        self.surface = pygame.transform.scale(surface, self.rect.size)
+
+    def check_type(self, action: any):
+        if type(action) == pygame.event.Event:
+            pygame.event.post(action)
+        else:
+            action(**self.kwargs)
+
+    def check_activate(self, event: pygame.event.Event):
+        if self.rect.collidepoint(event.pos) and self.activate is not None:
+            self.check_type(self.activate)
+
+    def check_deactivate(self, event: pygame.event.Event):
+        if not self.rect.collidepoint(event.pos) and self.deactivate is not None:
+            self.check_type(self.deactivate)
 
     def tick(self, event: pygame.event.Event):
-        activate_type = type(self.activate)
-        deactivate_type = type(self.deactivate)
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.rect.collidepoint(event.pos):
-                if self.activate is not None:
-                    if activate_type == pygame.event.Event:
-                        pygame.event.post(self.activate)
-                    else:
-                        self.activate(**self.kwargs)
+            self.check_activate(event)
         if event.type == pygame.MOUSEBUTTONUP:
-            if not self.rect.collidepoint(event.pos):
-                if self.deactivate is not None:
-                    if deactivate_type == pygame.event.Event:
-                        pygame.event.post(self.deactivate)
-                    else:
-                        self.deactivate(**self.kwargs)
+            self.check_deactivate(event)
 
-    def draw(self):
+    def draw(self, surface):
         if self.surface:
-            pygame.display.get_surface().blit(self.surface, self.rect)
+            surface.blit(self.surface, self.rect)
 
 
 class Flick(Button):
@@ -53,33 +65,30 @@ class Flick(Button):
                  activate: any = None,
                  deactivate: any = None,
                  **kwargs):
-        super().__init__(base, pos=pos, **kwargs)
+        super().__init__(base, pos, **kwargs)
         self.activate = activate
         self.deactivate = deactivate
         self.mouse_y = 0
         self.activated = False
         self.hovering = False
 
+    def check_activate(self, event: pygame.event.Event):
+        if self.mouse_y < pygame.mouse.get_pos()[1] and not self.activated:
+            self.activated = True
+            if not self.hovering:
+                self.check_type(self.activate)
+                self.hovering = True
+            else:
+                self.check_deactivate(event)
+
+    def check_deactivate(self, event: pygame.event.Event):
+        self.check_type(self.deactivate)
+        self.hovering = False
+
     def tick(self, event: pygame.event.Event):
-        # Don't touch the IF monster
-        activate_type = type(self.activate)
-        deactivate_type = type(self.deactivate)
         if event.type == pygame.MOUSEMOTION:
             if self.rect.collidepoint(event.pos):
-                if self.mouse_y < pygame.mouse.get_pos()[1] and not self.activated:
-                    if not self.hovering:
-                        if activate_type == pygame.event.Event:
-                            pygame.event.post(self.activate)
-                        else:
-                            self.activate(**self.kwargs)
-                        self.hovering = True
-                    else:
-                        if deactivate_type == pygame.event.Event:
-                            pygame.event.post(self.deactivate)
-                        else:
-                            self.deactivate(**self.kwargs)
-                        self.hovering = False
-                    self.activated = True
+                self.check_activate(event)
             else:
                 self.activated = False
             self.mouse_y = event.pos[1]
