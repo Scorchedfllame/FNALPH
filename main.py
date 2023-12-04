@@ -30,7 +30,7 @@ def main():
                                                                        'pink'),
                         (0, 0))
         pygame.display.update()
-        clock.tick(120)
+        clock.tick(60)
 
 
 if __name__ == "__main__":

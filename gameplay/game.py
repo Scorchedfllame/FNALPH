@@ -32,7 +32,7 @@ class Game:
         screen = pygame.display.get_surface()
         flick_button = pygame.image.load('resources/ui/buttons/camera_flick.png').convert_alpha()
         camera_flick = Flick(flick_button,
-                             (int(screen.get_width()/2), screen.get_height()),
+                             (int(screen.get_width()/2), screen.get_height() - 25),
                              self.events['camera_up_event'],
                              self.events['camera_down_event'],
                              draw_type='midbottom',
