@@ -1,14 +1,13 @@
-from gameplay.office import Office
-from gameplay.systems import Cameras
-from gameplay.power import PowerManager
-from gameplay.buttons import *
-from data.game.constants import *
+import pygame
+from .office import Office
+from .clock import Clock
+from .systems import *
+from .power import PowerManager
+from .buttons import Flick, Button
 
 
 class Game:
     def __init__(self):
-        self.timer = 0
-        self.power_manager = PowerManager()
         self.utils = {}
         self.animatronics = []
         self.systems = {"Cameras": Cameras()}
@@ -18,6 +17,8 @@ class Game:
         self.office = Office()
         self.events = self.init_events()
         self.init_buttons()
+        self.power_manager = PowerManager()
+        self.clock = Clock()
         self.debugger = True
         self._win = False
         self._killed = False
@@ -41,6 +42,7 @@ class Game:
 
     def start(self):
         pygame.time.set_timer(UPDATE_POWER, 100)
+        pygame.time.set_timer(CLOCK, 1000)
 
     def get_power_usage(self) -> int:
         power_usage = 1
@@ -76,9 +78,11 @@ class Game:
                 button.tick(event)
             self.office.tick(event)
             self.tick(event)
+            self.clock.tick(event)
         self.office.frame()
         for system in self.systems.values():
             system.frame()
+
 
     def global_draw(self):
         screen = pygame.display.get_surface()

@@ -6,7 +6,7 @@ from gameplay import *
 def main():
     pygame.init()
     info = pygame.display.Info()
-    screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.FULLSCREEN)
+    screen = pygame.display.set_mode((100, 100), pygame.RESIZABLE)
     pygame.display.set_caption('Five Nights At Lone Peak High')
     clock = pygame.time.Clock()
     debugger = True
