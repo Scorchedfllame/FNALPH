@@ -11,7 +11,7 @@ class Office:
         self.light_left = False
         self.light_right = False
         self.IMAGE_SCALE_SIZE = 2
-        self.image = pygame.image.load('resources/backgrounds/offices/office.png').convert()
+        self.image = pygame.image.load('resources/backgrounds/office.png').convert()
         self.image = pygame.transform.scale_by(self.image, self.IMAGE_SCALE_SIZE)
         self.surface = pygame.surface.Surface(self.image.get_size())
         self.rot_x = 0
@@ -43,7 +43,7 @@ class Office:
         mouse_x, _ = mouse_pos
         screen_x, _ = pygame.display.get_surface().get_size()
         normalized = (2 * mouse_x/screen_x - 1)
-        if screen_x * 2/5 > mouse_x or mouse_x > screen_x * 3/5:
+        if screen_x * 3/7 > mouse_x or mouse_x > screen_x * 4/7:
             return normalized * 10
         return 0
 
