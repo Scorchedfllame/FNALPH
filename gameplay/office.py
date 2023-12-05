@@ -1,5 +1,5 @@
 import pygame
-from AppData.GameData.constants import *
+from data.game.constants import *
 import random
 
 
@@ -11,11 +11,11 @@ class Office:
         self.light_left = False
         self.light_right = False
         self.IMAGE_SCALE_SIZE = 2
-        self.image = pygame.image.load('resources/backgrounds/offices/office.png').convert()
+        self.image = pygame.image.load('resources/backgrounds/office.png').convert()
         self.image = pygame.transform.scale_by(self.image, self.IMAGE_SCALE_SIZE)
         self.surface = pygame.surface.Surface(self.image.get_size())
         self.rot_x = 0
-        self.MAX_ROTATION = 45
+        self.MAX_ROTATION = 90
         self.active = True
         self._locked = False
 
@@ -43,15 +43,15 @@ class Office:
         mouse_x, _ = mouse_pos
         screen_x, _ = pygame.display.get_surface().get_size()
         normalized = (2 * mouse_x/screen_x - 1)
-        if screen_x * 2/5 > mouse_x or mouse_x > screen_x * 3/5:
-            return normalized * 5
+        if screen_x * 3/7 > mouse_x or mouse_x > screen_x * 4/7:
+            return normalized * 10
         return 0
 
     def get_pos_from_rot(self):
         screen_x, _ = pygame.display.get_surface().get_size()
         image_x, _ = self.image.get_size()
         # normalization 0-1
-        normalized = (self.rot_x + 45)/90
+        normalized = (self.rot_x + self.MAX_ROTATION)/(2*self.MAX_ROTATION)
 
         # turn into other stuff
         return normalized * (screen_x - image_x)

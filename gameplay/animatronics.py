@@ -1,5 +1,5 @@
 import json
-from AppData.GameData.constants import *
+from data.game.constants import *
 import pygame
 import random
 

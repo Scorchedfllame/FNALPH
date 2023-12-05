@@ -6,28 +6,32 @@ class Button:
                  pos: tuple[int, int],
                  activate: any = None,
                  deactivate: any = None,
-                 draw_type: str = None,
+                 draw_type: str = "topleft",
+                 scale: float = 1,
                  **kwargs):
-
-        if type(base) == pygame.Rect:
-            self.rect = base
-            self.surface = None
-        elif type(base) == pygame.surface.Surface:
-            self.rect = base.get_rect()
-            self.surface = base
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
-
-        if draw_type is not None:
-            pos = self.rect.__getattribute__(draw_type)
-            self.rect.x = pos[0]
-            self.rect.y = pos[1]
-
+        self._base = base
+        self.scale = scale
+        self.base = base
+        self.rect = None
+        self.surface = None
+        self.draw_type = draw_type
         self.activate = activate
         self.deactivate = deactivate
         self.kwargs = kwargs
+        self.resize(pos, scale)
+
+    def resize(self, pos: tuple[int, int], scale: float = 1):
+        self.base = pygame.transform.scale_by(self._base, scale)
+        if type(self.base) == pygame.Rect:
+            self.rect = self.base
+            self.surface = None
+        elif type(self.base) == pygame.surface.Surface:
+            self.rect = self.base.get_rect()
+            self.surface = self.base
+        self.rect.__setattr__(self.draw_type, pos)
 
     def change_surface(self, surface: pygame.surface.Surface):
+        self._base = surface
         self.surface = pygame.transform.scale(surface, self.rect.size)
 
     def check_type(self, action: any):
@@ -50,9 +54,9 @@ class Button:
         if event.type == pygame.MOUSEBUTTONUP:
             self.check_deactivate(event)
 
-    def draw(self):
+    def draw(self, surface):
         if self.surface:
-            pygame.display.get_surface().blit(self.surface, self.rect)
+            surface.blit(self.surface, self.rect)
 
 
 class Flick(Button):
@@ -61,15 +65,15 @@ class Flick(Button):
                  activate: any = None,
                  deactivate: any = None,
                  **kwargs):
-        super().__init__(base, pos=pos, **kwargs)
+        super().__init__(base, pos, **kwargs)
         self.activate = activate
         self.deactivate = deactivate
-        self.mouse_y = 0
+        self.last_mouse_pos = (0, 0)
         self.activated = False
         self.hovering = False
 
     def check_activate(self, event: pygame.event.Event):
-        if self.mouse_y < pygame.mouse.get_pos()[1] and not self.activated:
+        if self.last_mouse_pos[1] < pygame.mouse.get_pos()[1] and not self.activated:
             self.activated = True
             if not self.hovering:
                 self.check_type(self.activate)
@@ -83,8 +87,8 @@ class Flick(Button):
 
     def tick(self, event: pygame.event.Event):
         if event.type == pygame.MOUSEMOTION:
-            if self.rect.collidepoint(event.pos):
+            if self.rect.clipline(self.last_mouse_pos, event.pos):
                 self.check_activate(event)
             else:
                 self.activated = False
-            self.mouse_y = event.pos[1]
+            self.last_mouse_pos = event.pos
