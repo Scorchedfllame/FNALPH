@@ -66,6 +66,7 @@ class Game:
             if event.type == pygame.WINDOWRESIZED:
                 for system in self.systems.values():
                     system.resize()
+                self.power_manager.resize()
                 self.resize()
             for animatronic in self.animatronics:
                 animatronic.tick(event)

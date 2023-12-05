@@ -15,6 +15,9 @@ class PowerManager:
         self.draw_power_percentage(surface)
         self.usage.draw(surface)
 
+    def resize(self):
+        self.usage.resize()
+
     def update_power(self, usage: int):
         self.usage.usage = usage
         self.power_remaining -= self.DIFFICULTY * (2 ** int(self.usage))
@@ -56,10 +59,13 @@ class Usage:
         self.height = 40
         self.y_offset = 30
         self.padding = 3
-        screen = pygame.display.get_surface()
-        x_offset = (30 + self.height + self.padding + self.large_font.size('100')[1])
         self.text = font.render("Usage: ", True, 'white')
         self.text_rect = self.text.get_rect()
+        self.resize()
+
+    def resize(self):
+        screen = pygame.display.get_surface()
+        x_offset = (30 + self.height + self.padding + self.large_font.size('100')[1])
         self.text_rect.topleft = (self.y_offset,
                                   screen.get_height() - x_offset)
 

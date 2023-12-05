@@ -1,5 +1,6 @@
 import pygame
 from data.game.constants import *
+from .buttons import Button
 import random
 
 
@@ -65,3 +66,41 @@ class Office:
 
     def lock(self):
         self._locked = True
+
+
+class Door:
+    def __init__(self, image_paths: dict[str]):
+        self.images = {'open_dark': pygame.image.load(image_paths['open_dark']).convert(),
+                       'open_light': pygame.image.load(image_paths['open_light']).convert(),
+                       'closed_dark': pygame.image.load(image_paths['closed_dark']).convert(),
+                       'closed_light': pygame.image.load(image_paths['closed_light']).convert(),
+                       'button_on': pygame.image.load(image_paths['button_on']).convert(),
+                       'button_off': pygame.image.load(image_paths['button_off']).convert()}
+        self.light_button = LightButton(image_paths['light_on'], image_paths['light_off'])
+        self.light_status = 'dark'
+        self.door_status = 'open'
+        self.current_surface = self.images[self.get_status()]
+        self.rect = self.current_surface.get_rect()
+
+    def update_light_status(self):
+        if self.light_button.on:
+            self.light_status = 'light'
+        else:
+            self.light_status = 'dark'
+
+    def get_status(self):
+        return f"{self.door_status}_{self.light_status}"
+
+    def open_door(self):
+        self.current_surface = self.images[f"open_{self.light_status}"]
+
+    def close_door(self):
+        self.current_surface = self.images[f"closed_{self.light_status}"]
+
+
+class LightButton:
+    def __init__(self, on_image_path: str, off_image_path: str):
+        self.on_image = pygame.image.load(on_image_path).convert()
+        self.off_image = pygame.image.load(off_image_path).convert()
+        self.on = False
+
