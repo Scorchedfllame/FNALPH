@@ -1,0 +1,17 @@
+{
+  "doors": [
+    {
+      "images": {
+        "open_dark": "resources/sprites/doors/test.png",
+        "open_light": "resources/sprites/doors/test.png",
+        "closed_dark": "resources/sprites/doors/test.png",
+        "closed_light": "resources/sprites/doors/test.png",
+        "door_button_on": "resources/sprites/doors/test.png",
+        "door_button_off": "resources/sprites/doors/test.png",
+        "light_button_on": "resources/sprites/doors/test.png",
+        "light_button_off": "resources/sprites/doors/test.png"
+      },
+      "pos": [100, 0]
+    }
+  ]
+}

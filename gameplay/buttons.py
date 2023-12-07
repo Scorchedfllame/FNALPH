@@ -92,3 +92,28 @@ class Flick(Button):
             else:
                 self.activated = False
             self.mouse_y = event.pos[1]
+
+
+class ToggleButton(Button):
+    def __init__(self, base: pygame.Rect | pygame.surface.Surface,
+                 pos: tuple[int, int],
+                 activate: any = None,
+                 deactivate: any = None,
+                 draw_type: str = "topleft",
+                 scale: float = 1,
+                 **kwargs):
+        super().__init__(base, pos, activate, deactivate, draw_type, scale, **kwargs)
+        self.active = False
+
+    def toggle(self):
+        if self.active:
+            self.active = False
+            self.deactivate()
+        else:
+            self.active = True
+            self.activate()
+
+    def tick(self, event: pygame.event.Event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.rect.collidepoint(event.pos):
+                self.toggle()
