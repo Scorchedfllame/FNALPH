@@ -21,16 +21,18 @@ class Office:
         for i in self.doors:
             if i.door_status == 'closed':
                 power_usage += 1
+            if i.light_status == 'light':
+                power_usage += 1
         return power_usage
 
     def tick(self, event: pygame.event.Event):
+        if self.active:
+            for door in self.doors:
+                door.tick(event)
         if event.type == CAMERA_FLIPPED_UP:
             self.active = False
         if event.type == CAMERA_FLIPPED_DOWN:
             self.active = True
-        if self.active:
-            for door in self.doors:
-                door.tick(event)
 
     def frame(self):
         if self.active:
@@ -70,18 +72,21 @@ class Office:
 
 
 class Door:
-    def __init__(self, image_paths: dict[str], relative_pos: tuple[int, int] = (0, 0)):
+    def __init__(self, image_paths: dict[str], positions: dict[tuple[int, int]]):
         self._default_images = {key: pygame.image.load(value).convert() for key, value in image_paths.items()}
         self.curr_images = self._default_images.copy()
         self.light_status = 'dark'
         self.door_status = 'open'
-        self.relative_pos = relative_pos
+        self.relative_pos = positions
         self.current_surface = self.curr_images[self.get_status()]
         self.rect = self.current_surface.get_rect()
-        self.rect.topleft = self.relative_pos
-        # self.light_button = Button(self.curr_images['light_button_off'], (0, 0), self.light_on, self.light_off)
+        self.rect.topleft = self.relative_pos['door']
+        self.light_button = ToggleButton(self.curr_images['light_button_off'],
+                                         self.relative_pos['light'],
+                                         self.light_on,
+                                         self.light_off)
         self.door_button = ToggleButton(self.curr_images['door_button_off'],
-                                        (self.rect.x, self.rect.y),
+                                        self.relative_pos['door'],
                                         self.close_door,
                                         self.open_door)
 
@@ -91,19 +96,26 @@ class Door:
         with open('data/game/office.json', 'r') as f:
             dictionary = json.loads(f.read())
             for door in dictionary['doors']:
-                door_list.append(Door(door['images'], tuple(door['pos'])))
+                door_list.append(Door(door['images'], {k: tuple(v) for k, v in door['positions'].items()}))
         return door_list
 
     def tick(self, event: pygame.event.Event):
+        if event.type == CAMERA_FLIPPED_UP:
+            self.light_button.check_deactivate()
         self.door_button.tick(event)
-        # self.light_button.tick(event)
+        self.light_button.tick(event)
 
     def draw(self, surface: pygame.Surface, vector: pygame.Vector2):
+        self.current_surface = self.curr_images[self.get_status()]
+        light_positions = self.relative_pos['light']
+        door_positions = self.relative_pos['door']
         self.rect.topleft = (0, 0)
         self.rect.move_ip(vector)
-        self.door_button.resize(self.rect.topleft)
+        surface.blit(self.current_surface, self.rect)
+        self.door_button.resize((self.rect.x + light_positions[0], self.rect.y + light_positions[1]))
+        self.light_button.resize((self.rect.x + door_positions[0], self.rect.y + door_positions[1]))
         self.door_button.draw(surface)
-        # self.light_button.draw(surface)
+        self.light_button.draw(surface)
 
     def light_on(self):
         self.light_status = 'light'

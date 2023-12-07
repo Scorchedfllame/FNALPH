@@ -3,15 +3,19 @@
     {
       "images": {
         "open_dark": "resources/sprites/doors/test.png",
-        "open_light": "resources/sprites/doors/test.png",
-        "closed_dark": "resources/sprites/doors/test.png",
-        "closed_light": "resources/sprites/doors/test.png",
+        "open_light": "resources/ui/icon.png",
+        "closed_dark": "resources/ui/map.png",
+        "closed_light": "resources/sprites/animatronics/baddie/chirca.png",
         "door_button_on": "resources/sprites/doors/test.png",
         "door_button_off": "resources/sprites/doors/test.png",
         "light_button_on": "resources/sprites/doors/test.png",
         "light_button_off": "resources/sprites/doors/test.png"
       },
-      "pos": [100, 0]
+      "positions": {
+        "door": [100, 0],
+        "light": [100, 200],
+        "button": [100, 400]
+      }
     }
   ]
 }

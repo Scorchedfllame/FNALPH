@@ -105,13 +105,21 @@ class ToggleButton(Button):
         super().__init__(base, pos, activate, deactivate, draw_type, scale, **kwargs)
         self.active = False
 
+    def check_activate(self, event=None):
+        self.active = True
+        if self.activate is not None:
+            self.check_type(self.activate)
+
+    def check_deactivate(self, event=None):
+        self.active = False
+        if self.deactivate is not None:
+            self.check_type(self.deactivate)
+
     def toggle(self):
         if self.active:
-            self.active = False
-            self.deactivate()
+            self.check_deactivate()
         else:
-            self.active = True
-            self.activate()
+            self.check_activate()
 
     def tick(self, event: pygame.event.Event):
         if event.type == pygame.MOUSEBUTTONDOWN:
