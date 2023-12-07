@@ -16,7 +16,7 @@ class Game:
         self.BIGGER_GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
         self.office = Office()
         self.events = self.init_events()
-        self.init_buttons()
+        self.flick = self.init_flick()
         self.power_manager = PowerManager()
         self.clock = Clock()
         self.debugger = True
@@ -29,7 +29,7 @@ class Game:
         camera_down_event = pygame.event.Event(CAMERA_FLIPPED_DOWN)
         return {"camera_up_event": camera_up_event, "camera_down_event": camera_down_event}
 
-    def init_buttons(self):
+    def init_flick(self):
         screen = pygame.display.get_surface()
         flick_button = pygame.image.load('resources/ui/buttons/camera_flick.png').convert_alpha()
         camera_flick = Flick(flick_button,
@@ -38,7 +38,7 @@ class Game:
                              self.events['camera_down_event'],
                              draw_type='midbottom',
                              scale=screen.get_width()/(screen.get_width()*1.2))
-        self.buttons.append(camera_flick)
+        return camera_flick
 
     def start(self):
         pygame.time.set_timer(UPDATE_POWER, 100)
@@ -61,6 +61,11 @@ class Game:
         for i in self.buttons:
             i.resize((int(screen.get_width()/2), screen.get_height() - 25), screen.get_width()/(screen.get_width()*2))
 
+    def blackout(self):
+        self.office.image = pygame.image.load('resources/backgrounds/office_blackout.png').convert()
+        self.office.image = pygame.transform.scale_by(self.office.image, self.office.IMAGE_SCALE_SIZE)
+        self.systems['Cameras'].activate_blackout()
+
     def global_tick(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -70,19 +75,20 @@ class Game:
                 for system in self.systems.values():
                     system.resize()
                 self.resize()
+            if event.type == BLACKOUT:
+                self.blackout()
             for animatronic in self.animatronics:
                 animatronic.tick(event)
             for system in self.systems.values():
                 system.tick(event)
-            for button in self.buttons:
-                button.tick(event)
+            if not self.systems['Cameras'].blackout:
+                self.flick.tick(event)
             self.office.tick(event)
             self.tick(event)
             self.clock.tick(event)
         self.office.frame()
         for system in self.systems.values():
             system.frame()
-
 
     def global_draw(self):
         screen = pygame.display.get_surface()
@@ -91,8 +97,8 @@ class Game:
             system.draw()
         for animatronic in self.animatronics:
             animatronic.draw()
-        for button in self.buttons:
-            button.draw(screen)
+        if not self.systems['Cameras'].blackout:
+            self.flick.draw(screen)
         self.power_manager.draw(screen)
 
     def kill(self):

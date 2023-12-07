@@ -9,18 +9,22 @@ class PowerManager:
         self.percentage = 100
         self.power_remaining = 100000
         self.usage = Usage(self.font, self.large_font)
-        self.DIFFICULTY = 7
+        self.DIFFICULTY = 70  # set back to 7 when done testing
+        self.active = True
 
     def draw(self, surface):
-        self.draw_power_percentage(surface)
-        self.usage.draw(surface)
+        if self.active:
+            self.draw_power_percentage(surface)
+            self.usage.draw(surface)
 
     def update_power(self, usage: int):
-        self.usage.usage = usage
-        self.power_remaining -= self.DIFFICULTY * (2 ** int(self.usage))
-        self.percentage = ceil(self.power_remaining / 1000)
-        if self.power_remaining <= 0:
-            pygame.event.post(pygame.event.Event(BLACKOUT))
+        if self.active:
+            self.usage.usage = usage
+            self.power_remaining = max(self.power_remaining - self.DIFFICULTY * (2 ** int(self.usage)), 0)
+            self.percentage = ceil(self.power_remaining / 1000)
+            if self.power_remaining <= 0:
+                pygame.event.post(pygame.event.Event(BLACKOUT))
+                self.active = False
 
     def draw_power_percentage(self, surface):
         LINEUP_OFFSET = 5
