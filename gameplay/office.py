@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from data.game.constants import *
 from .buttons import ToggleButton
@@ -78,6 +80,7 @@ class Door:
         self.light_status = 'dark'
         self.door_status = 'open'
         self.relative_pos = positions
+        self.flicker_counter = 1
         self.current_surface = self.curr_images[self.get_status()]
         self.rect = self.current_surface.get_rect()
         self.rect.topleft = self.relative_pos['door']
@@ -105,8 +108,26 @@ class Door:
         self.door_button.tick(event)
         self.light_button.tick(event)
 
+    def get_flicker(self):
+        if self.light_status == 'light':
+            if self.flicker_counter > 0:
+                if random.randint(self.flicker_counter, 101) >= 100:
+                    self.flicker_counter = -1
+                    return 'dark'
+                else:
+                    self.flicker_counter += 1
+                    return 'light'
+            elif self.flicker_counter < 0:
+                if random.randint(-10, self.flicker_counter) <= -8:
+                    self.flicker_counter = 1
+                    return 'light'
+                else:
+                    return 'dark'
+        return 'dark'
+
     def draw(self, surface: pygame.Surface, vector: pygame.Vector2):
-        self.current_surface = self.curr_images[self.get_status()]
+        light = self.get_flicker()
+        self.current_surface = self.curr_images[f"{self.door_status}_{light}"]
         light_positions = self.relative_pos['light']
         door_positions = self.relative_pos['door']
         self.rect.topleft = (0, 0)
