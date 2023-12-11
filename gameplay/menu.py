@@ -43,12 +43,12 @@ class MainMenu(Menu):
         pass
 
     def init_buttons(self) -> list[Button]:
-        play_game = Button(pygame.image.load(self.directory + "buttons/play.png"),
-                           (100, 100),
-                           activate=self.start_game)
-        options = Button(pygame.image.load(self.directory + "buttons/options.png"),
-                         (100, 200),
-                         activate=self.open_options())
+        play_game = Button(pygame.image.load(self.directory + "buttons/new_game.png"),
+                           (100, 800),
+                           activate=self.start_game, scale=.25)
+        options = Button(pygame.image.load(self.directory + "buttons/continue.png"),
+                         (100, 900),
+                         activate=self.open_options(), scale=.25)
         return [play_game, options]
 
 
