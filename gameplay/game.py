@@ -66,6 +66,9 @@ class Game:
         self.office.image = pygame.transform.scale_by(self.office.image, self.office.IMAGE_SCALE_SIZE)
         self.systems['Cameras'].activate_blackout()
 
+    def win(self):
+        pass # add code here for when you WIN :3
+
     def global_tick(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -77,6 +80,8 @@ class Game:
                 self.resize()
             if event.type == BLACKOUT:
                 self.blackout()
+            if event.type == WIN:
+                self.win()
             for animatronic in self.animatronics:
                 animatronic.tick(event)
             for system in self.systems.values():

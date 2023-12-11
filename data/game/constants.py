@@ -17,3 +17,4 @@ ACTIVATE_CAMERA = pygame.USEREVENT + 8
 #   Game States
 KILL = pygame.USEREVENT + 2
 BLACKOUT = pygame.USEREVENT + 6
+WIN = pygame.USEREVENT + 10
