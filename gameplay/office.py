@@ -9,7 +9,7 @@ import json
 class Office:
     def __init__(self):
         self.doors = Door.generate_doors()
-        self.IMAGE_SCALE_SIZE = 2
+        self.IMAGE_SCALE_SIZE = 1
         self.image = pygame.image.load('resources/backgrounds/offices/office.png').convert()
         self.image = pygame.transform.scale_by(self.image, self.IMAGE_SCALE_SIZE)
         self.surface = pygame.surface.Surface(self.image.get_size())
@@ -130,11 +130,12 @@ class Door:
         self.current_surface = self.curr_images[f"{self.door_status}_{light}"]
         light_positions = self.relative_pos['light']
         door_positions = self.relative_pos['door']
+        button_positions = self.relative_pos['button']
         self.rect.topleft = (0, 0)
         self.rect.move_ip(vector)
-        surface.blit(self.current_surface, self.rect)
-        self.door_button.resize((self.rect.x + light_positions[0], self.rect.y + light_positions[1]))
-        self.light_button.resize((self.rect.x + door_positions[0], self.rect.y + door_positions[1]))
+        surface.blit(self.current_surface, (self.rect.x + door_positions[0], self.rect.y + door_positions[1]))
+        self.door_button.resize((self.rect.x + button_positions[0], self.rect.y + button_positions[1]))
+        self.light_button.resize((self.rect.x + light_positions[0], self.rect.y + light_positions[1]))
         self.door_button.draw(surface)
         self.light_button.draw(surface)
 
