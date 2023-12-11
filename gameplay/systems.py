@@ -28,7 +28,7 @@ class Camera:
     def resize(self):
         screen = pygame.display.get_surface()
         self.font_pos[0] = screen.get_width() * 7/12
-        self.font_pos[1] = int(screen.get_width()/2 * (850/1290))
+        self.font_pos[1] = int(screen.get_width()/2 * (850/1290) + screen.get_height())
 
     @classmethod
     def generate_cameras(cls, cameras: list[dict]) -> list:
@@ -99,6 +99,7 @@ class Cameras(System):
         self.map_image = self.init_images()
         camera_data = self.load_data('cameras')
         for i in range(len(self._camera_list)):
+            self._camera_list[i].resize()
             x, y = tuple(camera_data[i]["position"])
             regular_size = (1290, 655)
             rect = self.map_image.get_rect()
