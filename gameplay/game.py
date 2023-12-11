@@ -19,6 +19,7 @@ class Game:
         self.animatronics = [Bonnie(self, 20)]
         self.events = self.init_events()
         self.init_buttons()
+        self.debugger = True
         self._win = False
         self._killed = False
 

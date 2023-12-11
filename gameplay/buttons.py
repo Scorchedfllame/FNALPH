@@ -68,12 +68,12 @@ class Flick(Button):
         super().__init__(base, pos, **kwargs)
         self.activate = activate
         self.deactivate = deactivate
-        self.mouse_y = 0
+        self.last_mouse_pos = (0, 0)
         self.activated = False
         self.hovering = False
 
     def check_activate(self, event: pygame.event.Event):
-        if self.mouse_y < pygame.mouse.get_pos()[1] and not self.activated:
+        if self.last_mouse_pos[1] < pygame.mouse.get_pos()[1] and not self.activated:
             self.activated = True
             if not self.hovering:
                 self.check_type(self.activate)
@@ -87,11 +87,10 @@ class Flick(Button):
 
     def tick(self, event: pygame.event.Event):
         if event.type == pygame.MOUSEMOTION:
-            if self.rect.collidepoint(event.pos):
+            if self.rect.clipline(self.last_mouse_pos, event.pos):
                 self.check_activate(event)
             else:
                 self.activated = False
-            self.mouse_y = event.pos[1]
 
 
 class ToggleButton(Button):
