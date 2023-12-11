@@ -9,9 +9,9 @@ import json
 class Office:
     def __init__(self):
         self.doors = Door.generate_doors()
-        self.IMAGE_SCALE_SIZE = 1
         self.image = pygame.image.load('resources/backgrounds/offices/office.png').convert()
-        self.image = pygame.transform.scale_by(self.image, self.IMAGE_SCALE_SIZE)
+        self.image = pygame.transform.scale_by(self.image,
+                                               pygame.display.get_surface().get_height()/self.image.get_size()[1])
         self.surface = pygame.surface.Surface(self.image.get_size())
         self.rot_x = 0
         self.MAX_ROTATION = 90
@@ -76,6 +76,9 @@ class Office:
 class Door:
     def __init__(self, image_paths: dict[str], positions: dict[tuple[int, int]]):
         self._default_images = {key: pygame.image.load(value).convert() for key, value in image_paths.items()}
+        scalar = pygame.display.get_surface().get_height()/self._default_images['open_dark'].get_size()[1]
+        for key, image in self._default_images.items():
+            self._default_images[key] = pygame.transform.scale_by(image, scalar)
         self.curr_images = self._default_images.copy()
         self.light_status = 'dark'
         self.door_status = 'open'

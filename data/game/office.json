@@ -13,8 +13,8 @@
       },
       "positions": {
         "door": [0, 0],
-        "light": [9, 507],
-        "button": [8, 438]
+        "light": [10, 547],
+        "button": [9, 478]
       }
     }
   ]
