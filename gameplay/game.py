@@ -2,6 +2,7 @@ from gameplay.office import Office
 from gameplay.systems import Cameras
 from gameplay.power import PowerManager
 from gameplay.buttons import *
+from gameplay import Bonnie
 from data.game.constants import *
 
 
@@ -10,12 +11,12 @@ class Game:
         self.timer = 0
         self.power_manager = PowerManager()
         self.utils = {}
-        self.animatronics = []
         self.systems = {"Cameras": Cameras()}
         self.buttons = []
         self.GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 55)
         self.BIGGER_GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
         self.office = Office()
+        self.animatronics = [Bonnie(self, 20)]
         self.events = self.init_events()
         self.init_buttons()
         self._win = False
@@ -40,6 +41,8 @@ class Game:
 
     def start(self):
         pygame.time.set_timer(UPDATE_POWER, 100)
+        for animatronic in self.animatronics:
+            animatronic.start()
 
     def get_power_usage(self) -> int:
         power_usage = 1
@@ -86,7 +89,7 @@ class Game:
         for system in self.systems.values():
             system.draw()
         for animatronic in self.animatronics:
-            animatronic.draw()
+            animatronic.draw(screen)
         for button in self.buttons:
             button.draw(screen)
         self.power_manager.draw(screen)

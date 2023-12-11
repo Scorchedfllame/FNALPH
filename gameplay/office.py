@@ -1,6 +1,4 @@
 import random
-
-import pygame
 from data.game.constants import *
 from .buttons import ToggleButton
 import json
@@ -63,23 +61,20 @@ class Office:
     def draw(self):
         if self.active:
             screen = pygame.display.get_surface()
-            rect = self.surface.get_rect()
             self.surface.blit(self.image, (0, 0))
             screen.blit(self.surface, (self.get_pos_from_rot(), 0))
             for door in self.doors:
                 door.draw(screen, pygame.Vector2(self.get_pos_from_rot(), 0))
 
-    def lock(self):
-        self._locked = True
-
 
 class Door:
-    def __init__(self, image_paths: dict[str], positions: dict[tuple[int, int]]):
+    def __init__(self, image_paths: dict[str], positions: dict):
         self._default_images = {key: pygame.image.load(value).convert() for key, value in image_paths.items()}
         scalar = pygame.display.get_surface().get_height()/self._default_images['open_dark'].get_size()[1]
         for key, image in self._default_images.items():
             self._default_images[key] = pygame.transform.scale_by(image, scalar)
         self.curr_images = self._default_images.copy()
+        self._locked = False
         self.light_status = 'dark'
         self.door_status = 'open'
         self.relative_pos = positions
@@ -108,8 +103,9 @@ class Door:
     def tick(self, event: pygame.event.Event):
         if event.type == CAMERA_FLIPPED_UP:
             self.light_button.check_deactivate()
-        self.door_button.tick(event)
-        self.light_button.tick(event)
+        if not self._locked:
+            self.door_button.tick(event)
+            self.light_button.tick(event)
 
     def get_flicker(self):
         if self.light_status == 'light':
@@ -142,6 +138,9 @@ class Door:
         self.door_button.draw(surface)
         self.light_button.draw(surface)
 
+    def lock(self):
+        self._locked = True
+
     def light_on(self):
         self.light_status = 'light'
 
@@ -158,4 +157,3 @@ class Door:
     def close_door(self):
         self.door_status = 'closed'
         self.current_surface = self.curr_images[f"closed_{self.light_status}"]
-
