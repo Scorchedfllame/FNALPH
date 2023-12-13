@@ -69,7 +69,7 @@ class Office:
 
 class Door:
     def __init__(self, image_paths: dict[str], positions: dict):
-        self._default_images = {key: pygame.image.load(value).convert() for key, value in image_paths.items()}
+        self._default_images = {key: pygame.image.load(value).convert_alpha() for key, value in image_paths.items()}
         scalar = pygame.display.get_surface().get_height()/self._default_images['open_dark'].get_size()[1]
         for key, image in self._default_images.items():
             self._default_images[key] = pygame.transform.scale_by(image, scalar)

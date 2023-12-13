@@ -201,3 +201,77 @@ class Bonnie(Animatronic):
         cameras = self._camera_key
         camera = cameras[self._location]
         return camera
+
+
+class Chica(Animatronic):
+    """
+    Starts in the lunchroom, moves around the left side and attacks at the left door.
+    """
+    def __init__(self, game: any, difficulty: int):
+        super().__init__('Chica', difficulty)
+        self._office = game.office
+        self._cameras = game.systems["Cameras"]._camera_list
+        self._location = -1
+        self._kill_locked = False
+        self._camera_key = self.load_data()['cameras']
+        self._movement_key = self.load_data()['movements']
+        self.movement_timer = 4700
+        self.OFFICE_LOCATION = len(self._movement_key)
+
+    def start(self) -> None:
+        pygame.time.set_timer(BONNIE_TIMER, self.movement_timer)
+        self._location = 0
+
+    def stop(self) -> None:
+        pygame.time.set_timer(BONNIE_TIMER, 0)
+        self._location = -1
+
+    def tick(self, event: pygame.event.Event) -> None:
+        if event.type == BONNIE_TIMER:
+            if self._kill_locked:
+                self.kill()
+            # Movement Opportunities
+            rng = random.randint(1, 20)
+            if self._location == self.OFFICE_LOCATION:
+                if rng < self._aggression:
+                    # Get whether door is closed
+                    if self._office.doors[1].door_status == 'closed':
+                        self.blocked()
+                    else:
+                        self._office.doors[1].lock()
+                        self._kill_locked = True
+                        pygame.time.set_timer(BONNIE_TIMER, random.randint(15000, 25000))
+            elif rng <= self._aggression:
+                self.move()
+        if event.type == CAMERA_FLIPPED_DOWN and self._kill_locked:
+            self.kill()
+
+    def blocked(self):
+        self._kill_locked = False
+        self._location = random.randint(0, 1)
+
+    def move(self) -> None:
+        movements = self._movement_key
+        moves = movements[self._location]
+        self._location = moves[random.randint(0, len(moves)-1)]
+        print(self._location)
+
+    def draw(self, surface) -> None:
+        if self._location == self.OFFICE_LOCATION:
+            if self._office.active:
+                surface.blit(self._get_image(), (0, 0))
+        else:
+            camera_location = self._get_cam_index_from_location()
+            camera = self._cameras[camera_location]
+            if camera.active:
+                surface.blit(self._get_image(), (0, 0))
+
+    # Some sort of dictionary with all the images and stages that bonnie possesses
+    def _get_image(self) -> any:
+        return pygame.image.load(
+            'resources/sprites/animatronics/baddie/chirca_' + str(self._location) + '.png').convert_alpha()
+
+    def _get_cam_index_from_location(self) -> int:
+        cameras = self._camera_key
+        camera = cameras[self._location]
+        return camera
