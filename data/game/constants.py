@@ -7,7 +7,8 @@ import pygame
 PUPPET_TIMER = pygame.USEREVENT + 1
 BONNIE_TIMER = pygame.USEREVENT + 5
 UPDATE_POWER = pygame.USEREVENT + 7
-CAMERA_ROTATION = pygame.USEREVENT + 10
+CLOCK = pygame.USEREVENT + 9
+CAMERA_ROTATION = pygame.USEREVENT + 11
 
 #   General
 CAMERA_FLIPPED_UP = pygame.USEREVENT + 3
@@ -17,3 +18,4 @@ ACTIVATE_CAMERA = pygame.USEREVENT + 8
 #   Game States
 KILL = pygame.USEREVENT + 2
 BLACKOUT = pygame.USEREVENT + 6
+WIN = pygame.USEREVENT + 10

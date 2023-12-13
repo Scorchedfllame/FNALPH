@@ -5,6 +5,7 @@ from gameplay import *
 
 def main():
     pygame.init()
+    info = pygame.display.Info()
     screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
     pygame.display.set_caption('Five Nights At Lone Peak High')
     pygame.display.set_icon(pygame.image.load('resources/ui/icon.png').convert())
