@@ -1,6 +1,5 @@
 import json
-from .game import Game
-from AppData.GameData.constants import *
+from data.game.constants import *
 import pygame
 import random
 
@@ -46,14 +45,15 @@ class Animatronic:
         self.name = name
         self._difficulty = difficulty
         self._aggression = self._difficulty
-        description, image_path = self.load_data(('description', 'image_path'))
+        description = self.load_data()['menu_label']['description']
+        image_path = self.load_data()['menu_label']['image_path']
         self.menu_label = MenuLabel(self.name, self._difficulty, description, image_path)
         self.jumpscare = jumpscare
 
-    def load_data(self, info: tuple) -> tuple:
-        with open('AppData/GameData/animatronics.json', 'r') as f:
+    def load_data(self) -> dict:
+        with open('data/game/animatronics.json', 'r') as f:
             animatronic = json.loads(f.read())[self.name]
-            return tuple([animatronic[i] for i in info])
+            return animatronic
 
     def start_jumpscare(self) -> None:
         if self.jumpscare is not None:
@@ -86,7 +86,7 @@ class Animatronic:
 
 
 class ThePuppet(Animatronic):
-    def __init__(self, game: Game, difficulty: int):
+    def __init__(self, game: any, difficulty: int):
         super().__init__("The Puppet", difficulty)
         self.CHARGE_AMOUNT = 20
         self.MAX_MUSIC_TIME = 100
@@ -133,15 +133,16 @@ class Bonnie(Animatronic):
     """
     Starts in the lunchroom, moves around the left side and attacks at the left door.
     """
-    def __init__(self, game: Game, difficulty: int):
+    def __init__(self, game: any, difficulty: int):
         super().__init__('Bonnie', difficulty)
-        self.OFFICE_LOCATION = 5
         self._office = game.office
-        self._cameras = game.systems["Cams System"].camera_list
+        self._cameras = game.systems["Cameras"]._camera_list
         self._location = -1
         self._kill_locked = False
-        self._camera_key, self._movement_key = self.load_data(('cameras', 'movements'))
+        self._camera_key = self.load_data()['cameras']
+        self._movement_key = self.load_data()['movements']
         self.movement_timer = 5100
+        self.OFFICE_LOCATION = len(self._movement_key)
 
     def start(self) -> None:
         pygame.time.set_timer(BONNIE_TIMER, self.movement_timer)
@@ -157,14 +158,15 @@ class Bonnie(Animatronic):
                 self.kill()
             # Movement Opportunities
             rng = random.randint(1, 20)
-            if self._location == self.OFFICE_LOCATION and rng < self._aggression:
-                # Get whether door is closed
-                if self._office.door_left:
-                    self.blocked()
-                else:
-                    self._office.lock()
-                    self._kill_locked = True
-                    pygame.time.set_timer(BONNIE_TIMER, random.randint(15000, 25000))
+            if self._location == self.OFFICE_LOCATION:
+                if rng < self._aggression:
+                    # Get whether door is closed
+                    if self._office.doors[0].door_status == 'closed':
+                        self.blocked()
+                    else:
+                        self._office.doors[0].lock()
+                        self._kill_locked = True
+                        pygame.time.set_timer(BONNIE_TIMER, random.randint(15000, 25000))
             elif rng <= self._aggression:
                 self.move()
         if event.type == CAMERA_FLIPPED_DOWN and self._kill_locked:
@@ -176,24 +178,26 @@ class Bonnie(Animatronic):
 
     def move(self) -> None:
         movements = self._movement_key
-        moves = movements[str(self._location)]
+        moves = movements[self._location]
         self._location = moves[random.randint(0, len(moves)-1)]
+        print(self._location)
 
-    def draw(self, screen) -> None:
+    def draw(self, surface) -> None:
         if self._location == self.OFFICE_LOCATION:
             if self._office.active:
-                screen.blit(self._get_image())
+                surface.blit(self._get_image(), (0, 0))
         else:
             camera_location = self._get_cam_index_from_location()
             camera = self._cameras[camera_location]
             if camera.active:
-                screen.blit(self._get_image())
+                surface.blit(self._get_image(), (0, 0))
 
     # Some sort of dictionary with all the images and stages that bonnie possesses
     def _get_image(self) -> any:
-        return pygame.image.load('resources/sprites/animatronics/bonnie/bonnie' + str(self._location)).convert_alpha()
+        return pygame.image.load(
+            'resources/sprites/animatronics/bonnie/bonbie_' + str(self._location) + '.png').convert_alpha()
 
     def _get_cam_index_from_location(self) -> int:
         cameras = self._camera_key
-        camera = cameras[str(self._location)]
+        camera = cameras[self._location]
         return camera
