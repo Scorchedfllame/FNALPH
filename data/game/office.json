@@ -2,14 +2,11 @@
   "doors": [
     {
       "images": {
-        "open_dark": "resources/sprites/doors/L_open_dark.png",
-        "open_light": "resources/sprites/doors/L_open_light.png",
-        "closed_dark": "resources/sprites/doors/L_closed_dark.png",
-        "closed_light": "resources/sprites/doors/L_closed_dark.png",
-        "door_button_on": "resources/sprites/doors/test.png",
-        "door_button_off": "resources/sprites/doors/L_door_button.png",
-        "light_button_on": "resources/sprites/doors/test.png",
-        "light_button_off": "resources/sprites/doors/L_light_button.png"
+        "open_dark": "resources/sprites/doors/left/open_dark.png",
+        "open_light": "resources/sprites/doors/left/open_light.png",
+        "closed_dark": "resources/sprites/doors/left/closed_dark.png",
+        "closed_light": "resources/sprites/doors/left/closed_light.png",
+        "button": "resources/sprites/doors/left/button.png"
       },
       "positions": {
         "door": [0, 0],
@@ -19,14 +16,11 @@
     },
     {
       "images": {
-      "open_dark": "resources/sprites/doors/R_open_dark.png",
-        "open_light": "resources/sprites/doors/R_open_light.png",
-        "closed_dark": "resources/sprites/doors/R_closed_dark.png",
-        "closed_light": "resources/sprites/doors/R_closed_light.png",
-        "door_button_on": "resources/sprites/doors/test.png",
-        "door_button_off": "resources/sprites/doors/R_door_button.png",
-        "light_button_on": "resources/sprites/doors/test.png",
-        "light_button_off": "resources/sprites/doors/R_light_button.png"
+      "open_dark": "resources/sprites/doors/right/open_dark.png",
+        "open_light": "resources/sprites/doors/right/open_light.png",
+        "closed_dark": "resources/sprites/doors/right/closed_dark.png",
+        "closed_light": "resources/sprites/doors/right/closed_light.png",
+        "button": "resources/sprites/doors/right/button.png"
       },
       "positions": {
         "door": [0, 0],

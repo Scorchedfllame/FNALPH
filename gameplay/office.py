@@ -82,11 +82,11 @@ class Door:
         self.current_surface = self.curr_images[self.get_status()]
         self.rect = self.current_surface.get_rect()
         self.rect.topleft = self.relative_pos['door']
-        self.light_button = ToggleButton(self.curr_images['light_button_off'],
+        self.light_button = ToggleButton(self.curr_images['button'],
                                          self.relative_pos['light'],
                                          self.light_on,
                                          self.light_off)
-        self.door_button = ToggleButton(self.curr_images['door_button_off'],
+        self.door_button = ToggleButton(self.curr_images['button'],
                                         self.relative_pos['door'],
                                         self.close_door,
                                         self.open_door)
@@ -97,7 +97,8 @@ class Door:
         with open('data/game/office.json', 'r') as f:
             dictionary = json.loads(f.read())
             for door in dictionary['doors']:
-                door_list.append(Door(door['images'], {k: tuple(v) for k, v in door['positions'].items()}))
+                door_list.append(Door(door['images'], {
+                    k: tuple(v) for k, v in door['positions'].items()}))
         return door_list
 
     def tick(self, event: pygame.event.Event):
@@ -133,10 +134,8 @@ class Door:
         self.rect.topleft = (0, 0)
         self.rect.move_ip(vector)
         surface.blit(self.current_surface, (self.rect.x + door_positions[0], self.rect.y + door_positions[1]))
-        self.door_button.resize((self.rect.x + button_positions[0], self.rect.y + button_positions[1]))
-        self.light_button.resize((self.rect.x + light_positions[0], self.rect.y + light_positions[1]))
-        self.door_button.draw(surface)
-        self.light_button.draw(surface)
+        self.door_button.resize((self.rect.x + button_positions[0], self.rect.y + button_positions[1]), scale=1.2)
+        self.light_button.resize((self.rect.x + light_positions[0], self.rect.y + light_positions[1]), scale=1.2)
 
     def lock(self):
         self._locked = True
