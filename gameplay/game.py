@@ -1,9 +1,4 @@
-import pygame
-from .office import Office
 from .clock import Clock
-from .systems import *
-from .power import PowerManager
-from .buttons import Flick, Button
 from gameplay.office import Office
 from gameplay.systems import Cameras
 from gameplay.power import PowerManager
@@ -57,7 +52,7 @@ class Game:
         power_usage += self.office.get_power_usage()
         for system in self.systems.values():
             if system.active:
-                power_usage += 2
+                power_usage += 1
         return min(power_usage, 5)
 
     def tick(self, event: pygame.event.Event):
@@ -71,7 +66,11 @@ class Game:
 
     def blackout(self):
         self.office.image = pygame.image.load('resources/backgrounds/office_blackout.png').convert()
-        self.office.image = pygame.transform.scale_by(self.office.image, self.office.IMAGE_SCALE_SIZE)
+        self.office.image = pygame.transform.scale_by(self.office.image,
+                                                      pygame.display.get_surface().get_height()/
+                                                      self.office.image.get_size()[1])
+        self.animatronics = []
+        self.office.doors = []
         self.systems['Cameras'].activate_blackout()
 
     def win(self):
@@ -108,7 +107,7 @@ class Game:
         for system in self.systems.values():
             system.draw()
         for animatronic in self.animatronics:
-            animatronic.draw()
+            animatronic.draw(screen)
         if not self.systems['Cameras'].blackout:
             self.flick.draw(screen)
         for button in self.buttons:

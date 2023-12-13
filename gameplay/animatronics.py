@@ -180,11 +180,10 @@ class Bonnie(Animatronic):
         movements = self._movement_key
         moves = movements[self._location]
         self._location = moves[random.randint(0, len(moves)-1)]
-        print(self._location)
 
     def draw(self, surface) -> None:
         if self._location == self.OFFICE_LOCATION:
-            if self._office.active:
+            if self._office.active and self._office.doors[0].light_status == 'light':
                 surface.blit(self._get_image(), (0, 0))
         else:
             camera_location = self._get_cam_index_from_location()
@@ -254,11 +253,10 @@ class Chica(Animatronic):
         movements = self._movement_key
         moves = movements[self._location]
         self._location = moves[random.randint(0, len(moves)-1)]
-        print(self._location)
 
     def draw(self, surface) -> None:
         if self._location == self.OFFICE_LOCATION:
-            if self._office.active:
+            if self._office.active and self._office.doors[1].light_status == 'light':
                 surface.blit(self._get_image(), (0, 0))
         else:
             camera_location = self._get_cam_index_from_location()
