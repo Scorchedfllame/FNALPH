@@ -105,6 +105,7 @@ class Game:
         if not self.systems['Cameras'].blackout:
             self.flick.draw(screen)
         self.power_manager.draw(screen)
+        self.clock.draw(screen)
 
     def kill(self):
         if not self._win:
