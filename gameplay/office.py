@@ -7,7 +7,7 @@ import json
 class Office:
     def __init__(self):
         self.doors = Door.generate_doors()
-        self.image = pygame.image.load('resources/backgrounds/offices/office.png').convert()
+        self.image = pygame.image.load('resources/backgrounds/office.png').convert()
         self.image = pygame.transform.scale_by(self.image,
                                                pygame.display.get_surface().get_height()/self.image.get_size()[1])
         self.surface = pygame.surface.Surface(self.image.get_size())

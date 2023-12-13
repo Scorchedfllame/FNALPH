@@ -81,8 +81,6 @@ class Game:
             self.office.tick(event)
             self.tick(event)
         self.office.frame()
-        for system in self.systems.values():
-            system.frame()
 
     def global_draw(self):
         screen = pygame.display.get_surface()
