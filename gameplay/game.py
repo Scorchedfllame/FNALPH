@@ -114,6 +114,7 @@ class Game:
         for button in self.buttons:
             button.draw(screen)
         self.power_manager.draw(screen)
+        self.clock.draw(screen)
 
     def kill(self):
         if not self._win:
