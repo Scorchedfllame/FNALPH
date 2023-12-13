@@ -4,17 +4,23 @@ from .clock import Clock
 from .systems import *
 from .power import PowerManager
 from .buttons import Flick, Button
+from gameplay.office import Office
+from gameplay.systems import Cameras
+from gameplay.power import PowerManager
+from gameplay.buttons import *
+from gameplay import Bonnie
+from data.game.constants import *
 
 
 class Game:
     def __init__(self):
         self.utils = {}
-        self.animatronics = []
         self.systems = {"Cameras": Cameras()}
         self.buttons = []
         self.GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 55)
         self.BIGGER_GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
         self.office = Office()
+        self.animatronics = [Bonnie(self, 20)]
         self.events = self.init_events()
         self.flick = self.init_flick()
         self.power_manager = PowerManager()
@@ -43,6 +49,8 @@ class Game:
     def start(self):
         pygame.time.set_timer(UPDATE_POWER, 100)
         pygame.time.set_timer(CLOCK, 1000)
+        for animatronic in self.animatronics:
+            animatronic.start()
 
     def get_power_usage(self) -> int:
         power_usage = 1
@@ -77,6 +85,7 @@ class Game:
             if event.type == pygame.WINDOWRESIZED:
                 for system in self.systems.values():
                     system.resize()
+                self.power_manager.resize()
                 self.resize()
             if event.type == BLACKOUT:
                 self.blackout()
@@ -92,8 +101,6 @@ class Game:
             self.tick(event)
             self.clock.tick(event)
         self.office.frame()
-        for system in self.systems.values():
-            system.frame()
 
     def global_draw(self):
         screen = pygame.display.get_surface()
@@ -104,6 +111,8 @@ class Game:
             animatronic.draw()
         if not self.systems['Cameras'].blackout:
             self.flick.draw(screen)
+        for button in self.buttons:
+            button.draw(screen)
         self.power_manager.draw(screen)
 
     def kill(self):

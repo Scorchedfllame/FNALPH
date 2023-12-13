@@ -17,7 +17,9 @@ class Camera:
     def __init__(self, name: str, background_path: str):
         self.name = name
         self.background_path = background_path
+        screen = pygame.display.get_surface()
         self.background = pygame.image.load(self.background_path).convert()
+        self.background = pygame.transform.scale_by(self.background, screen.get_height()/self.background.get_height())
         self.active = False
         self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 60)
         self.font_color = 'White'
@@ -28,7 +30,7 @@ class Camera:
     def resize(self):
         screen = pygame.display.get_surface()
         self.font_pos[0] = screen.get_width() * 7/12
-        self.font_pos[1] = int(screen.get_width()/2 * (850/1290))
+        self.font_pos[1] = int(screen.get_width()/2 * (850/1290) + screen.get_height())
 
     @classmethod
     def generate_cameras(cls, cameras: list[dict]) -> list:
@@ -50,9 +52,9 @@ class Camera:
     def add_button(self, button: Button):
         self._buttons.append(button)
 
-    def draw(self, surface) -> None:
+    def draw(self, surface, offset: int = 0) -> None:
         if self.active:
-            surface.blit(self.background, (0, 10))
+            surface.blit(self.background, (offset, 0))
             text = self.font.render(self.name, True, self.font_color)
             surface.blit(text, tuple(self.font_pos))
 
@@ -67,13 +69,13 @@ class Cameras(System):
         self.active = False
         self.blackout = False
         self._last_camera = 0
-        self._animation_counter = 0
-        self._animating_direction = 0
-        self.MAX_FRAMES = 5
+        self.MAX_ROTATION = 90
         self.active_icons = []
         self.inactive_icons = []
         self.generate_buttons()
-        self.activate_camera_event = pygame.event.Event(ACTIVATE_CAMERA)
+        pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 3000)
+        self.current_rotation = 0
+        self.rotation_cycle = 0
 
     @staticmethod
     def init_images():
@@ -100,6 +102,7 @@ class Cameras(System):
         self.map_image = self.init_images()
         camera_data = self.load_data('cameras')
         for i in range(len(self._camera_list)):
+            self._camera_list[i].resize()
             x, y = tuple(camera_data[i]["position"])
             regular_size = (1290, 655)
             rect = self.map_image.get_rect()
@@ -118,18 +121,6 @@ class Cameras(System):
                                 self.activate_camera,
                                 camera_index=i))
         self.resize()
-
-    def frame(self):
-        if self._animating_direction != 0:
-            self._animation_counter += self._animating_direction
-            self._animation_counter = max(0, min(self.MAX_FRAMES, self._animation_counter))
-            if self._animation_counter == self.MAX_FRAMES:
-                self.activate()
-                self._animating_direction = 0
-            elif self._animation_counter == self.MAX_FRAMES - 1 and self._animating_direction == -1:
-                self.deactivate()
-            if self._animation_counter == 0:
-                self._animating_direction = 0
 
     def activate(self):
         self.active = True
@@ -170,29 +161,52 @@ class Cameras(System):
         rect.bottomright = surface.get_size()
         surface.blit(self.map_image, rect)
 
+    @staticmethod
+    def get_pos_from_rot(screen_x, image_x, rotation, max_rotation):
+        # normalization 0-1
+        normalized = (rotation + max_rotation)/(2*max_rotation)
+
+        # turn into other stuff
+        return normalized * (screen_x - image_x)
+
     def draw(self):
+        if self.rotation_cycle == 0:
+            self.current_rotation += 1
+        elif self.rotation_cycle == 2:
+            self.current_rotation -= 1
+        self.current_rotation = max(-self.MAX_ROTATION, min(self.current_rotation, self.MAX_ROTATION))
         if self.active:
             screen = pygame.display.get_surface()
-            if self._animating_direction != 0:
-                print(self._animating_direction)
-                path = f"resources/animations/camera/{self._animation_counter}.png"
-                animation_frame = pygame.image.load(path).convert_alpha()
-                frame_rect = animation_frame.get_rect()
-                frame_rect.midbottom = (screen.get_width()/2, screen.get_height)
-                screen.blit(animation_frame, frame_rect)
             for i, camera in enumerate(self._camera_list):
-                camera.draw(screen)
+                offset = self.get_pos_from_rot(screen.get_width(),
+                                               camera.background.get_width(),
+                                               self.current_rotation,
+                                               self.MAX_ROTATION)
+                camera.draw(screen, offset)
             self.draw_map(screen)
             for button in self.buttons:
                 button.draw(screen)
 
     def tick(self, event: pygame.event.Event):
-        if event.type == CAMERA_FLIPPED_DOWN:
-            self._animating_direction = -1
-        if event.type == CAMERA_FLIPPED_UP:
-            self._animating_direction = 1
         for button in self.buttons:
             button.tick(event)
+        if event.type == CAMERA_FLIPPED_UP:
+            self.activate()
+        if event.type == CAMERA_FLIPPED_DOWN:
+            self.deactivate()
+        if event.type == CAMERA_ROTATION:
+            self.rotation_cycle += 1
+            if self.rotation_cycle == 4:
+                self.rotation_cycle = 0
+            match self.rotation_cycle:
+                case 0:
+                    self.current_rotation = -90
+                case 1:
+                    self.current_rotation = 90
+                case 2:
+                    self.current_rotation = 90
+                case 3:
+                    self.current_rotation = -90
 
 
 class Vents(System):
