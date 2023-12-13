@@ -67,6 +67,7 @@ class Cameras(System):
         self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 90)
         self.enabled = True
         self.active = False
+        self.blackout = False
         self._last_camera = 0
         self.MAX_ROTATION = 90
         self.active_icons = []
@@ -124,6 +125,10 @@ class Cameras(System):
     def activate(self):
         self.active = True
         self.activate_camera(self._last_camera)
+
+    def activate_blackout(self):
+        self.blackout = True
+        pygame.event.post(pygame.event.Event(CAMERA_FLIPPED_DOWN))
 
     def deactivate(self):
         self.active = False
