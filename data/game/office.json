@@ -6,7 +6,8 @@
         "open_light": "resources/sprites/doors/left/open_light.png",
         "closed_dark": "resources/sprites/doors/left/closed_dark.png",
         "closed_light": "resources/sprites/doors/left/closed_light.png",
-        "button": "resources/sprites/doors/left/button.png"
+        "button": "resources/sprites/doors/left/button.png",
+        "animation": "resources/animations/doors/master_l.png"
       },
       "positions": {
         "door": [0, 0],
@@ -20,7 +21,8 @@
         "open_light": "resources/sprites/doors/right/open_light.png",
         "closed_dark": "resources/sprites/doors/right/closed_dark.png",
         "closed_light": "resources/sprites/doors/right/closed_light.png",
-        "button": "resources/sprites/doors/right/button.png"
+        "button": "resources/sprites/doors/right/button.png",
+        "animation": "resources/animations/doors/master_r.png"
       },
       "positions": {
         "door": [0, 0],
