@@ -20,12 +20,16 @@ class Camera:
         screen = pygame.display.get_surface()
         self.background = pygame.image.load(self.background_path).convert()
         self.background = pygame.transform.scale_by(self.background, screen.get_height()/self.background.get_height())
+        self._background = self.background.__copy__()
         self.active = False
         self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 60)
         self.font_color = 'White'
         self.font_pos = [0, 0]
         self.resize()
         self._buttons = []
+
+    def reset_background(self):
+        self.background = self._background.__copy__()
 
     def resize(self):
         screen = pygame.display.get_surface()
@@ -62,7 +66,7 @@ class Camera:
 class Cameras(System):
     def __init__(self):
         super().__init__("Cams System", 'resources/background/test.png')
-        self._camera_list = Camera.generate_cameras(self.load_data('cameras'))
+        self.camera_list = Camera.generate_cameras(self.load_data('cameras'))
         self.map_image = self.init_images()
         self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 90)
         self.enabled = True
@@ -101,8 +105,8 @@ class Cameras(System):
     def resize(self):
         self.map_image = self.init_images()
         camera_data = self.load_data('cameras')
-        for i in range(len(self._camera_list)):
-            self._camera_list[i].resize()
+        for i in range(len(self.camera_list)):
+            self.camera_list[i].resize()
             x, y = tuple(camera_data[i]["position"])
             regular_size = (1290, 655)
             rect = self.map_image.get_rect()
@@ -115,7 +119,7 @@ class Cameras(System):
     def generate_buttons(self):
         camera_buttons = self.load_data('cameras')
         self.load_camera_buttons(camera_buttons)
-        for i in range(len(self._camera_list)):
+        for i in range(len(self.camera_list)):
             self.buttons.append(Button(self.inactive_icons[i],
                                 (0, 0),
                                 self.activate_camera,
@@ -136,18 +140,18 @@ class Cameras(System):
         self.disable_cameras()
 
     def disable_cameras(self):
-        for i, camera in enumerate(self._camera_list):
+        for i, camera in enumerate(self.camera_list):
             self.buttons[i].change_surface(self.inactive_icons[i])
             camera.deactivate()
 
     def get_active_camera(self):
-        for i in range(len(self._camera_list)):
-            if self._camera_list[i].active:
+        for i in range(len(self.camera_list)):
+            if self.camera_list[i].active:
                 return i
 
     def activate_camera(self, camera_index: int):
         self.disable_cameras()
-        camera = self._camera_list[camera_index]
+        camera = self.camera_list[camera_index]
         self.buttons[camera_index].change_surface(self.active_icons[camera_index])
         camera.activate()
         self._last_camera = camera_index
@@ -177,7 +181,7 @@ class Cameras(System):
         self.current_rotation = max(-self.MAX_ROTATION, min(self.current_rotation, self.MAX_ROTATION))
         if self.active:
             screen = pygame.display.get_surface()
-            for i, camera in enumerate(self._camera_list):
+            for i, camera in enumerate(self.camera_list):
                 offset = self.get_pos_from_rot(screen.get_width(),
                                                camera.background.get_width(),
                                                self.current_rotation,
