@@ -46,7 +46,6 @@ class Animator:
     def draw(self, surface: pygame.Surface, vector: pygame.Vector2 = pygame.Vector2(0, 0)):
         if self.active:
             self.update_rect()
-            print(self.image_rect)
             surface.blit(self.frames, vector, self.image_rect)
             if self.direction == 'backward':
                 self.one_backward()
