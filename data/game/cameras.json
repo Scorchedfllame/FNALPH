@@ -23,6 +23,12 @@
       "position": [503, 278],
       "name": "Commons",
       "background": "resources/backgrounds/cameras/commons.png"
+    },
+    {
+      "label": "5",
+      "position": [953, 478],
+      "name": "Room 202",
+      "background": "resources/backgrounds/cameras/lee_room.png"
     }
   ]
 }

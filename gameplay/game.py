@@ -101,13 +101,6 @@ class Game:
                 self.blackout()
             if event.type == WIN:
                 self.win()
-            if event.type == CLOCK:
-                for animatronic in self.animatronics:
-                    change_list = self.animatronic_data[animatronic.name]['change']
-                    for change in change_list:
-                        if change[0] == self.clock.hour:
-                            animatronic.update_aggression(change[1])
-                            break
             for animatronic in self.animatronics:
                 animatronic.tick(event)
             for system in self.systems.values():
@@ -117,6 +110,13 @@ class Game:
             self.office.tick(event)
             self.tick(event)
             self.clock.tick(event)
+            if event.type == CLOCK:
+                for animatronic in self.animatronics:
+                    change_list = self.animatronic_data[animatronic.name]['change']
+                    for change in change_list:
+                        if change[0] == self.clock.hour:
+                            animatronic.update_aggression(change[1])
+                            break
         self.office.frame()
 
     def global_draw(self):
