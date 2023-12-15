@@ -94,6 +94,9 @@ class Door:
         anim_rect = self.current_surface.get_rect()
         self.animator = Animator(self.curr_images['animation'], anim_rect)
 
+    def reset(self):
+        self.curr_images = self._default_images
+
     @classmethod
     def generate_doors(cls) -> list:
         door_list = []

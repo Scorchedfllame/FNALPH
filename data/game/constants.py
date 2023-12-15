@@ -6,6 +6,7 @@ import pygame
 #   Timers
 PUPPET_TIMER = pygame.USEREVENT + 1
 BONNIE_TIMER = pygame.USEREVENT + 5
+CHICA_TIMER = pygame.USEREVENT + 12
 UPDATE_POWER = pygame.USEREVENT + 7
 CLOCK = pygame.USEREVENT + 9
 CAMERA_ROTATION = pygame.USEREVENT + 11

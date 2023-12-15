@@ -15,7 +15,7 @@ class Game:
         self.GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 55)
         self.BIGGER_GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
         self.office = Office()
-        self.animatronics = [Bonnie(self, 10), Chica(self, 10)]
+        self.animatronics = [Chica(self, 10), Bonnie(self, 10)]
         self.events = self.init_events()
         self.flick = self.init_flick()
         self.power_manager = PowerManager()
@@ -114,6 +114,10 @@ class Game:
             button.draw(screen)
         self.power_manager.draw(screen)
         self.clock.draw(screen)
+
+    def update_animatronics(self):
+        for animatronic in self.animatronics:
+            animatronic.update_images()
 
     def kill(self):
         if not self._win:
