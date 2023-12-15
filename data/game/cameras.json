@@ -1,0 +1,28 @@
+{
+  "cameras": [
+    {
+      "label": "1a",
+      "position": [450, 150],
+      "name": "Lunchroom",
+      "background": "resources/backgrounds/cameras/lunchroom.png"
+    },
+    {
+      "label": "2a",
+      "position": [303, 200],
+      "name": "Hallway",
+      "background": "resources/backgrounds/cameras/hallway.png"
+    },
+    {
+      "label": "3",
+      "position": [853, 278],
+      "name": "Birrell",
+      "background": "resources/backgrounds/cameras/test.png"
+    },
+    {
+      "label": "4a",
+      "position": [503, 278],
+      "name": "Commons",
+      "background": "resources/backgrounds/cameras/commons.png"
+    }
+  ]
+}

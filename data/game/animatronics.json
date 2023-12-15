@@ -1,0 +1,40 @@
+{
+  "The Puppet": {
+    "description": "Located in Cam 6. She will kill you if you don't keep the music box wound up. The global music box can sooth her.",
+    "image_path": "resourcs/sprites/animatronics/puppet.png"
+  },
+  "Bonnie": {
+    "menu_label": {
+      "description": "Comes at you from the left side of the school.",
+      "image_path": "resources/sprites/animatronics/bonnie.png"
+    },
+
+    "cameras": [
+      0,
+      1,
+      2
+    ],
+    "movements": [
+            [1, 2],
+            [2, 3],
+            [3]
+    ]
+  },
+  "Chica": {
+    "menu_label": {
+      "description": "Comes at you from the right side of the school.",
+      "image_path": "resources/sprites/animatronics/chica.png"
+    },
+
+    "cameras": [
+      0,
+      2,
+      1
+    ],
+    "movements": [
+            [1],
+            [2],
+            [3]
+    ]
+  }
+}

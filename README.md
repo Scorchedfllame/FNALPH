@@ -1,2 +1,2 @@
-# FNaF
-Practice with Classes and Objects in the form of a UCN inspired game.
+# Prototype 1
+First sprint towards a functioning prototype for the beginning of the project
