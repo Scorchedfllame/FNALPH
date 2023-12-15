@@ -145,10 +145,10 @@ class Chica(Animatronic):
         self._camera_key = self.load_data()['cameras']
         self._movement_key = self.load_data()['movements']
         self.FILE_LOCATION = 'resources/sprites/animatronics/baddie/chirca_'
-        self.open_light = pygame.image.load(self.FILE_LOCATION+'open_light.png').convert()
+        self.open_light = pygame.image.load(self.FILE_LOCATION+'open_light.png').convert_alpha()
         self.open_light = pygame.transform.scale_by(self.open_light, pygame.display.get_surface().get_height()/
                                                     self.open_light.get_height())
-        self.closed_light = pygame.image.load(self.FILE_LOCATION + 'closed_light.png').convert()
+        self.closed_light = pygame.image.load(self.FILE_LOCATION + 'closed_light.png').convert_alpha()
         self.closed_light = pygame.transform.scale_by(self.closed_light, pygame.display.get_surface().get_height() /
                                                       self.closed_light.get_height())
         self.TIMER = CHICA_TIMER
@@ -234,10 +234,10 @@ class Bonnie(Animatronic):
         self._camera_key = self.load_data()['cameras']
         self._movement_key = self.load_data()['movements']
         self.FILE_LOCATION = 'resources/sprites/animatronics/bonnie/bonbie_'
-        self.open_light = pygame.image.load(self.FILE_LOCATION+'open_light.png').convert()
+        self.open_light = pygame.image.load(self.FILE_LOCATION+'open_light.png').convert_alpha()
         self.open_light = pygame.transform.scale_by(self.open_light, pygame.display.get_surface().get_height()/
                                                     self.open_light.get_height())
-        self.closed_light = pygame.image.load(self.FILE_LOCATION + 'closed_light.png').convert()
+        self.closed_light = pygame.image.load(self.FILE_LOCATION + 'closed_light.png').convert_alpha()
         self.closed_light = pygame.transform.scale_by(self.closed_light, pygame.display.get_surface().get_height() /
                                                       self.closed_light.get_height())
         self.TIMER = BONNIE_TIMER
