@@ -95,7 +95,7 @@ class Door:
         self.animator = Animator(self.curr_images['animation'], anim_rect)
 
     def reset(self):
-        self.curr_images = self._default_images
+        self.curr_images = self._default_images.copy()
 
     @classmethod
     def generate_doors(cls) -> list:

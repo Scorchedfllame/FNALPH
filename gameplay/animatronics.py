@@ -191,6 +191,7 @@ class Chica(Animatronic):
 
     def move(self, position: int) -> None:
         self._update_camera()
+        self.door.reset()
         self.camera.reset_background()
         self._location = position
         self._game.update_animatronics()
@@ -214,8 +215,6 @@ class Chica(Animatronic):
             cameras = self._camera_key
             camera = cameras[self._location]
             self.camera = self._cameras[camera]
-        else:
-            self.door.reset()
 
 
 class Bonnie(Animatronic):
@@ -280,6 +279,7 @@ class Bonnie(Animatronic):
 
     def move(self, position: int) -> None:
         self._update_camera()
+        self.door.reset()
         self.camera.reset_background()
         self._location = position
         self._game.update_animatronics()
@@ -303,6 +303,4 @@ class Bonnie(Animatronic):
             cameras = self._camera_key
             camera = cameras[self._location]
             self.camera = self._cameras[camera]
-        else:
-            self.door.reset()
 
