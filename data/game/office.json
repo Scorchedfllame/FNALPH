@@ -1,0 +1,34 @@
+{
+  "doors": [
+    {
+      "images": {
+        "open_dark": "resources/sprites/doors/left/open_dark.png",
+        "open_light": "resources/sprites/doors/left/open_light.png",
+        "closed_dark": "resources/sprites/doors/left/closed_dark.png",
+        "closed_light": "resources/sprites/doors/left/closed_light.png",
+        "button": "resources/sprites/doors/left/button.png",
+        "animation": "resources/animations/doors/master_l.png"
+      },
+      "positions": {
+        "door": [0, 0],
+        "light": [10, 547],
+        "button": [9, 478]
+      }
+    },
+    {
+      "images": {
+      "open_dark": "resources/sprites/doors/right/open_dark.png",
+        "open_light": "resources/sprites/doors/right/open_light.png",
+        "closed_dark": "resources/sprites/doors/right/closed_dark.png",
+        "closed_light": "resources/sprites/doors/right/closed_light.png",
+        "button": "resources/sprites/doors/right/button.png",
+        "animation": "resources/animations/doors/master_r.png"
+      },
+      "positions": {
+        "door": [0, 0],
+        "light": [2076, 520],
+        "button": [2075, 471]
+      }
+    }
+  ]
+}

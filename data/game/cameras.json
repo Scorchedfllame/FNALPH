@@ -17,6 +17,12 @@
       "position": [853, 278],
       "name": "Birrell",
       "background": "resources/backgrounds/cameras/test.png"
+    },
+    {
+      "label": "4a",
+      "position": [503, 278],
+      "name": "Commons",
+      "background": "resources/backgrounds/cameras/commons.png"
     }
   ]
 }

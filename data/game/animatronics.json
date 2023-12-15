@@ -5,21 +5,36 @@
   },
   "Bonnie": {
     "menu_label": {
-      "description": "Comes at you from the right side of the school.",
+      "description": "Comes at you from the left side of the school.",
       "image_path": "resources/sprites/animatronics/bonnie.png"
     },
 
     "cameras": [
+      0,
       1,
-      2,
-      3,
-      4,
-      5
+      2
     ],
-    "movements": {
-            "0": [1, 2],
-            "1": [2, 3],
-            "2": [4]
-    }
+    "movements": [
+            [1, 2],
+            [2, 3],
+            [3]
+    ]
+  },
+  "Chica": {
+    "menu_label": {
+      "description": "Comes at you from the right side of the school.",
+      "image_path": "resources/sprites/animatronics/chica.png"
+    },
+
+    "cameras": [
+      0,
+      2,
+      1
+    ],
+    "movements": [
+            [1],
+            [2],
+            [3]
+    ]
   }
 }
