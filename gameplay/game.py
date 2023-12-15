@@ -5,17 +5,23 @@ from gameplay.power import PowerManager
 from gameplay.buttons import *
 from gameplay import Bonnie, Chica
 from data.game.constants import *
+import json
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, night: int):
+        self.night_dict = self.get_night_dict()
         self.utils = {}
         self.systems = {"Cameras": Cameras()}
         self.buttons = []
         self.GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 55)
         self.BIGGER_GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
         self.office = Office()
-        self.animatronics = [Chica(self, 10), Bonnie(self, 10)]
+        self.animatronics = []
+        self.animatronic_data = self.night_dict[str(night)]
+        animatronic_key = {"Bonnie": Bonnie, "Chica": Chica}
+        for animatronic, data in self.animatronic_data.items():
+            self.animatronics.append(animatronic_key[animatronic](self, data['difficulty']))
         self.events = self.init_events()
         self.flick = self.init_flick()
         self.power_manager = PowerManager()
@@ -23,6 +29,11 @@ class Game:
         self.debugger = True
         self._win = False
         self._killed = False
+
+    @staticmethod
+    def get_night_dict() -> dict:
+        with open('data/game/nights.json', 'r') as f:
+            return json.loads(f.read())
 
     @staticmethod
     def init_events() -> dict:
@@ -43,7 +54,7 @@ class Game:
 
     def start(self):
         pygame.time.set_timer(UPDATE_POWER, 100)
-        pygame.time.set_timer(CLOCK, 1000)
+        self.clock.start()
         for animatronic in self.animatronics:
             animatronic.start()
 
@@ -90,6 +101,13 @@ class Game:
                 self.blackout()
             if event.type == WIN:
                 self.win()
+            if event.type == CLOCK:
+                for animatronic in self.animatronics:
+                    change_list = self.animatronic_data[animatronic.name]['change']
+                    for change in change_list:
+                        if change[0] == self.clock.hour:
+                            animatronic.update_aggression(change[1])
+                            break
             for animatronic in self.animatronics:
                 animatronic.tick(event)
             for system in self.systems.values():
