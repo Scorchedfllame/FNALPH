@@ -1,4 +1,6 @@
 import os
+
+import pygame.transform
 from gameplay import *
 from data.saves.save import SaveManager
 
@@ -7,6 +9,7 @@ class Menu:
     def __init__(self, directory: str):
         self.directory = directory
         self.background = pygame.image.load(self.directory + "background.png").convert()
+        self.background = pygame.transform.scale_by(self.background, pygame.display.get_surface().get_width()/self.background.get_width())
         self.buttons = []
         self.active = False
         self.save_manager = SaveManager()
