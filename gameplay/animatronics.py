@@ -95,7 +95,7 @@ class Chica(Animatronic):
     def __init__(self, game: any, difficulty: int):
         super().__init__('Chica', difficulty)
         self._office = game.office
-        self.door = game.office.doors[1]
+        self.door = game.office.doors[0]
         self._game = game
         self._cameras = game.systems["Cameras"].camera_list
         self._location = 0
@@ -185,7 +185,7 @@ class Bonnie(Animatronic):
     def __init__(self, game: any, difficulty: int):
         super().__init__('Bonnie', difficulty)
         self._office = game.office
-        self.door = game.office.doors[0]
+        self.door = game.office.doors[1]
         self._game = game
         self._cameras = game.systems["Cameras"].camera_list
         self._location = 0
@@ -280,7 +280,7 @@ class Lefty(Animatronic):
         self._kill_locked = False
         self._camera_key = self.load_data()['cameras']
         self._movement_key = self.load_data()['movements']
-        self.FILE_LOCATION = 'resources/sprites/animatronics/bonnie/bonnie_'
+        self.FILE_LOCATION = 'resources/sprites/animatronics/lefty/lefty_'
         self.open_light = pygame.image.load(self.FILE_LOCATION+'open_light.png').convert_alpha()
         self.open_light = pygame.transform.scale_by(self.open_light, pygame.display.get_surface().get_height()/
                                                     self.open_light.get_height())
@@ -362,13 +362,16 @@ class Knight(Animatronic):
     def __init__(self, game: any, difficulty: int):
         super().__init__('Knight', difficulty)
         self._game = game
+        self.door = self._game.office.doors[0]
         cameras = game.systems["Cameras"].camera_list
         self.camera = cameras[4]
         self._location = 0
         self.FILE_LOCATION = 'resources/sprites/animatronics/knight/knight_'
         self.TIMER = KNIGHT_TIMER
-        self.movement_timer = 5000
+        self.aggression = 0
+        self.movement_timer = 100
         self.OFFICE_LOCATION = 4
+        self.MAX_AGGRESSION = 18000
 
     def start(self) -> None:
         pygame.time.set_timer(self.TIMER, self.movement_timer)
@@ -380,12 +383,20 @@ class Knight(Animatronic):
 
     def tick(self, event: pygame.event.Event) -> None:
         if event.type == self.TIMER:
-            # Movement Opportunities
-            rng = random.randint(1, 20)
-            if self._location == self.OFFICE_LOCATION:
-                self.kill()
-            elif rng <= self._aggression:
-                self.move(self._location + 1)
+            if not self.camera.active:
+                self.aggression += self._difficulty * 20
+                # Movement Opportunities
+                if self.aggression >= self.MAX_AGGRESSION:
+                    if self._location == self.OFFICE_LOCATION:
+                        if self.door.door_status == 'closed':
+                            self.blocked()
+                        else:
+                            self.kill()
+                    else:
+                        self.move(self._location + 1)
+                        self.aggression = 0
+            else:
+                self.aggression = random.randint(0, 3000)
 
     def blocked(self):
         self.move(0)

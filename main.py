@@ -10,7 +10,7 @@ def main():
     pygame.display.set_caption('Five Nights At Lone Peak High')
     pygame.display.set_icon(pygame.image.load('resources/ui/icon.png').convert())
     clock = pygame.time.Clock()
-    debugger = True
+    debugger = False
     main_menu = MainMenu()
     main_menu.activate()
 
@@ -22,9 +22,13 @@ def main():
             main_menu.tick()
             main_menu.draw()
         else:
-            # Game loop
-            main_menu.game_round.global_tick()
-            main_menu.game_round.global_draw()
+            if main_menu.game_round.active:
+                # Game loop
+                main_menu.game_round.global_tick()
+                main_menu.game_round.global_draw()
+            else:
+                main_menu = MainMenu()
+                main_menu.activate()
         if debugger:
             screen.blit(pygame.font.SysFont('minecraftten', 25).render("%.1f" % clock.get_fps(),
                                                                        True,

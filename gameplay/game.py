@@ -1,3 +1,4 @@
+import pygame
 from .clock import Clock
 from gameplay.office import Office
 from gameplay.systems import Cameras
@@ -26,9 +27,16 @@ class Game:
         self.flick = self.init_flick()
         self.power_manager = PowerManager()
         self.clock = Clock()
+        self.status = 'playing'
         self.debugger = True
+        self.active = True
         self._win = False
         self._killed = False
+
+    def stop(self):
+        for animatronic in self.animatronics:
+            animatronic.stop()
+            self.active = False
 
     @staticmethod
     def get_night_dict() -> dict:
@@ -69,10 +77,14 @@ class Game:
     def tick(self, event: pygame.event.Event):
         if event.type == UPDATE_POWER:
             self.power_manager.update_power(self.get_power_usage())
-        if event.type == KILL:
-            print("you died")
-            #event.video
-
+        if event.type == KILL and self.status == 'playing':
+            self.stop()
+            self.status = 'killed'
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_NUMLOCK:
+                pygame.event.post(pygame.event.Event(KILL))
+        if event.type == WIN and self.status == 'playing':
+            self.status = 'win'
 
     def resize(self):
         screen = pygame.display.get_surface()
@@ -136,6 +148,12 @@ class Game:
             button.draw(screen)
         self.power_manager.draw(screen)
         self.clock.draw(screen)
+        if self.status == 'win':
+            screen.fill('black')
+            text = self.BIGGER_GLOBAL_FONT.render("6:00 AM", True, "white")
+            rect = text.get_rect()
+            rect.center = (screen.get_width()/2, screen.get_height()/2)
+            screen.blit(text, rect)
 
     def update_animatronics(self):
         for animatronic in self.animatronics:
