@@ -49,6 +49,7 @@ class Animatronic:
         image_path = self.load_data()['menu_label']['image_path']
         self.menu_label = MenuLabel(self.name, self._difficulty, description, image_path)
         self.jumpscare = jumpscare
+        self.video = None
 
     def load_data(self) -> dict:
         with open('data/game/animatronics.json', 'r') as f:
@@ -74,7 +75,8 @@ class Animatronic:
         pass
 
     def kill(self):
-        pygame.event.post(KILL)
+        kill = pygame.event.Event(KILL, {"video": self.video})
+        pygame.event.post(kill)
         if self.jumpscare is not None:
             self.jumpscare.activate()
 
@@ -145,6 +147,8 @@ class Chica(Animatronic):
         self._camera_key = self.load_data()['cameras']
         self._movement_key = self.load_data()['movements']
         self.FILE_LOCATION = 'resources/sprites/animatronics/baddie/chirca_'
+        self.video = pygame.image.load(self.FILE_LOCATION+'jumpscare.png').convert_alpha()
+
         self.open_light = pygame.image.load(self.FILE_LOCATION+'open_light.png').convert_alpha()
         self.open_light = pygame.transform.scale_by(self.open_light, pygame.display.get_surface().get_height()/
                                                     self.open_light.get_height())

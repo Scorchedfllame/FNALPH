@@ -69,6 +69,10 @@ class Game:
     def tick(self, event: pygame.event.Event):
         if event.type == UPDATE_POWER:
             self.power_manager.update_power(self.get_power_usage())
+        if event.type == KILL:
+            print("you died")
+            #event.video
+
 
     def resize(self):
         screen = pygame.display.get_surface()
