@@ -3,7 +3,7 @@ from gameplay.office import Office
 from gameplay.systems import Cameras
 from gameplay.power import PowerManager
 from gameplay.buttons import *
-from gameplay import Bonnie, Chica
+from gameplay import Bonnie, Chica, Lefty, Knight
 from data.game.constants import *
 import json
 
@@ -19,7 +19,7 @@ class Game:
         self.office = Office()
         self.animatronics = []
         self.animatronic_data = self.night_dict[str(night)]
-        animatronic_key = {"Bonnie": Bonnie, "Chica": Chica}
+        animatronic_key = {"Bonnie": Bonnie, "Chica": Chica, "Lefty": Lefty, "Knight": Knight}
         for animatronic, data in self.animatronic_data.items():
             self.animatronics.append(animatronic_key[animatronic](self, data['difficulty']))
         self.events = self.init_events()

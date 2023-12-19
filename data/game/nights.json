@@ -7,6 +7,14 @@
     "Chica": {
       "difficulty": 0,
       "change": [[2, 2]]
+    },
+    "Lefty": {
+      "difficulty": 0,
+      "change": []
+    },
+    "Knight": {
+      "difficulty": 0,
+      "change": []
     }
   }
 }
