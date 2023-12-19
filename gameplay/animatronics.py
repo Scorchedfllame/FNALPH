@@ -49,6 +49,7 @@ class Animatronic:
         image_path = self.load_data()['menu_label']['image_path']
         self.menu_label = MenuLabel(self.name, self._difficulty, description, image_path)
         self.jumpscare = jumpscare
+        self.move_sounds = [pygame.mixer.Sound('resources/sounds/footsteps_' + str(i) + '.mp3') for i in range(1, 5)]
         self.video = None
 
     def load_data(self) -> dict:
@@ -113,7 +114,7 @@ class Chica(Animatronic):
                                                       self.closed_light.get_height())
         self.TIMER = CHICA_TIMER
         self.movement_timer = 4900
-        self.OFFICE_LOCATION = len(self._movement_key)
+        self.OFFICE_LOCATION = len(self._camera_key)
 
     def start(self) -> None:
         pygame.time.set_timer(self.TIMER, self.movement_timer)
@@ -155,6 +156,7 @@ class Chica(Animatronic):
         self.camera.reset_background()
         self._location = position
         self._game.update_animatronics()
+        self.move_sounds[random.randint(0, len(self.move_sounds)-1)].play()
 
     def update_images(self) -> None:
         if self._location != self.OFFICE_LOCATION:
@@ -201,7 +203,7 @@ class Bonnie(Animatronic):
                                                       self.closed_light.get_height())
         self.TIMER = BONNIE_TIMER
         self.movement_timer = 5100
-        self.OFFICE_LOCATION = len(self._movement_key)
+        self.OFFICE_LOCATION = len(self._camera_key)
 
     def start(self) -> None:
         pygame.time.set_timer(self.TIMER, self.movement_timer)
@@ -243,6 +245,7 @@ class Bonnie(Animatronic):
         self.camera.reset_background()
         self._location = position
         self._game.update_animatronics()
+        self.move_sounds[random.randint(0, len(self.move_sounds)-1)].play()
 
     def update_images(self) -> None:
         if self._location != self.OFFICE_LOCATION:
@@ -289,7 +292,7 @@ class Lefty(Animatronic):
                                                       self.closed_light.get_height())
         self.TIMER = LEFTY_TIMER
         self.movement_timer = 2500
-        self.OFFICE_LOCATION = len(self._movement_key)
+        self.OFFICE_LOCATION = len(self._camera_key)
 
     def start(self) -> None:
         pygame.time.set_timer(self.TIMER, self.movement_timer)
@@ -332,6 +335,7 @@ class Lefty(Animatronic):
         self.camera.reset_background()
         self._location = position
         self._game.update_animatronics()
+        self.move_sounds[random.randint(0, len(self.move_sounds) - 1)].play()
 
     def update_images(self) -> None:
         if self._location != self.OFFICE_LOCATION:
@@ -399,6 +403,7 @@ class Knight(Animatronic):
                 self.aggression = random.randint(0, 3000)
 
     def blocked(self):
+        self.aggression = 0
         self.move(0)
 
     def move(self, position: int) -> None:

@@ -7,10 +7,13 @@ from gameplay.buttons import *
 from gameplay import Bonnie, Chica, Lefty, Knight
 from data.game.constants import *
 import json
+from data.saves.save import SaveManager
 
 
 class Game:
     def __init__(self, night: int):
+        self.night = night
+        self.save_manager = SaveManager()
         self.night_dict = self.get_night_dict()
         self.utils = {}
         self.systems = {"Cameras": Cameras()}
@@ -32,11 +35,13 @@ class Game:
         self.active = True
         self._win = False
         self._killed = False
+        self.jump_scare_sound = pygame.mixer.Sound('resources/sounds/jump_scare.mp3')
 
     def stop(self):
+        self.active = False
         for animatronic in self.animatronics:
             animatronic.stop()
-            self.active = False
+        self.office.stop()
 
     @staticmethod
     def get_night_dict() -> dict:
@@ -80,11 +85,13 @@ class Game:
         if event.type == KILL and self.status == 'playing':
             self.stop()
             self.status = 'killed'
+            self.jump_scare_sound.play()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_NUMLOCK:
                 pygame.event.post(pygame.event.Event(KILL))
         if event.type == WIN and self.status == 'playing':
             self.status = 'win'
+            self.save_manager.data = {"night": self.night + 1}
 
     def resize(self):
         screen = pygame.display.get_surface()
@@ -92,6 +99,8 @@ class Game:
             i.resize((int(screen.get_width()/2), screen.get_height() - 25), screen.get_width()/(screen.get_width()*2))
 
     def blackout(self):
+        pygame.mixer.stop()
+        pygame.mixer.Sound('resources/sounds/power_off.mp3').play()
         self.office.image = pygame.image.load('resources/backgrounds/office_blackout.png').convert()
         self.office.image = pygame.transform.scale_by(self.office.image,
                                                       pygame.display.get_surface().get_height()/
@@ -158,11 +167,6 @@ class Game:
     def update_animatronics(self):
         for animatronic in self.animatronics:
             animatronic.update_images()
-
-    def kill(self):
-        if not self._win:
-            self._killed = True
-            self.stop_timer()
 
     def stop_timer(self):
         pass

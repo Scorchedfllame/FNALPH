@@ -5,7 +5,7 @@ class Clock:
     def __init__(self):
         self.time = 12
         self.hour = 0
-        self.HOUR_DURATION = 3
+        self.HOUR_DURATION = 60
         self.FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 100)
         self.active = True
 

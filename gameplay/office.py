@@ -7,6 +7,9 @@ import json
 
 class Office:
     def __init__(self):
+        self.ambience = pygame.mixer.Sound('resources/sounds/office_ambience.mp3')
+        self.ambience.play()
+        self.camera_toggle_sound = pygame.mixer.Sound('resources/sounds/camera_pull.mp3')
         self.doors = Door.generate_doors()
         self.image = pygame.image.load('resources/backgrounds/office.png').convert()
         self.image = pygame.transform.scale_by(self.image,
@@ -26,14 +29,21 @@ class Office:
                 power_usage += 1
         return power_usage
 
+    def stop(self):
+        self.ambience.stop()
+
     def tick(self, event: pygame.event.Event):
         if self.active:
             for door in self.doors:
                 door.tick(event)
         if event.type == CAMERA_FLIPPED_UP:
             self.active = False
+            self.ambience.stop()
+            self.camera_toggle_sound.play()
         if event.type == CAMERA_FLIPPED_DOWN:
             self.active = True
+            self.ambience.play()
+            self.camera_toggle_sound.play()
 
     def frame(self):
         if self.active:
@@ -70,11 +80,15 @@ class Office:
 
 class Door:
     def __init__(self, image_paths: dict[str], positions: dict):
+        self.light_off_sound = pygame.mixer.Sound('resources/sounds/light_stuck.mp3')
+        self.light_on_sound = pygame.mixer.Sound('resources/sounds/light_button.mp3')
+        self.door_toggle_sound = pygame.mixer.Sound('resources/sounds/door_close.mp3')
         self._default_images = {key: pygame.image.load(value).convert_alpha() for key, value in image_paths.items()}
         scalar = pygame.display.get_surface().get_height()/self._default_images['open_dark'].get_size()[1]
         for key, image in self._default_images.items():
             self._default_images[key] = pygame.transform.scale_by(image, scalar)
         self.curr_images = self._default_images.copy()
+        self.light_noise = pygame.mixer.Sound('resources/sounds/light_noise.mp3')
         self._locked = False
         self.light_status = 'dark'
         self.door_status = 'open'
@@ -119,10 +133,14 @@ class Door:
             if self.flicker_counter > 0:
                 if random.randint(self.flicker_counter, 101) >= 100:
                     self.flicker_counter = -1
+                    self.light_noise.stop()
                     return 'dark'
+
                 else:
                     self.flicker_counter += 1
+                    self.light_noise.play(loops=100)
                     return 'light'
+
             elif self.flicker_counter < 0:
                 if random.randint(-10, self.flicker_counter) <= -8:
                     self.flicker_counter = 1
@@ -149,20 +167,26 @@ class Door:
         self._locked = True
 
     def light_on(self):
+        self.light_noise.play(loops=100)
+        self.light_on_sound.play()
         self.light_status = 'light'
 
     def light_off(self):
+        self.light_noise.stop()
+        self.light_off_sound.play()
         self.light_status = 'dark'
 
     def get_status(self):
         return f"{self.door_status}_{self.light_status}"
 
     def open_door(self):
+        self.door_toggle_sound.play()
         self.animator.play_backward()
         self.door_status = 'open'
         self.current_surface = self.curr_images[f"open_{self.light_status}"]
 
     def close_door(self):
+        self.door_toggle_sound.play()
         self.animator.play_forward()
         self.door_status = 'closed'
         self.current_surface = self.curr_images[f"closed_{self.light_status}"]

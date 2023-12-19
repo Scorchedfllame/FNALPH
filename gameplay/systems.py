@@ -77,9 +77,11 @@ class Cameras(System):
         self.active_icons = []
         self.inactive_icons = []
         self.generate_buttons()
-        pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 3000)
+        pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 4000)
         self.current_rotation = 0
         self.rotation_cycle = 0
+        self.camera_switch_sound = pygame.mixer.Sound('resources/sounds/camera_pull.mp3')
+        self.camera_pan_sound = pygame.mixer.Sound('resources/sounds/camera_pan.mp3')
 
     @staticmethod
     def init_images():
@@ -150,6 +152,7 @@ class Cameras(System):
                 return i
 
     def activate_camera(self, camera_index: int):
+        self.camera_switch_sound.play()
         self.disable_cameras()
         camera = self.camera_list[camera_index]
         self.buttons[camera_index].change_surface(self.active_icons[camera_index])
@@ -204,10 +207,14 @@ class Cameras(System):
                 self.rotation_cycle = 0
             match self.rotation_cycle:
                 case 0:
+                    if self.active:
+                        self.camera_pan_sound.play(maxtime=2)
                     self.current_rotation = -90
                 case 1:
                     self.current_rotation = 90
                 case 2:
+                    if self.active:
+                        self.camera_pan_sound.play(maxtime=2)
                     self.current_rotation = 90
                 case 3:
                     self.current_rotation = -90

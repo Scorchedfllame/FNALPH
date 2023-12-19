@@ -1,19 +1,19 @@
 {
   "1": {
     "Bonnie": {
-      "difficulty": 2,
+      "difficulty": 5,
       "change": [[2, 2]]
     },
     "Chica": {
-      "difficulty": 2,
+      "difficulty": 4,
       "change": [[2, 2]]
     },
     "Lefty": {
-      "difficulty": 0,
+      "difficulty": 1,
       "change": []
     },
     "Knight": {
-      "difficulty": 0,
+      "difficulty": 2,
       "change": []
     }
   },

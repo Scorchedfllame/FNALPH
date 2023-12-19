@@ -9,7 +9,7 @@ class PowerManager:
         self.percentage = 100
         self.power_remaining = 100000
         self.usage = Usage(self.font, self.large_font)
-        self.DIFFICULTY = 7  # set back to 7 when done testing
+        self.DIFFICULTY = 5  # set back to 7 when done testing
         self.active = True
 
     def draw(self, surface):
