@@ -1,13 +1,18 @@
 import os
+
+import pygame.transform
 from gameplay import *
+from data.saves.save import SaveManager
 
 
 class Menu:
     def __init__(self, directory: str):
         self.directory = directory
         self.background = pygame.image.load(self.directory + "background.png").convert()
+        self.background = pygame.transform.scale_by(self.background, pygame.display.get_surface().get_width()/self.background.get_width())
         self.buttons = []
         self.active = False
+        self.save_manager = SaveManager()
 
     def activate(self):
         self.active = True
@@ -34,21 +39,24 @@ class MainMenu(Menu):
         for button in self.buttons:
             button.draw(screen)
 
-    def start_game(self):
+    def new_game(self):
         self.active = False
-        self.game_round = Game()
+        self.save_manager.reset_save()
+        self.game_round = Game(self.save_manager.load_data()['night'])
         self.game_round.start()
 
-    def open_options(self):
-        pass
+    def continue_game(self):
+        self.active = False
+        self.game_round = Game(self.save_manager.load_data()['night'])
+        self.game_round.start()
 
     def init_buttons(self) -> list[Button]:
         play_game = Button(pygame.image.load(self.directory + "buttons/new_game.png"),
-                           (100, 800),
-                           activate=self.start_game, scale=.25)
+                           (160, 900),
+                           activate=self.new_game, scale=.2)
         options = Button(pygame.image.load(self.directory + "buttons/continue.png"),
-                         (100, 900),
-                         activate=self.open_options(), scale=.25)
+                         (160, 1000),
+                         activate=self.continue_game(), scale=.2)
         return [play_game, options]
 
 
