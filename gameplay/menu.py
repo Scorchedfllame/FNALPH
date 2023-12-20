@@ -8,11 +8,13 @@ from data.saves.save import SaveManager
 class Menu:
     def __init__(self, directory: str):
         self.directory = directory
+        self.background_sound = pygame.mixer.Sound('resources/sounds/main_menu.mp3')
         self.background = pygame.image.load(self.directory + "background.png").convert()
         self.background = pygame.transform.scale_by(self.background, pygame.display.get_surface().get_width()/self.background.get_width())
         self.buttons = []
         self.active = False
         self.save_manager = SaveManager()
+        self.background_sound.play(loops=10)
 
     def activate(self):
         self.active = True
@@ -48,6 +50,7 @@ class MainMenu(Menu):
         self.start_game()
 
     def start_game(self):
+        self.background_sound.stop()
         self.active = False
         self.game_round = Game(self.save_manager.load_data()['night'])
         self.game_round.start()

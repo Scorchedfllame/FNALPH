@@ -91,7 +91,6 @@ class Door:
             self._default_images[key] = pygame.transform.scale_by(image, scalar)
         self.curr_images = self._default_images.copy()
         self.light_noise = pygame.mixer.Sound('resources/sounds/light_noise.mp3')
-        self._locked = False
         self.light_status = 'dark'
         self.door_status = 'open'
         self.relative_pos = positions
@@ -109,6 +108,7 @@ class Door:
                                         self.open_door)
         anim_rect = self.current_surface.get_rect()
         self.animator = Animator(self.curr_images['animation'], anim_rect)
+        self.button_fail_sound = pygame.mixer.Sound('resources/sounds/light_stuck.mp3')
 
     def reset(self):
         self.curr_images = self._default_images.copy()
@@ -126,9 +126,8 @@ class Door:
     def tick(self, event: pygame.event.Event):
         if event.type == CAMERA_FLIPPED_UP:
             self.light_button.check_deactivate()
-        if not self._locked:
-            self.door_button.tick(event)
-            self.light_button.tick(event)
+        self.door_button.tick(event)
+        self.light_button.tick(event)
 
     def get_flicker(self):
         if self.light_status == 'light':
@@ -167,7 +166,12 @@ class Door:
         self.animator.draw(surface, vector)
 
     def lock(self):
-        self._locked = True
+        def fail():
+            pygame.mixer.find_channel(True).play(self.button_fail_sound)
+        self.door_button.activate = fail
+        self.light_button.activate = fail
+        self.door_button.deactivate = fail
+        self.light_button.deactivate = fail
 
     def light_on(self):
         pygame.mixer.find_channel(True).play(self.light_noise, loops=100)

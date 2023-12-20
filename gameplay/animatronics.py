@@ -2,6 +2,7 @@ import json
 from data.game.constants import *
 import pygame
 import random
+import os
 
 
 class Jumpscare:
@@ -103,15 +104,11 @@ class Chica(Animatronic):
         self._kill_locked = False
         self._camera_key = self.load_data()['cameras']
         self._movement_key = self.load_data()['movements']
-        self.FILE_LOCATION = 'resources/sprites/animatronics/chica/chica_'
-        # self.video = pygame.image.load(self.FILE_LOCATION+'jumpscare.png').convert_alpha()
-
-        self.open_light = pygame.image.load(self.FILE_LOCATION+'open_light.png').convert_alpha()
-        self.open_light = pygame.transform.scale_by(self.open_light, pygame.display.get_surface().get_height()/
-                                                    self.open_light.get_height())
-        self.closed_light = pygame.image.load(self.FILE_LOCATION + 'closed_light.png').convert_alpha()
-        self.closed_light = pygame.transform.scale_by(self.closed_light, pygame.display.get_surface().get_height() /
-                                                      self.closed_light.get_height())
+        self.FILE_LOCATION = 'resources/sprites/animatronics/chica/'
+        self.images = os.listdir(self.FILE_LOCATION)
+        self.img_dict = {}
+        for image in self.images:
+            self.img_dict[image.removesuffix('.png')] = pygame.image.load(self.FILE_LOCATION + image).convert_alpha()
         self.TIMER = CHICA_TIMER
         self.movement_timer = 4900
         self.OFFICE_LOCATION = len(self._camera_key)
@@ -152,8 +149,8 @@ class Chica(Animatronic):
 
     def move(self, position: int) -> None:
         lefty = self._game.animatronics[2]
-        office = position == self.OFFICE_LOCATION and lefty.location == lefty.OFFICE_LOCATION
-        shoulder = position == self.OFFICE_LOCATION - 1 and lefty.location == lefty.OFFICE_LOCATION - 1
+        office = position == self.OFFICE_LOCATION and lefty._location == lefty.OFFICE_LOCATION
+        shoulder = position == self.OFFICE_LOCATION - 1 and lefty._location == lefty.OFFICE_LOCATION - 1
         if not (office or shoulder):
             self._update_camera()
             self.door.reset()
@@ -167,14 +164,12 @@ class Chica(Animatronic):
             self._update_camera()
             self.camera.background.blit(self._get_image(), (0, 0))
         else:
-            self.door.curr_images['open_light'] = self.open_light
-            self.door.curr_images['closed_light'] = self.closed_light
+            self.door.curr_images['open_light'] = self.img_dict[self.name.lower() + '_' + 'open_light']
+            self.door.curr_images['closed_light'] = self.img_dict[self.name.lower() + '_' + 'closed_light']
 
     # Some sort of dictionary with all the images and stages that bonnie possesses
     def _get_image(self) -> any:
-        image = pygame.image.load(
-            self.FILE_LOCATION + str(self._location) + '.png').convert_alpha()
-        return pygame.transform.scale_by(image, pygame.display.get_surface().get_height() / image.get_height())
+        return self.img_dict[self.name.lower() + '_' + str(self._location)]
 
     def _update_camera(self):
         if self._location != self.OFFICE_LOCATION:
@@ -198,13 +193,11 @@ class Bonnie(Animatronic):
         self._kill_locked = False
         self._camera_key = self.load_data()['cameras']
         self._movement_key = self.load_data()['movements']
-        self.FILE_LOCATION = 'resources/sprites/animatronics/bonnie/bonnie_'
-        self.open_light = pygame.image.load(self.FILE_LOCATION+'open_light.png').convert_alpha()
-        self.open_light = pygame.transform.scale_by(self.open_light, pygame.display.get_surface().get_height()/
-                                                    self.open_light.get_height())
-        self.closed_light = pygame.image.load(self.FILE_LOCATION + 'closed_light.png').convert_alpha()
-        self.closed_light = pygame.transform.scale_by(self.closed_light, pygame.display.get_surface().get_height() /
-                                                      self.closed_light.get_height())
+        self.FILE_LOCATION = 'resources/sprites/animatronics/bonnie/'
+        self.images = os.listdir(self.FILE_LOCATION)
+        self.img_dict = {}
+        for image in self.images:
+            self.img_dict[image.removesuffix('.png')] = pygame.image.load(self.FILE_LOCATION + image).convert_alpha()
         self.TIMER = BONNIE_TIMER
         self.movement_timer = 5100
         self.OFFICE_LOCATION = len(self._camera_key)
@@ -256,14 +249,12 @@ class Bonnie(Animatronic):
             self._update_camera()
             self.camera.background.blit(self._get_image(), (0, 0))
         else:
-            self.door.curr_images['open_light'] = self.open_light
-            self.door.curr_images['closed_light'] = self.closed_light
+            self.door.curr_images['open_light'] = self.img_dict[self.name.lower() + '_' + 'open_light']
+            self.door.curr_images['closed_light'] = self.img_dict[self.name.lower() + '_' + 'closed_light']
 
     # Some sort of dictionary with all the images and stages that bonnie possesses
     def _get_image(self) -> any:
-        image = pygame.image.load(
-            self.FILE_LOCATION + str(self._location) + '.png').convert_alpha()
-        return pygame.transform.scale_by(image, pygame.display.get_surface().get_height() / image.get_height())
+        return self.img_dict[self.name.lower() + '_' + str(self._location)]
 
     def _update_camera(self):
         if self._location != self.OFFICE_LOCATION:
@@ -287,13 +278,11 @@ class Lefty(Animatronic):
         self._kill_locked = False
         self._camera_key = self.load_data()['cameras']
         self._movement_key = self.load_data()['movements']
-        self.FILE_LOCATION = 'resources/sprites/animatronics/lefty/lefty_'
-        self.open_light = pygame.image.load(self.FILE_LOCATION+'open_light.png').convert_alpha()
-        self.open_light = pygame.transform.scale_by(self.open_light, pygame.display.get_surface().get_height()/
-                                                    self.open_light.get_height())
-        self.closed_light = pygame.image.load(self.FILE_LOCATION + 'closed_light.png').convert_alpha()
-        self.closed_light = pygame.transform.scale_by(self.closed_light, pygame.display.get_surface().get_height() /
-                                                      self.closed_light.get_height())
+        self.FILE_LOCATION = 'resources/sprites/animatronics/lefty/'
+        self.images = os.listdir(self.FILE_LOCATION)
+        self.img_dict = {}
+        for image in self.images:
+            self.img_dict[image.removesuffix('.png')] = pygame.image.load(self.FILE_LOCATION + image).convert_alpha()
         self.TIMER = LEFTY_TIMER
         self.movement_timer = 2500
         self.OFFICE_LOCATION = len(self._camera_key)
@@ -337,8 +326,8 @@ class Lefty(Animatronic):
 
     def move(self, position: int) -> None:
         chica = self._game.animatronics[1]
-        office = position == self.OFFICE_LOCATION and chica.location == chica.OFFICE_LOCATION
-        shoulder = position == self.OFFICE_LOCATION -1 and chica.location == chica.OFFICE_LOCATION -1
+        office = position == self.OFFICE_LOCATION and chica._location == chica.OFFICE_LOCATION
+        shoulder = position == self.OFFICE_LOCATION -1 and chica._location == chica.OFFICE_LOCATION -1
         if not (office or shoulder):
             self._update_camera()
             self.door.reset()
@@ -352,14 +341,12 @@ class Lefty(Animatronic):
             self._update_camera()
             self.camera.background.blit(self._get_image(), (0, 0))
         else:
-            self.door.curr_images['open_light'] = self.open_light
-            self.door.curr_images['closed_light'] = self.closed_light
+            self.door.curr_images['open_light'] = self.img_dict[self.name.lower() + '_' + 'open_light']
+            self.door.curr_images['closed_light'] = self.img_dict[self.name.lower() + '_' + 'closed_light']
 
     # Some sort of dictionary with all the images and stages that bonnie possesses
     def _get_image(self) -> any:
-        image = pygame.image.load(
-            self.FILE_LOCATION + str(self._location) + '.png').convert_alpha()
-        return pygame.transform.scale_by(image, pygame.display.get_surface().get_height() / image.get_height())
+        return self.img_dict[self.name.lower() + '_' + str(self._location)]
 
     def _update_camera(self):
         if self._location != self.OFFICE_LOCATION:
