@@ -100,6 +100,7 @@ class Chica(Animatronic):
         self.door = game.office.doors[0]
         self._game = game
         self._cameras = game.systems["Cameras"].camera_list
+        self.camera = self._cameras[0]
         self._location = 0
         self._kill_locked = False
         self._camera_key = self.load_data()['cameras']
@@ -189,6 +190,7 @@ class Bonnie(Animatronic):
         self.door = game.office.doors[1]
         self._game = game
         self._cameras = game.systems["Cameras"].camera_list
+        self.camera = self._cameras[0]
         self._location = 0
         self._kill_locked = False
         self._camera_key = self.load_data()['cameras']
@@ -274,6 +276,7 @@ class Lefty(Animatronic):
         self.door = game.office.doors[0]
         self._game = game
         self._cameras = game.systems["Cameras"].camera_list
+        self.camera = self._cameras[0]
         self._location = 0
         self._kill_locked = False
         self._camera_key = self.load_data()['cameras']
