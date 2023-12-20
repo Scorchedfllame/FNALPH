@@ -1,10 +1,8 @@
 import json
 from .buttons import Button
-from .animatronics import Animatronic
 from data.game.constants import *
 import pygame
 from .animation import Animator
-import math
 
 
 class System:
@@ -84,7 +82,7 @@ class Cameras(System):
         pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 4000)
         self.current_rotation = 0
         self.rotation_cycle = 0
-        self.camera_switch_sound = pygame.mixer.Sound('resources/sounds/camera_pull.mp3')
+        self.camera_switch_sound = pygame.mixer.Sound('resources/sounds/static.mp3')
         self.camera_pan_sound = pygame.mixer.Sound('resources/sounds/camera_pan.mp3')
 
     @staticmethod
@@ -159,6 +157,7 @@ class Cameras(System):
 
     def activate_camera(self, camera_index: int):
         self.camera_switch_sound.play()
+        self.camera_switch_sound.fadeout(300)
         self.disable_cameras()
         camera = self.camera_list[camera_index]
         self.buttons[camera_index].change_surface(self.active_icons[camera_index])
@@ -183,6 +182,10 @@ class Cameras(System):
         return normalized * (screen_x - image_x)
 
     def draw(self):
+        if self.active:
+            self.camera_pan_sound.set_volume(.5)
+        else:
+            self.camera_pan_sound.set_volume(0)
         if self.rotation_cycle == 0:
             self.current_rotation += 1
         elif self.rotation_cycle == 2:
@@ -215,15 +218,13 @@ class Cameras(System):
                 self.rotation_cycle = 0
             match self.rotation_cycle:
                 case 0:
-                    if self.active:
-                        self.camera_pan_sound.play(maxtime=2)
                     self.current_rotation = -90
+                    self.camera_pan_sound.play(maxtime=3500)
                 case 1:
                     self.current_rotation = 90
                 case 2:
-                    if self.active:
-                        self.camera_pan_sound.play(maxtime=2)
                     self.current_rotation = 90
+                    self.camera_pan_sound.play(maxtime=3500)
                 case 3:
                     self.current_rotation = -90
 

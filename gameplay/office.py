@@ -8,6 +8,7 @@ import json
 class Office:
     def __init__(self):
         self.ambience = pygame.mixer.Sound('resources/sounds/office_ambience.mp3')
+        self.ambience.set_volume(.2)
         self.camera_toggle_sound = pygame.mixer.Sound('resources/sounds/camera_pull.mp3')
         self.doors = Door.generate_doors()
         self.image = pygame.image.load('resources/backgrounds/office.png').convert()
@@ -40,11 +41,11 @@ class Office:
                 door.tick(event)
         if event.type == CAMERA_FLIPPED_UP:
             self.active = False
-            self.ambience.set_volume(.4)
+            self.ambience.set_volume(.1)
             self.camera_toggle_sound.play()
         if event.type == CAMERA_FLIPPED_DOWN:
             self.active = True
-            self.ambience.set_volume(1)
+            self.ambience.set_volume(.2)
             self.camera_toggle_sound.play()
 
     def frame(self):
