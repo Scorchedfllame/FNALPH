@@ -1,25 +1,25 @@
 {
   "1": {
     "Bonnie": {
-      "difficulty": 5,
+      "difficulty": 0,
       "change": [[2, 2]]
     },
     "Chica": {
-      "difficulty": 4,
-      "change": [[2, 2]]
+      "difficulty": 0,
+      "change": [[2, 1]]
     },
     "Lefty": {
-      "difficulty": 1,
+      "difficulty": 0,
       "change": []
     },
     "Knight": {
-      "difficulty": 2,
+      "difficulty": 0,
       "change": []
     }
   },
   "2": {
     "Bonnie": {
-      "difficulty": 2,
+      "difficulty": 3,
       "change": [[2, 2]]
     },
     "Chica": {
@@ -28,11 +28,65 @@
     },
     "Lefty": {
       "difficulty": 0,
-      "change": [[4, 2]]
+      "change": []
     },
     "Knight": {
-      "difficulty": 1,
+      "difficulty": 2,
       "change": [[4, 1]]
+    }
+  },
+  "3": {
+    "Bonnie": {
+      "difficulty": 5,
+      "change": [[2, 1], [4, 2]]
+    },
+    "Chica": {
+      "difficulty": 4,
+      "change": [[2, 3]]
+    },
+    "Lefty": {
+      "difficulty": 0,
+      "change": [[3, 1]]
+    },
+    "Knight": {
+      "difficulty": 3,
+      "change": [[2, 2], [4, 2]]
+    }
+  },
+  "4": {
+    "Bonnie": {
+      "difficulty": 9,
+      "change": [[2, 2], [3, 3]]
+    },
+    "Chica": {
+      "difficulty": 6,
+      "change": [[1, 3], [2, 2], [3, 1]]
+    },
+    "Lefty": {
+      "difficulty": 2,
+      "change": [[3, 2], [5, 3]]
+    },
+    "Knight": {
+      "difficulty": 5,
+      "change": [[2, 2], [4, 5]]
+    }
+  },
+  "5": {
+    "Bonnie": {
+      "difficulty": 10,
+      "change": [[2, 2], [4, 3]]
+    },
+    "Chica": {
+      "difficulty": 9,
+      "change": [[2, 3], [4, 2]]
+    },
+    "Lefty": {
+      "difficulty": 7,
+      "change": [[3, 2], [4, 2], [5, 2]]
+    },
+    "Knight": {
+      "difficulty": 8,
+      "change": [[2, 2], [4, 2]]
     }
   }
 }

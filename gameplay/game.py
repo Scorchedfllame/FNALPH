@@ -29,19 +29,28 @@ class Game:
         self.events = self.init_events()
         self.flick = self.init_flick()
         self.power_manager = PowerManager()
-        self.clock = Clock()
+        self.clock = Clock(self.night)
         self.status = 'playing'
         self.debugger = True
         self.active = True
         self._win = False
         self._killed = False
+        self.end_function = 'next'
         self.jump_scare_sound = pygame.mixer.Sound('resources/sounds/jump_scare.mp3')
+        self.victory_sound = pygame.mixer.Sound('resources/sounds/five-nights-at-freddys-6-am.mp3')
+        try:
+            self.phone_call = pygame.mixer.Sound('resources/sounds/night_' + str(self.night) + '.mp3')
+        except:
+            self.phone_call = None
 
     def stop(self):
-        self.active = False
         for animatronic in self.animatronics:
             animatronic.stop()
         self.office.stop()
+        self.save_manager.save_game()
+
+    def next_night(self):
+        self.save_manager.save_game()
 
     @staticmethod
     def get_night_dict() -> dict:
@@ -67,9 +76,12 @@ class Game:
 
     def start(self):
         pygame.time.set_timer(UPDATE_POWER, 100)
+        self.office.start()
         self.clock.start()
         for animatronic in self.animatronics:
             animatronic.start()
+        if self.phone_call is not None:
+            pygame.mixer.find_channel(True).play(self.phone_call)
 
     def get_power_usage(self) -> int:
         power_usage = 1
@@ -80,18 +92,31 @@ class Game:
         return min(power_usage, 5)
 
     def tick(self, event: pygame.event.Event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                self.stop()
+                self.active = False
+                self.end_function = 'menu'
+        if event.type == GAME_TIMER:
+            self.victory_sound.fadeout(1000)
+            self.active = False
         if event.type == UPDATE_POWER:
             self.power_manager.update_power(self.get_power_usage())
         if event.type == KILL and self.status == 'playing':
+            pygame.mixer.stop()
+            self.save_manager.data = {"night": self.night}
             self.stop()
             self.status = 'killed'
-            self.jump_scare_sound.play()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_NUMLOCK:
-                pygame.event.post(pygame.event.Event(KILL))
+            self.jump_scare_sound.set_volume(0.5)
+            self.jump_scare_sound.play(maxtime=4)
+            pygame.time.set_timer(GAME_TIMER, 5000)
         if event.type == WIN and self.status == 'playing':
-            self.status = 'win'
+            pygame.mixer.stop()
             self.save_manager.data = {"night": self.night + 1}
+            self.stop()
+            self.status = 'win'
+            self.victory_sound.play(fade_ms=1000)
+            pygame.time.set_timer(GAME_TIMER, int(self.victory_sound.get_length() * 1000)-1000)
 
     def resize(self):
         screen = pygame.display.get_surface()
@@ -115,6 +140,7 @@ class Game:
     def global_tick(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.mixer.quit()
                 pygame.quit()
                 exit()
             if event.type == pygame.WINDOWRESIZED:
@@ -159,7 +185,7 @@ class Game:
         self.clock.draw(screen)
         if self.status == 'win':
             screen.fill('black')
-            text = self.BIGGER_GLOBAL_FONT.render("6:00 AM", True, "white")
+            text = pygame.transform.scale_by(self.BIGGER_GLOBAL_FONT.render("6:00 AM", True, "white"), 3)
             rect = text.get_rect()
             rect.center = (screen.get_width()/2, screen.get_height()/2)
             screen.blit(text, rect)

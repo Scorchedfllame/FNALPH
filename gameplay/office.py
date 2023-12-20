@@ -8,7 +8,6 @@ import json
 class Office:
     def __init__(self):
         self.ambience = pygame.mixer.Sound('resources/sounds/office_ambience.mp3')
-        self.ambience.play()
         self.camera_toggle_sound = pygame.mixer.Sound('resources/sounds/camera_pull.mp3')
         self.doors = Door.generate_doors()
         self.image = pygame.image.load('resources/backgrounds/office.png').convert()
@@ -19,6 +18,9 @@ class Office:
         self.MAX_ROTATION = 90
         self.active = True
         self._locked = False
+
+    def start(self):
+        self.ambience.play()
 
     def get_power_usage(self):
         power_usage = 0
@@ -38,11 +40,11 @@ class Office:
                 door.tick(event)
         if event.type == CAMERA_FLIPPED_UP:
             self.active = False
-            self.ambience.stop()
+            self.ambience.set_volume(.4)
             self.camera_toggle_sound.play()
         if event.type == CAMERA_FLIPPED_DOWN:
             self.active = True
-            self.ambience.play()
+            self.ambience.set_volume(1)
             self.camera_toggle_sound.play()
 
     def frame(self):
@@ -138,12 +140,13 @@ class Door:
 
                 else:
                     self.flicker_counter += 1
-                    self.light_noise.play(loops=100)
+
                     return 'light'
 
             elif self.flicker_counter < 0:
                 if random.randint(-10, self.flicker_counter) <= -8:
                     self.flicker_counter = 1
+                    pygame.mixer.find_channel(True).play(self.light_noise, loops=100)
                     return 'light'
                 else:
                     return 'dark'
@@ -167,26 +170,26 @@ class Door:
         self._locked = True
 
     def light_on(self):
-        self.light_noise.play(loops=100)
-        self.light_on_sound.play()
+        pygame.mixer.find_channel(True).play(self.light_noise, loops=100)
+        pygame.mixer.find_channel(True).play(self.light_on_sound)
         self.light_status = 'light'
 
     def light_off(self):
         self.light_noise.stop()
-        self.light_off_sound.play()
+        pygame.mixer.find_channel(True).play(self.light_off_sound)
         self.light_status = 'dark'
 
     def get_status(self):
         return f"{self.door_status}_{self.light_status}"
 
     def open_door(self):
-        self.door_toggle_sound.play()
+        pygame.mixer.find_channel(True).play(self.door_toggle_sound)
         self.animator.play_backward()
         self.door_status = 'open'
         self.current_surface = self.curr_images[f"open_{self.light_status}"]
 
     def close_door(self):
-        self.door_toggle_sound.play()
+        pygame.mixer.find_channel(True).play(self.door_toggle_sound)
         self.animator.play_forward()
         self.door_status = 'closed'
         self.current_surface = self.curr_images[f"closed_{self.light_status}"]

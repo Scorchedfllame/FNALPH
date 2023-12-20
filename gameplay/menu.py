@@ -30,6 +30,10 @@ class MainMenu(Menu):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    exit()
             for button in self.buttons:
                 button.tick(event)
 
@@ -40,15 +44,16 @@ class MainMenu(Menu):
             button.draw(screen)
 
     def new_game(self):
-        self.active = False
         self.save_manager.reset_save()
+        self.start_game()
+
+    def start_game(self):
+        self.active = False
         self.game_round = Game(self.save_manager.load_data()['night'])
         self.game_round.start()
 
     def continue_game(self):
-        self.active = False
-        self.game_round = Game(self.save_manager.load_data()['night'])
-        self.game_round.start()
+        self.start_game()
 
     def init_buttons(self) -> list[Button]:
         play_game = Button(pygame.image.load(self.directory + "buttons/new_game.png"),
@@ -56,7 +61,7 @@ class MainMenu(Menu):
                            activate=self.new_game, scale=.2)
         options = Button(pygame.image.load(self.directory + "buttons/continue.png"),
                          (160, 1000),
-                         activate=self.continue_game(), scale=.2)
+                         activate=self.continue_game, scale=.2)
         return [play_game, options]
 
 

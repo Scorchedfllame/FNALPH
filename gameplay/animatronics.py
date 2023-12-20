@@ -304,7 +304,9 @@ class Lefty(Animatronic):
         self._location = -1
 
     def tick(self, event: pygame.event.Event) -> None:
-        if event.type == self.TIMER and not self.camera.active:
+        if (event.type == self.TIMER and
+                not ((self._game.systems['Cameras']._last_camera == self.camera) or
+                     self.camera.active)):
             if self._kill_locked:
                 self.kill()
             # Movement Opportunities
@@ -371,11 +373,14 @@ class Knight(Animatronic):
         self.camera = cameras[4]
         self._location = 0
         self.FILE_LOCATION = 'resources/sprites/animatronics/knight/knight_'
+        self.run_sound = pygame.mixer.Sound('resources/sounds/fnaf-running.mp3')
         self.TIMER = KNIGHT_TIMER
         self.aggression = 0
         self.movement_timer = 100
         self.OFFICE_LOCATION = 4
         self.MAX_AGGRESSION = 18000
+        self.kill_locked = False
+        self.running = False
 
     def start(self) -> None:
         pygame.time.set_timer(self.TIMER, self.movement_timer)
@@ -386,35 +391,53 @@ class Knight(Animatronic):
         self._location = -1
 
     def tick(self, event: pygame.event.Event) -> None:
+        if self.kill_locked and self.camera.active and not self.running:
+            self.run()
+        if event.type == self.TIMER:
+            if self.running:
+                self.get_to_door()
+            elif self.kill_locked:
+                self.run()
+
         if event.type == self.TIMER:
             if not self.camera.active:
-                self.aggression += self._difficulty * 20
+                self.aggression += self._difficulty * 10
                 # Movement Opportunities
                 if self.aggression >= self.MAX_AGGRESSION:
-                    if self._location == self.OFFICE_LOCATION:
-                        if self.door.door_status == 'closed':
-                            self.blocked()
-                        else:
-                            self.kill()
-                    else:
+                    if self._location < self.OFFICE_LOCATION:
                         self.move(self._location + 1)
-                        self.aggression = 0
+                    elif self._location == self.OFFICE_LOCATION:
+                        self.kill_locked = True
+                        pygame.time.set_timer(KNIGHT_TIMER, 25000)
             else:
                 self.aggression = random.randint(0, 3000)
 
+    def run(self):
+        self.running = True
+        pygame.mixer.find_channel(True).play(self.run_sound)
+        pygame.time.set_timer(self.TIMER, 3000)
+
+    def get_to_door(self):
+        if self.door.door_status == 'closed':
+            self.blocked()
+        else:
+            self.kill()
+            self.move(0)
+
     def blocked(self):
-        self.aggression = 0
+        self.kill_locked = False
+        self.running = False
+        pygame.time.set_timer(self.TIMER, self.movement_timer)
         self.move(0)
 
     def move(self, position: int) -> None:
-        self._update_camera()
+        self.aggression = 0
         self.camera.reset_background()
         self._location = position
         self._game.update_animatronics()
 
     def update_images(self) -> None:
         if self._location != self.OFFICE_LOCATION:
-            self._update_camera()
             self.camera.background.blit(self._get_image(), (0, 0))
 
     # Some sort of dictionary with all the images and stages that bonnie possesses
@@ -422,7 +445,4 @@ class Knight(Animatronic):
         image = pygame.image.load(
             self.FILE_LOCATION + str(self._location) + '.png').convert_alpha()
         return pygame.transform.scale_by(image, pygame.display.get_surface().get_height() / image.get_height())
-
-    def _update_camera(self):
-        pass
 
