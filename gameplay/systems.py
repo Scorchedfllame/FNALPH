@@ -3,6 +3,7 @@ from .buttons import Button
 from .animatronics import Animatronic
 from data.game.constants import *
 import pygame
+from .animation import Animator
 import math
 
 
@@ -66,6 +67,9 @@ class Camera:
 class Cameras(System):
     def __init__(self):
         super().__init__("Cams System", 'resources/background/test.png')
+        self.animation = Animator(pygame.image.load('resources/animations/Camera_Flip.png').convert_alpha(),
+                                  pygame.rect.Rect(0, 0, 1920, 1080),
+                                  speed=.5)
         self.camera_list = Camera.generate_cameras(self.load_data('cameras'))
         self.map_image = self.init_images()
         self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 90)
@@ -131,6 +135,7 @@ class Cameras(System):
     def activate(self):
         self.active = True
         self.activate_camera(self._last_camera)
+        self.animation.play_forward()
 
     def activate_blackout(self):
         self.blackout = True
@@ -140,6 +145,7 @@ class Cameras(System):
         self.active = False
         self._last_camera = self.get_active_camera()
         self.disable_cameras()
+        self.animation.play_backward()
 
     def disable_cameras(self):
         for i, camera in enumerate(self.camera_list):
@@ -182,8 +188,8 @@ class Cameras(System):
         elif self.rotation_cycle == 2:
             self.current_rotation -= 1
         self.current_rotation = max(-self.MAX_ROTATION, min(self.current_rotation, self.MAX_ROTATION))
-        if self.active:
-            screen = pygame.display.get_surface()
+        screen = pygame.display.get_surface()
+        if self.active and not self.animation.active:
             for i, camera in enumerate(self.camera_list):
                 offset = self.get_pos_from_rot(screen.get_width(),
                                                camera.background.get_width(),
@@ -193,6 +199,8 @@ class Cameras(System):
             self.draw_map(screen)
             for button in self.buttons:
                 button.draw(screen)
+            pygame.draw.rect(screen, (230, 230, 230, 250), pygame.rect.Rect(10, 10, 1900, 1060), 3, 1)
+        self.animation.draw(screen)
 
     def tick(self, event: pygame.event.Event):
         for button in self.buttons:
