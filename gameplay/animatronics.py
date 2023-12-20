@@ -332,12 +332,16 @@ class Lefty(Animatronic):
         self.move(random.randint(0, 1))
 
     def move(self, position: int) -> None:
-        self._update_camera()
-        self.door.reset()
-        self.camera.reset_background()
-        self._location = position
-        self._game.update_animatronics()
-        self.move_sounds[random.randint(0, len(self.move_sounds) - 1)].play()
+        chica = self._game.animatronics[1]
+        office = position == self.OFFICE_LOCATION and chica.location == chica.OFFICE_LOCATION
+        shoulder = position == self.OFFICE_LOCATION -1 and chica.location == chica.OFFICE_LOCATION -1
+        if not (office or shoulder):
+            self._update_camera()
+            self.door.reset()
+            self.camera.reset_background()
+            self._location = position
+            self._game.update_animatronics()
+            self.move_sounds[random.randint(0, len(self.move_sounds) - 1)].play()
 
     def update_images(self) -> None:
         if self._location != self.OFFICE_LOCATION:
