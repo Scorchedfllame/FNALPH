@@ -7,6 +7,7 @@ from gameplay import Bonnie, Chica, Lefty, Knight
 from data.game.constants import *
 import json
 from data.saves.save import SaveManager
+import random
 
 
 class Game:
@@ -52,6 +53,9 @@ class Game:
         self.office.stop()
         self.save_manager.save_game()
         self.power_manager.stop()
+        if self.night == 6:
+            self.save_manager.data = {"night": 5}
+        self.save_manager.save_game()
         for system in self.systems.values():
             system.stop()
         pygame.display.get_surface().fill('black')
@@ -130,9 +134,11 @@ class Game:
         self.office.image = pygame.transform.scale_by(self.office.image,
                                                       pygame.display.get_surface().get_height()/
                                                       self.office.image.get_size()[1])
+        self.systems['Cameras'].activate_blackout()
+        pygame.time.set_timer(pygame.event.Event(KILL, {'animation': self.animatronics[3].jumpscare}),
+                              random.randint(5000, 40000))
         self.animatronics = []
         self.office.doors = []
-        self.systems['Cameras'].activate_blackout()
 
     def kill(self, animation):
         self.kill_anim = animation

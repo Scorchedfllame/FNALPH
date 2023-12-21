@@ -69,7 +69,6 @@ class Animatronic:
         self.movement_timer = movement_timer_length
         self.OFFICE_LOCATION = len(self._camera_key)
         self.active = False
-        self.camera_locked = False
         self.camera = self._cameras[self._camera_key[0]]
         if 'jumpscare' in self.load_data().keys():
             jump_data = self.load_data()['jumpscare']
@@ -109,27 +108,17 @@ class Animatronic:
 
     def tick(self, event: pygame.event.Event) -> None:
         if self.active:
-            if self.camera_locked and not self.camera.active:
-                self.successful_movement()
             if event.type == self.TIMER:
-                if self.camera_locked:
-                    self.camera.big_glitch()
-                    self.successful_movement()
                 if self._kill_locked:
                     self.kill()
                 # Movement Opportunities
                 rng = random.randint(1, 20)
                 if rng <= self._aggression:
-                    if self.camera.active:
-                        self.camera_locked = True
-                        pygame.time.set_timer(self.TIMER, random.randint(15000, 20000))
-                    else:
-                        self.successful_movement()
+                    self.successful_movement()
             if event.type == CAMERA_FLIPPED_DOWN and self._kill_locked:
                 self.kill()
 
     def successful_movement(self):
-        self.camera_locked = False
         if self._location == self.OFFICE_LOCATION:
             # Get whether door is closed
             self.at_door()
@@ -151,10 +140,11 @@ class Animatronic:
 
     def blocked(self):
         self._kill_locked = False
-        self.camera_locked = False
         self.move(self.get_movement())
 
     def move(self, position: int) -> None:
+        if self.camera.active:
+            self.camera.small_glitch()
         self._update_camera()
         self.door.reset()
         self.camera.reset_background()
@@ -162,6 +152,9 @@ class Animatronic:
         self._game.update_animatronics()
         self.move_sounds[random.randint(0, len(self.move_sounds)-1)].play()
         pygame.time.set_timer(self.TIMER, self.movement_timer)
+        if self.camera.active:
+            self.camera.small_glitch()
+        self._update_camera()
 
     def update_images(self) -> None:
         if self.active:
@@ -196,6 +189,8 @@ class Chica(Animatronic):
         office = position == self.OFFICE_LOCATION and lefty._location == lefty.OFFICE_LOCATION
         shoulder = position == self.OFFICE_LOCATION - 1 and lefty._location == lefty.OFFICE_LOCATION - 1
         if not (office or shoulder):
+            if self.camera.active:
+                self.camera.small_glitch()
             self._update_camera()
             self.door.reset()
             self.camera.reset_background()
@@ -203,6 +198,9 @@ class Chica(Animatronic):
             self._game.update_animatronics()
             self.move_sounds[random.randint(0, len(self.move_sounds)-1)].play()
             pygame.time.set_timer(self.TIMER, self.movement_timer)
+            if self.camera.active:
+                self.camera.small_glitch()
+            self._update_camera()
 
 
 class Bonnie(Animatronic):
@@ -241,6 +239,8 @@ class Lefty(Animatronic):
         office = position == self.OFFICE_LOCATION and chica._location == chica.OFFICE_LOCATION
         shoulder = position == self.OFFICE_LOCATION - 1 and chica._location == chica.OFFICE_LOCATION - 1
         if not (office or shoulder):
+            if self.camera.active:
+                self.camera.small_glitch()
             self._update_camera()
             self.door.reset()
             self.camera.reset_background()
@@ -248,6 +248,8 @@ class Lefty(Animatronic):
             self._game.update_animatronics()
             self.move_sounds[random.randint(0, len(self.move_sounds) - 1)].play()
             pygame.time.set_timer(self.TIMER, self.movement_timer)
+            if self.camera.active:
+                self.camera.small_glitch()
 
 
 class Knight(Animatronic):

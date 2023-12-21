@@ -25,16 +25,14 @@ class Camera:
         self._background = self.background.__copy__()
         self.active = False
         self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 60)
+        self.glitch_sound = pygame.mixer.Sound('resources/sounds/static.mp3')
         self.font_color = 'White'
         self.font_pos = [0, 0]
         self.resize()
         self._buttons = []
 
     def small_glitch(self):
-        print('big glitch')
-
-    def big_glitch(self):
-        print('big glitch')
+        pygame.mixer.find_channel().play(self.glitch_sound, maxtime=1000)
 
     def reset_background(self):
         self.background = self._background.__copy__()
