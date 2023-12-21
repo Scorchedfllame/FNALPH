@@ -53,8 +53,8 @@ class Game:
         self.office.stop()
         self.save_manager.save_game()
         self.power_manager.stop()
-        if self.night == 6:
-            self.save_manager.data = {"night": 5}
+        if self.night == 7:
+            self.save_manager.data = {"night": 6}
         self.save_manager.save_game()
         for system in self.systems.values():
             system.stop()

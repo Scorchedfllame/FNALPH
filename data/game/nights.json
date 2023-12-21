@@ -53,7 +53,7 @@
       },
       "Lefty": {
         "difficulty": 1,
-        "change": [[3, 1], [4, 1]]
+        "change": []
       },
       "Knight": {
         "difficulty": 2,
@@ -74,7 +74,7 @@
       },
       "Lefty": {
         "difficulty": 2,
-        "change": [[3, 2], [5, 3]]
+        "change": []
       },
       "Knight": {
         "difficulty": 6,
@@ -95,7 +95,7 @@
       },
       "Lefty": {
         "difficulty": 3,
-        "change": [[3, 2], [4, 2], [5, 2]]
+        "change": []
       },
       "Knight": {
         "difficulty": 5,
