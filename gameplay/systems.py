@@ -1,8 +1,11 @@
 import json
+import random
+
 from .buttons import Button
 from data.game.constants import *
 import pygame
 from .animation import Animator
+import os
 
 
 class System:
@@ -84,6 +87,10 @@ class Cameras(System):
         self.rotation_cycle = 0
         self.camera_switch_sound = pygame.mixer.Sound('resources/sounds/static.mp3')
         self.camera_pan_sound = pygame.mixer.Sound('resources/sounds/camera_pan.mp3')
+        self.static = []
+        for frame in os.listdir('resources/animations/static/'):
+            image = pygame.image.load(f'resources/animations/static/{frame}').convert_alpha()
+            self.static.append(image)
 
     @staticmethod
     def init_images():
@@ -199,11 +206,17 @@ class Cameras(System):
                                                self.current_rotation,
                                                self.MAX_ROTATION)
                 camera.draw(screen, offset)
+            self.draw_static(screen)
             self.draw_map(screen)
             for button in self.buttons:
                 button.draw(screen)
             pygame.draw.rect(screen, (230, 230, 230, 250), pygame.rect.Rect(10, 10, 1900, 1060), 3, 1)
         self.animation.draw(screen)
+
+    def draw_static(self, screen: pygame.surface.Surface):
+        for i in range(5):
+            frame = random.randint(0, len(self.static) - 1)
+            screen.blit(self.static[frame], (0, 0))
 
     def tick(self, event: pygame.event.Event):
         for button in self.buttons:

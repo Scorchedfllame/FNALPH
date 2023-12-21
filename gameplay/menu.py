@@ -9,7 +9,7 @@ class Menu:
     def __init__(self, directory: str):
         self.directory = directory
         self.main_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 500)
-        self.secondary_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 400)
+        self.secondary_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 50)
         self.background_sound = pygame.mixer.Sound('resources/sounds/main_menu.mp3')
         self.background = pygame.image.load(self.directory + "background.png").convert()
         self.background = pygame.transform.scale_by(self.background, pygame.display.get_surface().get_width()/self.background.get_width())
@@ -45,6 +45,13 @@ class MainMenu(Menu):
         screen.blit(self.background, (0, 0))
         for button in self.buttons.values():
             button.draw(screen)
+        night = self.secondary_font.render(f"Night {self.save_manager.load_data()['night']}",
+                                           True,
+                                           'white')
+        night_rect = night.get_rect()
+        night_rect.topright = self.buttons['continue'].rect.bottomright
+        night_rect.y -= 25
+        screen.blit(night, night_rect)
 
     def new_game(self):
         self.save_manager.reset_save()
