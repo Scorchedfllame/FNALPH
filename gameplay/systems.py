@@ -30,13 +30,19 @@ class Camera:
         self.resize()
         self._buttons = []
 
+    def small_glitch(self):
+        print('big glitch')
+
+    def big_glitch(self):
+        print('big glitch')
+
     def reset_background(self):
         self.background = self._background.__copy__()
 
     def resize(self):
         screen = pygame.display.get_surface()
-        self.font_pos[0] = screen.get_width() * 7/12
-        self.font_pos[1] = int(screen.get_width()/2 * (850/1290) + screen.get_height())
+        self.font_pos[0] = int(screen.get_width() * 7/12)
+        self.font_pos[1] = int(screen.get_height() * 9/15)
 
     @classmethod
     def generate_cameras(cls, cameras: list[dict]) -> list:
@@ -61,6 +67,9 @@ class Camera:
     def draw(self, surface, offset: int = 0) -> None:
         if self.active:
             surface.blit(self.background, (offset, 0))
+
+    def draw_text(self, surface: pygame.Surface):
+        if self.active:
             text = self.font.render(self.name, True, self.font_color)
             surface.blit(text, tuple(self.font_pos))
 
@@ -82,7 +91,6 @@ class Cameras(System):
         self.active_icons = []
         self.inactive_icons = []
         self.generate_buttons()
-        pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 4000)
         self.current_rotation = 0
         self.rotation_cycle = 0
         self.camera_switch_sound = pygame.mixer.Sound('resources/sounds/static.mp3')
@@ -207,6 +215,8 @@ class Cameras(System):
                                                self.MAX_ROTATION)
                 camera.draw(screen, offset)
             self.draw_static(screen)
+            for i in self.camera_list:
+                i.draw_text(screen)
             self.draw_map(screen)
             for button in self.buttons:
                 button.draw(screen)
@@ -214,9 +224,15 @@ class Cameras(System):
         self.animation.draw(screen)
 
     def draw_static(self, screen: pygame.surface.Surface):
-        for i in range(5):
-            frame = random.randint(0, len(self.static) - 1)
-            screen.blit(self.static[frame], (0, 0))
+        frame = random.randint(0, len(self.static) - 1)
+        screen.blit(self.static[frame], (0, 0))
+        screen.blit(self.static[(frame + 1) % len(self.static)], (0, 0))
+
+    def start(self):
+        pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 4000)
+
+    def stop(self):
+        pygame.time.set_timer(CAMERA_ROTATION, 0)
 
     def tick(self, event: pygame.event.Event):
         for button in self.buttons:
@@ -234,11 +250,13 @@ class Cameras(System):
                     self.current_rotation = -90
                     self.camera_pan_sound.play(maxtime=3500)
                 case 1:
+                    self.camera_pan_sound.set_volume(0)
                     self.current_rotation = 90
                 case 2:
                     self.current_rotation = 90
                     self.camera_pan_sound.play(maxtime=3500)
                 case 3:
+                    self.camera_pan_sound.set_volume(0)
                     self.current_rotation = -90
 
 

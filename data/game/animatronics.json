@@ -83,6 +83,18 @@
     "menu_label": {
       "description": "Comes at you from the right side of the school.",
       "image_path": "resources/sprites/animatronics/knight.png"
-    }
+    },
+    "cameras": [
+      4,
+      4,
+      4,
+      4
+    ],
+    "movements": [
+      [1],
+      [2],
+      [3],
+      [0, 1]
+    ]
   }
 }

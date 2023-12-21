@@ -9,13 +9,13 @@
     {
       "label": "2a",
       "position": [903, 250],
-      "name": "Birrell Hallway",
+      "name": "Room 133 Hallway",
       "background": "resources/backgrounds/cameras/Birrell Hall.png"
     },
     {
       "label": "2b",
       "position": [900, 320],
-      "name": "Birrell Room",
+      "name": "Room 133",
       "background": "resources/backgrounds/cameras/Birrell Room.png"
     },
     {
@@ -75,7 +75,7 @@
     {
       "label": "8b",
       "position": [953, 398],
-      "name": "Lee Room",
+      "name": "Room 140",
       "background": "resources/backgrounds/cameras/Lee Room.png"
     }
   ]

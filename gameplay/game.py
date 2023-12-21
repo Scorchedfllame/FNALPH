@@ -22,13 +22,13 @@ class Game:
         self.BIGGER_GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
         self.office = Office()
         self.animatronics = []
-        self.animatronic_data = self.night_dict[str(self.night)]
+        self.night_data = self.night_dict[str(self.night)]
         animatronic_key = {"Bonnie": Bonnie, "Chica": Chica, "Lefty": Lefty, "Knight": Knight}
-        for animatronic, data in self.animatronic_data.items():
+        for animatronic, data in self.night_data['animatronics'].items():
             self.animatronics.append(animatronic_key[animatronic](self, data['difficulty']))
         self.events = self.init_events()
         self.flick = self.init_flick()
-        self.power_manager = PowerManager()
+        self.power_manager = PowerManager(self.night_data['power_time'])
         self.clock = Clock(self.night)
         self.status = 'playing'
         self.debugger = True
@@ -49,6 +49,9 @@ class Game:
             animatronic.stop()
         self.office.stop()
         self.save_manager.save_game()
+        self.power_manager.stop()
+        for system in self.systems.values():
+            system.stop()
 
     def next_night(self):
         self.save_manager.save_game()
@@ -68,7 +71,7 @@ class Game:
         screen = pygame.display.get_surface()
         flick_button = pygame.image.load('resources/ui/buttons/camera_flick.png').convert_alpha()
         camera_flick = Flick(flick_button,
-                             (int(screen.get_width()/2), screen.get_height() - 25),
+                             (int(screen.get_width() * 2/5), screen.get_height() - 25),
                              self.events['camera_up_event'],
                              self.events['camera_down_event'],
                              draw_type='midbottom',
@@ -76,9 +79,11 @@ class Game:
         return camera_flick
 
     def start(self):
-        pygame.time.set_timer(UPDATE_POWER, 100)
+        self.power_manager.start()
         self.office.start()
         self.clock.start()
+        for system in self.systems.values():
+            system.start()
         for animatronic in self.animatronics:
             animatronic.start()
         if self.phone_call is not None:
@@ -126,7 +131,6 @@ class Game:
 
     def kill(self):
         pygame.mixer.stop()
-        self.save_manager.data = {"night": self.night}
         self.stop()
         self.status = 'killed'
         self.end_function = 'menu'
@@ -167,7 +171,7 @@ class Game:
             self.clock.tick(event)
             if event.type == CLOCK:
                 for animatronic in self.animatronics:
-                    change_list = self.animatronic_data[animatronic.name]['change']
+                    change_list = self.night_data['animatronics'][animatronic.name]['change']
                     for change in change_list:
                         if change[0] == self.clock.hour:
                             animatronic.update_aggression(change[1])
@@ -179,8 +183,6 @@ class Game:
         self.office.draw()
         for system in self.systems.values():
             system.draw()
-        for animatronic in self.animatronics:
-            animatronic.draw(screen)
         if not self.systems['Cameras'].blackout:
             self.flick.draw(screen)
         for button in self.buttons:

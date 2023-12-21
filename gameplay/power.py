@@ -3,7 +3,7 @@ from math import ceil
 
 
 class PowerManager:
-    def __init__(self):
+    def __init__(self, power_penalty):
         self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 55)
         self.large_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
         self.percentage = 100
@@ -11,6 +11,16 @@ class PowerManager:
         self.usage = Usage(self.font, self.large_font)
         self.DIFFICULTY = 5  # set back to 7 when done testing
         self.active = True
+        self.power_penalty = power_penalty
+
+    def start(self):
+        pygame.time.set_timer(UPDATE_POWER, 100)
+        pygame.time.set_timer(POWER_PENALTY, self.power_penalty)
+
+    def stop(self):
+        self.active = False
+        pygame.time.set_timer(UPDATE_POWER, 0)
+        pygame.time.set_timer(POWER_PENALTY, 0)
 
     def draw(self, surface):
         if self.active:
