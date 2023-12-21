@@ -211,7 +211,7 @@ class Bonnie(Animatronic):
     """
 
     def __init__(self, game: any, difficulty: int):
-        super().__init__('Bonnie', game, difficulty, 170, BONNIE_TIMER, 1)
+        super().__init__('Bonnie', game, difficulty, 4970, BONNIE_TIMER, 1)
 
 
 class Lefty(Animatronic):
