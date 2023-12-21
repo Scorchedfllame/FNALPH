@@ -11,9 +11,9 @@ from data.saves.save import SaveManager
 
 
 class Game:
-    def __init__(self, night: int):
-        self.night = night
-        self.save_manager = SaveManager()
+    def __init__(self, save_manager: SaveManager):
+        self.save_manager = save_manager
+        self.night = self.save_manager.load_data()['night']
         self.night_dict = self.get_night_dict()
         self.utils = {}
         self.systems = {"Cameras": Cameras()}
@@ -22,7 +22,7 @@ class Game:
         self.BIGGER_GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
         self.office = Office()
         self.animatronics = []
-        self.animatronic_data = self.night_dict[str(night)]
+        self.animatronic_data = self.night_dict[str(self.night)]
         animatronic_key = {"Bonnie": Bonnie, "Chica": Chica, "Lefty": Lefty, "Knight": Knight}
         for animatronic, data in self.animatronic_data.items():
             self.animatronics.append(animatronic_key[animatronic](self, data['difficulty']))

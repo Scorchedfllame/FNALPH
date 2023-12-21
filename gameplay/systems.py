@@ -183,7 +183,7 @@ class Cameras(System):
 
     def draw(self):
         if self.active:
-            self.camera_pan_sound.set_volume(.5)
+            self.camera_pan_sound.set_volume(.2)
         else:
             self.camera_pan_sound.set_volume(0)
         if self.rotation_cycle == 0:
