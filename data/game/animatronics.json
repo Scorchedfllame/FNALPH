@@ -26,7 +26,8 @@
             [7, 7, 7, 7, 7, 7, 7, 7, 5],
             [8],
             [1, 2]
-    ]
+    ],
+    "jumpscare": [1200, 540, 50]
   },
   "Chica": {
     "menu_label": {
@@ -50,7 +51,8 @@
             [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3],
             [6],
             [1]
-    ]
+    ],
+    "jumpscare": [498, 374, 50]
   },
   "Lefty": {
     "menu_label": {
@@ -77,7 +79,8 @@
       [7],
       [8],
       [6, 7]
-    ]
+    ],
+    "jumpscare": [1920, 1080, 50]
   },
   "Knight": {
     "menu_label": {
@@ -85,7 +88,6 @@
       "image_path": "resources/sprites/animatronics/knight.png"
     },
     "cameras": [
-      4,
       4,
       4,
       4

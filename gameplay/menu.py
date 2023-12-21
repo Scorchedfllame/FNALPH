@@ -30,38 +30,43 @@ class MainMenu(Menu):
         self.game_round = None
 
     def tick(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.event.post(pygame.event.Event(pygame.QUIT))
-            for button in self.buttons.values():
-                button.tick(event)
+        if self.active:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.event.post(pygame.event.Event(pygame.QUIT))
+                for button in self.buttons.values():
+                    button.tick(event)
 
     def draw(self):
-        screen = pygame.display.get_surface()
-        screen.blit(self.background, (0, 0))
-        for button in self.buttons.values():
-            button.draw(screen)
-        night = self.secondary_font.render(f"Night {self.save_manager.load_data()['night']}",
-                                           True,
-                                           'white')
-        night_rect = night.get_rect()
-        night_rect.topright = self.buttons['continue'].rect.bottomright
-        night_rect.y -= 25
-        screen.blit(night, night_rect)
+        if self.active:
+            screen = pygame.display.get_surface()
+            screen.blit(self.background, (0, 0))
+            for button in self.buttons.values():
+                button.draw(screen)
+            night = self.secondary_font.render(f"Night {self.save_manager.load_data()['night']}",
+                                               True,
+                                               'white')
+            night_rect = night.get_rect()
+            night_rect.topright = self.buttons['continue'].rect.bottomright
+            night_rect.y -= 25
+            screen.blit(night, night_rect)
 
     def new_game(self):
         self.save_manager.reset_save()
         self.start_game()
 
     def start_game(self):
-        self.background_sound.stop()
+        del self.game_round
         self.active = False
+        pygame.display.get_surface().fill('black')
+        pygame.display.flip()
         self.game_round = Game(self.save_manager)
         self.game_round.start()
+        self.background_sound.stop()
 
     def continue_game(self):
         self.start_game()

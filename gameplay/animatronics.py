@@ -3,6 +3,7 @@ from data.game.constants import *
 import pygame
 import random
 import os
+from .animation import Animator
 
 
 class Jumpscare:
@@ -42,15 +43,13 @@ class Animatronic:
     General class for all animatronics.
     Creating from this will make an empty animatronic with no functionality.
     """
-    def __init__(self, name: str, game, difficulty: int, movement_timer_length: int, timer: int, door: int,
-                 jumpscare: Jumpscare = None):
+    def __init__(self, name: str, game, difficulty: int, movement_timer_length: int, timer: int, door: int):
         self.name = name
         self._difficulty = difficulty
         self._aggression = self._difficulty
         description = self.load_data()['menu_label']['description']
         image_path = self.load_data()['menu_label']['image_path']
         self.menu_label = MenuLabel(self.name, self._difficulty, description, image_path)
-        self.jumpscare = jumpscare
         self.move_sounds = [pygame.mixer.Sound('resources/sounds/footsteps_' + str(i) + '.mp3') for i in range(1, 5)]
         self.video = None
         self._office = game.office
@@ -72,23 +71,25 @@ class Animatronic:
         self.active = False
         self.camera_locked = False
         self.camera = self._cameras[self._camera_key[0]]
+        if 'jumpscare' in self.load_data().keys():
+            jump_data = self.load_data()['jumpscare']
+            self.jumpscare = Animator(pygame.image.load(self.FILE_LOCATION + "jumpscare.png").convert_alpha(),
+                                      pygame.rect.Rect(0, 0, jump_data[0],
+                                                       jump_data[1]),
+                                      scale_to_fit=True,
+                                      speed=jump_data[2]/100,
+                                      type='jump')
+        else:
+            self.jumpscare = None
 
     def load_data(self) -> dict:
         with open('data/game/animatronics.json', 'r') as f:
             animatronic = json.loads(f.read())[self.name]
             return animatronic
 
-    def start_jumpscare(self) -> None:
-        if self.jumpscare is not None:
-            self.jumpscare.activate()
-        else:
-            print("BOO!")
-
     def kill(self):
-        kill = pygame.event.Event(KILL, {"video": self.video})
+        kill = pygame.event.Event(KILL, {"animation": self.jumpscare})
         pygame.event.post(kill)
-        if self.jumpscare is not None:
-            self.jumpscare.activate()
 
     def update_aggression(self, delta: int) -> None:
         self._aggression = max(min(self._aggression + delta, 20), 0)
@@ -210,7 +211,7 @@ class Bonnie(Animatronic):
     """
 
     def __init__(self, game: any, difficulty: int):
-        super().__init__('Bonnie', game, difficulty, 4970, BONNIE_TIMER, 1)
+        super().__init__('Bonnie', game, difficulty, 170, BONNIE_TIMER, 1)
 
 
 class Lefty(Animatronic):
@@ -261,6 +262,7 @@ class Knight(Animatronic):
         self.locked = False
         self.attack_num = 0
         self.run_sound = pygame.mixer.Sound('resources/sounds/fnaf-running.mp3')
+        self.OFFICE_LOCATION = 3
 
     def run(self):
         self.primed = False
@@ -291,13 +293,14 @@ class Knight(Animatronic):
                     self.locked = True
                     pygame.time.set_timer(self.TIMER, random.randint(830, 16670))
             if event.type == self.TIMER:
-                self.locked = False
-                if self.running:
-                    self.get_to_door()
                 pygame.time.set_timer(self.TIMER, self.movement_timer)
-                # Movement Opportunities
                 rng = random.randint(1, 20)
-                if rng <= self._aggression and not self.locked and not self.locked:
+                if self.primed:
+                    self.run()
+                elif self.running:
+                    self.get_to_door()
+                # Movement Opportunities
+                elif rng <= self._aggression and not self.locked and not self.locked:
                     self.successful_movement()
 
     def move(self, position: int) -> None:

@@ -18,10 +18,10 @@ class SaveManager:
         with open(f"data/saves/save.json", 'w') as f:
             f.write(json.dumps(data))
 
-    @staticmethod
-    def load_data() -> bool | dict:
+    def load_data(self) -> bool | dict:
         path = f"data/saves/save.json"
         if not os.path.isfile(path):
             return False
         with open(path, 'r') as f:
-            return json.loads(f.read())
+            self.data = json.loads(f.read())
+            return self.data

@@ -105,14 +105,16 @@ class ToggleButton(Button):
         self.active = False
 
     def check_activate(self, event=None):
-        self.active = True
-        if self.activate is not None:
-            self.check_type(self.activate)
+        if not self.active:
+            self.active = True
+            if self.activate is not None:
+                self.check_type(self.activate)
 
     def check_deactivate(self, event=None):
-        self.active = False
-        if self.deactivate is not None:
-            self.check_type(self.deactivate)
+        if self.active:
+            self.active = False
+            if self.deactivate is not None:
+                self.check_type(self.deactivate)
 
     def toggle(self):
         if self.active:

@@ -94,6 +94,7 @@ class Cameras(System):
         self.current_rotation = 0
         self.rotation_cycle = 0
         self.camera_switch_sound = pygame.mixer.Sound('resources/sounds/static.mp3')
+        self.camera_switch_sound.set_volume(.25)
         self.camera_pan_sound = pygame.mixer.Sound('resources/sounds/camera_pan.mp3')
         self.static = []
         for frame in os.listdir('resources/animations/static/'):
@@ -146,8 +147,8 @@ class Cameras(System):
         self.resize()
 
     def activate(self):
-        self.active = True
         self.activate_camera(self._last_camera)
+        self.active = True
         self.animation.play_forward()
 
     def activate_blackout(self):
@@ -171,8 +172,9 @@ class Cameras(System):
                 return i
 
     def activate_camera(self, camera_index: int):
-        self.camera_switch_sound.play()
-        self.camera_switch_sound.fadeout(300)
+        if self.active:
+            self.camera_switch_sound.play(fade_ms=100)
+            self.camera_switch_sound.fadeout(200)
         self.disable_cameras()
         camera = self.camera_list[camera_index]
         self.buttons[camera_index].change_surface(self.active_icons[camera_index])
@@ -248,13 +250,13 @@ class Cameras(System):
             match self.rotation_cycle:
                 case 0:
                     self.current_rotation = -90
-                    self.camera_pan_sound.play(maxtime=3500)
+                    self.camera_pan_sound.play(maxtime=3300)
                 case 1:
                     self.camera_pan_sound.set_volume(0)
                     self.current_rotation = 90
                 case 2:
                     self.current_rotation = 90
-                    self.camera_pan_sound.play(maxtime=3500)
+                    self.camera_pan_sound.play(maxtime=3300)
                 case 3:
                     self.camera_pan_sound.set_volume(0)
                     self.current_rotation = -90

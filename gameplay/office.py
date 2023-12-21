@@ -34,6 +34,8 @@ class Office:
 
     def stop(self):
         self.ambience.stop()
+        for door in self.doors:
+            door.stop()
 
     def tick(self, event: pygame.event.Event):
         if self.active:
@@ -110,6 +112,14 @@ class Door:
         anim_rect = self.current_surface.get_rect()
         self.animator = Animator(self.curr_images['animation'], anim_rect)
         self.button_fail_sound = pygame.mixer.Sound('resources/sounds/light_stuck.mp3')
+        self.door_toggle_sound.set_volume(.5)
+
+    def stop(self):
+        self.button_fail_sound.stop()
+        self.door_toggle_sound.stop()
+        self.light_noise.stop()
+        self.light_on_sound.stop()
+        self.light_off_sound.stop()
 
     def reset(self):
         self.curr_images = self._default_images.copy()

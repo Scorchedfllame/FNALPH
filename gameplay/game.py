@@ -1,4 +1,3 @@
-import pygame
 from .clock import Clock
 from gameplay.office import Office
 from gameplay.systems import Cameras
@@ -39,12 +38,15 @@ class Game:
         self.jump_scare_sound = pygame.mixer.Sound('resources/sounds/jump_scare.mp3')
         self.jump_scare_sound.set_volume(0.3)
         self.victory_sound = pygame.mixer.Sound('resources/sounds/five-nights-at-freddys-6-am.mp3')
+        self.kill_anim = None
         try:
             self.phone_call = pygame.mixer.Sound('resources/sounds/night_' + str(self.night) + '.mp3')
         except:
             self.phone_call = None
 
     def stop(self):
+        pygame.time.set_timer(GAME_TIMER, 0)
+        pygame.mixer.stop()
         for animatronic in self.animatronics:
             animatronic.stop()
         self.office.stop()
@@ -52,6 +54,8 @@ class Game:
         self.power_manager.stop()
         for system in self.systems.values():
             system.stop()
+        pygame.display.get_surface().fill('black')
+        pygame.display.flip()
 
     def next_night(self):
         self.save_manager.save_game()
@@ -106,10 +110,11 @@ class Game:
         if event.type == GAME_TIMER:
             self.victory_sound.fadeout(1000)
             self.active = False
+            self.stop()
         if event.type == UPDATE_POWER:
             self.power_manager.update_power(self.get_power_usage())
         if event.type == KILL and self.status == 'playing':
-            self.kill()
+            self.kill(event.animation)
         if event.type == WIN and self.status == 'playing':
             self.win()
 
@@ -129,13 +134,15 @@ class Game:
         self.office.doors = []
         self.systems['Cameras'].activate_blackout()
 
-    def kill(self):
+    def kill(self, animation):
+        self.kill_anim = animation
+        self.kill_anim.play_forward()
         pygame.mixer.stop()
         self.stop()
         self.status = 'killed'
         self.end_function = 'menu'
-        self.jump_scare_sound.play(maxtime=2000)
-        pygame.time.set_timer(GAME_TIMER, 2000)
+        self.jump_scare_sound.play(maxtime=1000)
+        pygame.time.set_timer(GAME_TIMER, 1000)
 
     def win(self):
         pygame.mixer.stop()
@@ -195,6 +202,8 @@ class Game:
             rect = text.get_rect()
             rect.center = (screen.get_width()/2, screen.get_height()/2)
             screen.blit(text, rect)
+        if self.kill_anim is not None:
+            self.kill_anim.draw(screen)
 
     def update_animatronics(self):
         for animatronic in self.animatronics:
