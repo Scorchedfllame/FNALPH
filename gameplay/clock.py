@@ -30,10 +30,10 @@ class Clock:
         width = screen.get_width()
         render = self.HOUR_FONT.render(f"{self.time} AM", True, 'white')
         rect = render.get_rect()
-        rect.topright = (width, 0)
+        rect.topright = (width - 15, 15)
         screen.blit(render, rect)
         night = self.NIGHT_FONT.render(f"Night {self.night}", True, 'white')
         night_rect = night.get_rect()
-        night_rect.topright = (width, rect.height)
+        night_rect.topright = (width - 15, rect.height - 5)
         screen.blit(night, night_rect)
 

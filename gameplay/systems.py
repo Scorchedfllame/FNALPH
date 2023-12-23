@@ -24,23 +24,28 @@ class Camera:
         self.background = pygame.transform.scale_by(self.background, screen.get_height()/self.background.get_height())
         self._background = self.background.__copy__()
         self.active = False
-        self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 60)
-        self.glitch_sound = pygame.mixer.Sound('resources/sounds/static.mp3')
+        self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 70)
+        self.glitch_sound = pygame.mixer.Sound('resources/sounds/Garble1.mp3')
+        self.glitch_sound.set_volume(.5)
         self.font_color = 'White'
         self.font_pos = [0, 0]
         self.resize()
         self._buttons = []
+        self.glitch_timer = 0
+        self.MAX_GLITCH_TIMER = self.glitch_sound.get_length() * 60
+        self.glitch = False
 
     def small_glitch(self):
-        pygame.mixer.find_channel().play(self.glitch_sound, maxtime=1000)
+        pygame.mixer.find_channel().play(self.glitch_sound)
+        self.glitch = True
 
     def reset_background(self):
         self.background = self._background.__copy__()
 
     def resize(self):
         screen = pygame.display.get_surface()
-        self.font_pos[0] = int(screen.get_width() * 7/12)
-        self.font_pos[1] = int(screen.get_height() * 9/15)
+        self.font_pos[0] = int(screen.get_width() * 6/12)
+        self.font_pos[1] = int(screen.get_height() * 8/15)
 
     @classmethod
     def generate_cameras(cls, cameras: list[dict]) -> list:
@@ -55,16 +60,27 @@ class Camera:
 
     def activate(self):
         self.active = True
+        self.glitch_sound.set_volume(.5)
 
     def deactivate(self):
         self.active = False
+        self.glitch_sound.set_volume(0)
 
     def add_button(self, button: Button):
         self._buttons.append(button)
 
     def draw(self, surface, offset: int = 0) -> None:
+        if self.glitch:
+            self.glitch_timer += 1
+            if self.glitch_timer > self.MAX_GLITCH_TIMER:
+                self.glitch_timer = 0
+                self.glitch = False
         if self.active:
             surface.blit(self.background, (offset, 0))
+            if self.glitch:
+                black = pygame.Surface(surface.get_size())
+                black.fill('black')
+                surface.blit(black, (0, 0))
 
     def draw_text(self, surface: pygame.Surface):
         if self.active:
@@ -98,13 +114,15 @@ class Cameras(System):
         for frame in os.listdir('resources/animations/static/'):
             image = pygame.image.load(f'resources/animations/static/{frame}').convert_alpha()
             self.static.append(image)
+        self.record_icon = RecordIcon((30, 30), 7, 3)
 
     @staticmethod
     def init_images():
         screen = pygame.display.get_surface()
-        map_image = pygame.image.load('resources/ui/map.png').convert_alpha()
+        map_image = pygame.image.load('resources/ui/map1.png').convert_alpha()
         scale_factor = Cameras.get_scaler(screen, map_image)
         map_image = pygame.transform.scale_by(map_image, scale_factor)
+        map_image.set_alpha(200)
         return map_image
 
     def load_camera_buttons(self, data: list[dict]):
@@ -181,18 +199,19 @@ class Cameras(System):
 
     @staticmethod
     def get_scaler(surface: pygame.Surface, rect: pygame.Surface | pygame.Rect):
-        return surface.get_width()/(2*rect.get_width())
+        return surface.get_width()/(2.1*rect.get_width())
 
     def draw_map(self, surface: pygame.surface.Surface):
         rect = self.map_image.get_rect()
-        rect.bottomright = surface.get_size()
+        rect.bottomright = (surface.get_width() - 20, surface.get_height() - 25)
+        font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 100)
+        self.map_image.blit(self.font.render("YOU", True, "white"), (640, 530))
         surface.blit(self.map_image, rect)
 
     @staticmethod
     def get_pos_from_rot(screen_x, image_x, rotation, max_rotation):
         # normalization 0-1
         normalized = (rotation + max_rotation)/(2*max_rotation)
-
         # turn into other stuff
         return normalized * (screen_x - image_x)
 
@@ -214,19 +233,21 @@ class Cameras(System):
                                                self.current_rotation,
                                                self.MAX_ROTATION)
                 camera.draw(screen, offset)
-            self.draw_static(screen)
+            self.draw_static(screen, self.static)
             for i in self.camera_list:
                 i.draw_text(screen)
             self.draw_map(screen)
             for button in self.buttons:
                 button.draw(screen)
-            pygame.draw.rect(screen, (230, 230, 230, 250), pygame.rect.Rect(10, 10, 1900, 1060), 3, 1)
+            pygame.draw.rect(screen, (170, 170, 170), pygame.rect.Rect(10, 10, 1900, 1060), 2, 1)
+            self.record_icon.draw(screen)
         self.animation.draw(screen)
 
-    def draw_static(self, screen: pygame.surface.Surface):
-        frame = random.randint(0, len(self.static) - 1)
-        screen.blit(self.static[frame], (0, 0))
-        screen.blit(self.static[(frame + 1) % len(self.static)], (0, 0))
+    @staticmethod
+    def draw_static(screen: pygame.surface.Surface, static):
+        frame = random.randint(0, len(static) - 1)
+        screen.blit(static[frame], (0, 0))
+        screen.blit(static[(frame + 1) % len(static)], (0, 0))
 
     def start(self):
         pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 4000)
@@ -258,6 +279,27 @@ class Cameras(System):
                 case 3:
                     self.camera_pan_sound.set_volume(0)
                     self.current_rotation = -90
+
+
+class RecordIcon:
+    def __init__(self, pos: tuple[int, int], radius: int, flash_time: float):
+        self.pos = pos
+        self.radius = radius
+        self.surface = self.create_surface()
+        self.frame = 0
+        self.MAX_FRAMES = flash_time * 60
+
+    def create_surface(self) -> pygame.Surface:
+        size = self.radius * 2
+        surface = pygame.Surface((size, size), pygame.SRCALPHA)
+        pygame.draw.circle(surface, "red", (size // 2, size // 2), self.radius)
+        surface = pygame.transform.scale_by(surface, 20/self.radius)
+        return surface
+
+    def draw(self, screen):
+        self.frame = (self.frame + 1) % self.MAX_FRAMES
+        if self.frame <= self.MAX_FRAMES/2:
+            screen.blit(self.surface, self.pos)
 
 
 class Vents(System):

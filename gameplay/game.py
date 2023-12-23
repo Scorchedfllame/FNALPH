@@ -42,10 +42,33 @@ class Game:
         self.kill_anim = None
         try:
             self.phone_call = pygame.mixer.Sound('resources/sounds/night_' + str(self.night) + '.mp3')
-        except:
+            self.mute_button = "start"
+        except FileNotFoundError:
             self.phone_call = None
+            self.mute_button = None
+
+    @staticmethod
+    def create_mute_call() -> pygame.Surface:
+        font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 50)
+        surface = pygame.Surface((200, 50))
+        base = pygame.rect.Rect(0, 0, 200, 50)
+        text = font.render('Mute Call', True, 'white')
+        text_rect = text.get_rect()
+        text_rect.center = (100, 30)
+        pygame.draw.rect(surface, 'white', base, 5, 5)
+        base_rect = pygame.Surface((200, 50))
+        pygame.draw.rect(base_rect, (200, 200, 200), pygame.Rect(0, 0, 200, 50), border_radius=5)
+        base_rect.set_alpha(200)
+        surface.blit(base_rect, (0, 0))
+        surface.blit(text, text_rect)
+        return surface
+
+    def mute_call(self):
+        self.phone_call.stop()
+        self.mute_button = None
 
     def stop(self):
+        pygame.time.set_timer(MUTE_TIME, 0)
         pygame.time.set_timer(GAME_TIMER, 0)
         pygame.mixer.stop()
         for animatronic in self.animatronics:
@@ -54,12 +77,10 @@ class Game:
         self.save_manager.save_game()
         self.power_manager.stop()
         if self.night == 7:
-            self.save_manager.data = {"night": 6}
+            self.save_manager.data["night"] = 6
         self.save_manager.save_game()
         for system in self.systems.values():
             system.stop()
-        pygame.display.get_surface().fill('black')
-        pygame.display.flip()
 
     def next_night(self):
         self.save_manager.save_game()
@@ -79,14 +100,15 @@ class Game:
         screen = pygame.display.get_surface()
         flick_button = pygame.image.load('resources/ui/buttons/camera_flick.png').convert_alpha()
         camera_flick = Flick(flick_button,
-                             (int(screen.get_width() * 2/5), screen.get_height() - 25),
+                             (int(screen.get_width() * 4 / 11), screen.get_height() - 25),
                              self.events['camera_up_event'],
                              self.events['camera_down_event'],
                              draw_type='midbottom',
-                             scale=screen.get_width()/(screen.get_width()*1.2))
+                             scale=screen.get_width() / (screen.get_width() * 1.4))
         return camera_flick
 
     def start(self):
+        pygame.time.set_timer(MUTE_TIME, 2500)
         self.power_manager.start()
         self.office.start()
         self.clock.start()
@@ -106,6 +128,13 @@ class Game:
         return min(power_usage, 5)
 
     def tick(self, event: pygame.event.Event):
+        if event.type == MUTE_TIME:
+            if self.mute_button == 'start':
+                self.mute_button = Button(self.create_mute_call(), (20, 20),
+                                          activate=self.mute_call)
+                pygame.time.set_timer(MUTE_TIME, 10000)
+            else:
+                self.mute_button = None
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.stop()
@@ -121,18 +150,21 @@ class Game:
             self.kill(event.animation)
         if event.type == WIN and self.status == 'playing':
             self.win()
+        if self.mute_button is not None and self.mute_button != 'start':
+            self.mute_button.tick(event)
 
     def resize(self):
         screen = pygame.display.get_surface()
         for i in self.buttons:
-            i.resize((int(screen.get_width()/2), screen.get_height() - 25), screen.get_width()/(screen.get_width()*2))
+            i.resize((int(screen.get_width() / 2), screen.get_height() - 25),
+                     screen.get_width() / (screen.get_width() * 2))
 
     def blackout(self):
         pygame.mixer.stop()
         pygame.mixer.Sound('resources/sounds/power_off.mp3').play()
         self.office.image = pygame.image.load('resources/backgrounds/office_blackout.png').convert()
         self.office.image = pygame.transform.scale_by(self.office.image,
-                                                      pygame.display.get_surface().get_height()/
+                                                      pygame.display.get_surface().get_height() /
                                                       self.office.image.get_size()[1])
         self.systems['Cameras'].activate_blackout()
         pygame.time.set_timer(pygame.event.Event(KILL, {'animation': self.animatronics[3].jumpscare}),
@@ -152,7 +184,7 @@ class Game:
 
     def win(self):
         pygame.mixer.stop()
-        self.save_manager.data = {"night": self.night + 1}
+        self.save_manager.data["night"] = self.night + 1
         self.stop()
         self.status = 'win'
         self.victory_sound.play(fade_ms=1000)
@@ -206,10 +238,12 @@ class Game:
             screen.fill('black')
             text = pygame.transform.scale_by(self.BIGGER_GLOBAL_FONT.render("6:00 AM", True, "white"), 3)
             rect = text.get_rect()
-            rect.center = (screen.get_width()/2, screen.get_height()/2)
+            rect.center = (screen.get_width() / 2, screen.get_height() / 2)
             screen.blit(text, rect)
         if self.kill_anim is not None:
             self.kill_anim.draw(screen)
+        if self.mute_button is not None and self.mute_button != 'start':
+            self.mute_button.draw(screen)
 
     def update_animatronics(self):
         for animatronic in self.animatronics:

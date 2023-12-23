@@ -51,6 +51,8 @@ class Animatronic:
         image_path = self.load_data()['menu_label']['image_path']
         self.menu_label = MenuLabel(self.name, self._difficulty, description, image_path)
         self.move_sounds = [pygame.mixer.Sound('resources/sounds/footsteps_' + str(i) + '.mp3') for i in range(1, 5)]
+        for sound in self.move_sounds:
+            sound.set_volume(.25)
         self.video = None
         self._office = game.office
         self.door = game.office.doors[door]

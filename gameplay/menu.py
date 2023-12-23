@@ -1,7 +1,6 @@
 import os
-import pygame_widgets
 import pygame.transform
-from gameplay import *
+from gameplay import Cameras, Game, Button
 from data.saves.save import SaveManager
 
 
@@ -12,11 +11,16 @@ class Menu:
         self.secondary_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 50)
         self.background_sound = pygame.mixer.Sound('resources/sounds/main_menu.mp3')
         self.background = pygame.image.load(self.directory + "background.png").convert()
-        self.background = pygame.transform.scale_by(self.background, pygame.display.get_surface().get_width()/self.background.get_width())
+        scalar = pygame.display.get_surface().get_width()/self.background.get_width()
+        self.background = pygame.transform.scale_by(self.background, scalar)
         self.buttons = []
         self.active = False
         self.save_manager = SaveManager()
         self.background_sound.play(loops=10)
+        self.static = []
+        for frame in os.listdir('resources/animations/static/'):
+            image = pygame.image.load(f'resources/animations/static/{frame}').convert_alpha()
+            self.static.append(image)
 
     def activate(self):
         self.active = True
@@ -31,7 +35,8 @@ class MainMenu(Menu):
 
     def tick(self):
         if self.active:
-            for event in pygame.event.get():
+            events = pygame.event.get()
+            for event in events:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
@@ -45,13 +50,15 @@ class MainMenu(Menu):
         if self.active:
             screen = pygame.display.get_surface()
             screen.blit(self.background, (0, 0))
+            Cameras.draw_static(screen, self.static)
             for button in self.buttons.values():
                 button.draw(screen)
             night = self.secondary_font.render(f"Night {self.save_manager.load_data()['night']}",
                                                True,
                                                'white')
             night_rect = night.get_rect()
-            night_rect.topright = self.buttons['continue'].rect.bottomright
+            cont_button = self.buttons['continue']
+            night_rect.topleft = cont_button.rect.bottomleft
             night_rect.y -= 25
             screen.blit(night, night_rect)
 
@@ -72,15 +79,13 @@ class MainMenu(Menu):
         self.start_game()
 
     def init_buttons(self) -> dict[str: Button]:
-        continue_button = Button(self.main_font.render('Continue', True, 'white'),
-                                 (140, 800),
-                                 activate=self.continue_game, scale=.2)
-        play_game = Button(self.main_font.render('New Game', True, 'white'),
-                           (140, 900),
-                           activate=self.new_game, scale=.2)
-        quit_button = Button(self.main_font.render('Quit', True, 'white'),
-                      (140, 1000),
-                      activate=pygame.event.Event(pygame.QUIT), scale=.2)
+        quit_event = pygame.event.Event(pygame.QUIT)
+        continue_surface = self.main_font.render('Continue', True, 'white')
+        play_surface = self.main_font.render('New Game', True, 'white')
+        quit_surface = self.main_font.render('Quit', True, 'white')
+        continue_button = Button(continue_surface, (140, 800), scale=.2, activate=self.continue_game)
+        play_game = Button(play_surface, (140, 900), scale=.2, activate=self.new_game)
+        quit_button = Button(quit_surface, (140, 1000), scale=.2, activate=lambda: pygame.event.post(quit_event))
         return {"play": play_game, "continue": continue_button, "quit": quit_button}
 
 

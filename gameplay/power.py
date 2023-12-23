@@ -9,7 +9,7 @@ class PowerManager:
         self.percentage = 100
         self.power_remaining = 100000
         self.usage = Usage(self.font, self.large_font)
-        self.DIFFICULTY = 6 # set back to 7 when done testing
+        self.DIFFICULTY = 10 # set back to 7 when done testing
         self.active = True
         self.power_penalty = power_penalty
 
@@ -33,7 +33,7 @@ class PowerManager:
     def update_power(self, usage: int):
         if self.active:
             self.usage.usage = usage
-            self.power_remaining = max(self.power_remaining - self.DIFFICULTY * (2 ** int(self.usage)), 0)
+            self.power_remaining = max(self.power_remaining - self.DIFFICULTY * usage, 0)
             self.percentage = ceil(self.power_remaining / 1000)
             if self.power_remaining <= 0:
                 pygame.event.post(pygame.event.Event(BLACKOUT))
@@ -54,7 +54,7 @@ class PowerManager:
         power_percent_rect = power_percent.get_rect()
 
         # Setting rectangles
-        power_left_text_rect.bottomleft = (30, screen_y - 30)
+        power_left_text_rect.bottomleft = (30, screen_y - 15)
         power_percentage_rect.bottomleft = power_left_text_rect.bottomright
         power_percent_rect.bottomleft = (power_percentage_rect.width + power_left_text_rect.bottomright[0],
                                          power_left_text_rect.bottomright[1])
@@ -79,7 +79,7 @@ class Usage:
 
     def resize(self):
         screen = pygame.display.get_surface()
-        x_offset = (30 + self.height + self.padding + self.large_font.size('100')[1])
+        x_offset = (15 + self.height + self.padding + self.large_font.size('100')[1])
         self.text_rect.topleft = (self.y_offset,
                                   screen.get_height() - x_offset)
 
