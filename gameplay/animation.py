@@ -7,7 +7,7 @@ class Animator:
     def __init__(self,
                  frames: pygame.Surface,
                  image_rect: pygame.Rect,
-                 current_frame: int = 0,
+                 starting_frame: int = 0,
                  direction: str = 'forward',
                  type: str = 'once',
                  speed: float = 1,
@@ -15,8 +15,10 @@ class Animator:
         self.frames = frames
         self.image_rect = image_rect
         self.MAX_FRAME = int(frames.get_height()/image_rect.height) * 100
-        self.current_frame = current_frame
+        self.current_frame = starting_frame
+        self.starting_frame = starting_frame
         self.direction = direction
+        self.regular_direction = direction
         self.active = False
         self.type = type
         self.scale_to_fit = scale_to_fit
@@ -26,6 +28,12 @@ class Animator:
             self.speed = 0
         else:
             self.speed = speed
+
+    def start(self):
+        self.current_frame = self.starting_frame
+        self.direction = self.regular_direction
+        self.update_rect()
+        self.active = False
 
     def update_rect(self):
         self.image_rect.y = int(self.current_frame/100) * self.image_rect.height

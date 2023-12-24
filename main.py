@@ -24,21 +24,13 @@ def main():
             main_menu.tick()
             main_menu.draw()
         else:
-            if main_menu.game_round.active:
+            if main_menu.game.active:
                 # Game loop
-                main_menu.game_round.global_tick()
-                main_menu.game_round.global_draw()
-            elif main_menu.game_round.end_function == 'menu':
-                gc.enable()
-                del main_menu
-                gc.disable()
-                main_menu = MainMenu()
+                main_menu.game.global_tick()
+                main_menu.game.global_draw()
+            elif main_menu.game.end_function == 'menu':
                 main_menu.activate()
-            elif main_menu.game_round.end_function == 'next':
-                gc.enable()
-                del main_menu
-                gc.disable()
-                main_menu = MainMenu()
+            elif main_menu.game.end_function == 'next':
                 main_menu.continue_game()
         pygame.display.update()
         clock.tick(60)

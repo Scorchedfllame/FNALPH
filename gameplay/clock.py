@@ -11,7 +11,10 @@ class Clock:
         self.NIGHT_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 50)
         self.active = True
 
-    def start(self):
+    def start(self, night):
+        self.night = night
+        self.hour = 0
+        self.time = 12
         pygame.time.set_timer(CLOCK, self.HOUR_DURATION * 1000)
 
     def update_time(self):

@@ -35,6 +35,13 @@ class Camera:
         self.MAX_GLITCH_TIMER = self.glitch_sound.get_length() * 60
         self.glitch = False
 
+    def start(self):
+        self.glitch = False
+        self.glitch_timer = 0
+        self.active = False
+        self.glitch_sound.set_volume(.5)
+        self.reset_background()
+
     def small_glitch(self):
         pygame.mixer.find_channel().play(self.glitch_sound)
         self.glitch = True
@@ -205,7 +212,7 @@ class Cameras(System):
         rect = self.map_image.get_rect()
         rect.bottomright = (surface.get_width() - 20, surface.get_height() - 25)
         font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 100)
-        self.map_image.blit(self.font.render("YOU", True, "white"), (640, 530))
+        self.map_image.blit(font.render("YOU", True, "white"), (640, 530))
         surface.blit(self.map_image, rect)
 
     @staticmethod
@@ -250,9 +257,17 @@ class Cameras(System):
         screen.blit(static[(frame + 1) % len(static)], (0, 0))
 
     def start(self):
+        self.current_rotation = 0
+        self.animation.start()
+        for camera in self.camera_list:
+            camera.start()
+        self.disable_cameras()
+        self.active = False
         pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 4000)
+        self._last_camera = 0
 
     def stop(self):
+        self.active = False
         pygame.time.set_timer(CAMERA_ROTATION, 0)
 
     def tick(self, event: pygame.event.Event):

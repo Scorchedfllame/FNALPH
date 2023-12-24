@@ -19,6 +19,10 @@ class Button:
         self.deactivate = deactivate
         self.kwargs = kwargs
         self.resize(pos, scale)
+        self.active = False
+
+    def start(self):
+        self.active = False
 
     def resize(self, pos: tuple[int, int], scale: float = 1):
         self.base = pygame.transform.scale_by(self._base, scale)
@@ -69,6 +73,11 @@ class Flick(Button):
         self.activate = activate
         self.deactivate = deactivate
         self.last_mouse_pos = (0, 0)
+        self.activated = False
+        self.hovering = False
+
+    def start(self):
+        self.active = False
         self.activated = False
         self.hovering = False
 

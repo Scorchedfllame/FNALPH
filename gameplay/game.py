@@ -25,14 +25,14 @@ class Game:
         self.night_data = self.night_dict[str(self.night)]
         animatronic_key = {"Bonnie": Bonnie, "Chica": Chica, "Lefty": Lefty, "Knight": Knight}
         for animatronic, data in self.night_data['animatronics'].items():
-            self.animatronics.append(animatronic_key[animatronic](self, data['difficulty']))
+            self.animatronics.append(animatronic_key[animatronic](self))
         self.events = self.init_events()
         self.flick = self.init_flick()
         self.power_manager = PowerManager(self.night_data['power_time'])
         self.clock = Clock(self.night)
         self.status = 'playing'
         self.debugger = True
-        self.active = True
+        self.active = False
         self._win = False
         self._killed = False
         self.end_function = 'next'
@@ -40,12 +40,15 @@ class Game:
         self.jump_scare_sound.set_volume(0.3)
         self.victory_sound = pygame.mixer.Sound('resources/sounds/five-nights-at-freddys-6-am.mp3')
         self.kill_anim = None
-        try:
-            self.phone_call = pygame.mixer.Sound('resources/sounds/night_' + str(self.night) + '.mp3')
-            self.mute_button = "start"
-        except FileNotFoundError:
-            self.phone_call = None
-            self.mute_button = None
+        self.phone_calls = []
+        self.phone_call = None
+        for i in range(10):
+            try:
+                self.phone_calls.append(pygame.mixer.Sound('resources/sounds/night_' + str(i + 1) + '.mp3'))
+                self.mute_button = "start"
+            except FileNotFoundError:
+                self.phone_calls.append(None)
+                self.mute_button = None
 
     @staticmethod
     def create_mute_call() -> pygame.Surface:
@@ -108,16 +111,26 @@ class Game:
         return camera_flick
 
     def start(self):
+        self.night = self.save_manager.data['night']
+        self.flick.start()
+        self.active = True
+        self.power_manager.start()
+        self.night_data = self.night_dict[str(self.night)]
+        for i, animatronic in enumerate(self.animatronics):
+            animatronic.set_difficulty(list(self.night_data['animatronics'].values())[i]['difficulty'])
+        self.status = 'playing'
         pygame.time.set_timer(MUTE_TIME, 2500)
         self.power_manager.start()
         self.office.start()
-        self.clock.start()
+        self.clock.start(self.night)
         for system in self.systems.values():
             system.start()
         for animatronic in self.animatronics:
             animatronic.start()
-        if self.phone_call is not None:
+        if self.phone_calls[self.night - 1] is not None:
+            self.phone_call = self.phone_calls[self.night - 1]
             pygame.mixer.find_channel(True).play(self.phone_call)
+            self.mute_button = 'start'
 
     def get_power_usage(self) -> int:
         power_usage = 1

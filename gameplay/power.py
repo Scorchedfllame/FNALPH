@@ -9,11 +9,15 @@ class PowerManager:
         self.percentage = 100
         self.power_remaining = 100000
         self.usage = Usage(self.font, self.large_font)
-        self.DIFFICULTY = 10 # set back to 7 when done testing
-        self.active = True
+        self.DIFFICULTY = 10 # set back to 10 when done testing
+        self.active = False
         self.power_penalty = power_penalty
 
     def start(self):
+        self.active = True
+        self.percentage = 100
+        self.power_remaining = 100000
+        self.usage.start()
         pygame.time.set_timer(UPDATE_POWER, 100)
         pygame.time.set_timer(POWER_PENALTY, self.power_penalty)
 
@@ -76,6 +80,9 @@ class Usage:
         self.text = font.render("Usage: ", True, 'white')
         self.text_rect = self.text.get_rect()
         self.resize()
+
+    def start(self):
+        self.usage = 1
 
     def resize(self):
         screen = pygame.display.get_surface()

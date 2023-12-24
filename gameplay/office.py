@@ -21,7 +21,11 @@ class Office:
         self._locked = False
 
     def start(self):
+        self.active = True
+        self.rot_x = 0
         self.ambience.play()
+        for door in self.doors:
+            door.start()
 
     def get_power_usage(self):
         power_usage = 0
@@ -113,6 +117,12 @@ class Door:
         self.animator = Animator(self.curr_images['animation'], anim_rect)
         self.button_fail_sound = pygame.mixer.Sound('resources/sounds/light_stuck.mp3')
         self.door_toggle_sound.set_volume(.5)
+
+    def start(self):
+        self.light_status = 'dark'
+        self.door_status = 'open'
+        self.door_button.active = False
+        self.light_button.active = False
 
     def stop(self):
         self.button_fail_sound.stop()

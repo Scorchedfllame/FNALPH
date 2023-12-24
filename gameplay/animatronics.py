@@ -43,9 +43,9 @@ class Animatronic:
     General class for all animatronics.
     Creating from this will make an empty animatronic with no functionality.
     """
-    def __init__(self, name: str, game, difficulty: int, movement_timer_length: int, timer: int, door: int):
+    def __init__(self, name: str, game, movement_timer_length: int, timer: int, door: int):
         self.name = name
-        self._difficulty = difficulty
+        self._difficulty = 0
         self._aggression = self._difficulty
         description = self.load_data()['menu_label']['description']
         image_path = self.load_data()['menu_label']['image_path']
@@ -92,6 +92,10 @@ class Animatronic:
         kill = pygame.event.Event(KILL, {"animation": self.jumpscare})
         pygame.event.post(kill)
 
+    def set_difficulty(self, difficulty: int):
+        self._difficulty = difficulty
+        self._aggression = self._difficulty
+
     def update_aggression(self, delta: int) -> None:
         self._aggression = max(min(self._aggression + delta, 20), 0)
 
@@ -101,6 +105,8 @@ class Animatronic:
     def start(self) -> None:
         self.active = True
         pygame.time.set_timer(self.TIMER, self.movement_timer)
+        self._location = 0
+        self.reset_aggression()
         self.update_images()
 
     def stop(self) -> None:
@@ -183,8 +189,8 @@ class Chica(Animatronic):
     Starts in the lunchroom, moves around the left side and attacks at the left door.
     """
 
-    def __init__(self, game: any, difficulty: int):
-        super().__init__('Chica', game, difficulty, 4980, CHICA_TIMER, 0)
+    def __init__(self, game: any):
+        super().__init__('Chica', game, 4980, CHICA_TIMER, 0)
 
     def move(self, position: int) -> None:
         lefty = self._game.animatronics[2]
@@ -210,8 +216,8 @@ class Bonnie(Animatronic):
     Starts in the lunchroom, moves around the left side and attacks at the left door.
     """
 
-    def __init__(self, game: any, difficulty: int):
-        super().__init__('Bonnie', game, difficulty, 4970, BONNIE_TIMER, 1)
+    def __init__(self, game: any):
+        super().__init__('Bonnie', game, 4970, BONNIE_TIMER, 1)
 
 
 class Lefty(Animatronic):
@@ -219,8 +225,8 @@ class Lefty(Animatronic):
     Starts in the lunchroom, moves around the left side and attacks at the left door.
     """
 
-    def __init__(self, game: any, difficulty: int):
-        super().__init__('Lefty', game, difficulty, 3020, LEFTY_TIMER, 0)
+    def __init__(self, game: any):
+        super().__init__('Lefty', game, 3020, LEFTY_TIMER, 0)
 
     def tick(self, event: pygame.event.Event) -> None:
         if self.active:
@@ -259,8 +265,8 @@ class Knight(Animatronic):
     Starts in the lunchroom, moves around the left side and attacks at the left door.
     """
 
-    def __init__(self, game: any, difficulty: int):
-        super().__init__('Knight', game, difficulty, 5010, KNIGHT_TIMER, 0)
+    def __init__(self, game: any):
+        super().__init__('Knight', game, 5010, KNIGHT_TIMER, 0)
         self.primed = False
         self.running = False
         self.locked = False
