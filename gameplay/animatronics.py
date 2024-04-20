@@ -274,6 +274,17 @@ class Knight(Animatronic):
         self.run_sound = pygame.mixer.Sound('resources/sounds/fnaf-running.mp3')
         self.OFFICE_LOCATION = 3
 
+    def start(self):
+        self.active = True
+        self.primed = False
+        self.running = False
+        self.locked = False
+        self.attack_num = 0
+        pygame.time.set_timer(self.TIMER, self.movement_timer)
+        self._location = 0
+        self.reset_aggression()
+        self.update_images()
+
     def run(self):
         self.primed = False
         self.running = True
@@ -300,7 +311,6 @@ class Knight(Animatronic):
                 if self.primed:
                     self.run()
                 elif not self.running:
-                    self.locked = True
                     pygame.time.set_timer(self.TIMER, random.randint(830, 16670))
             if event.type == self.TIMER:
                 pygame.time.set_timer(self.TIMER, self.movement_timer)
@@ -310,7 +320,7 @@ class Knight(Animatronic):
                 elif self.running:
                     self.get_to_door()
                 # Movement Opportunities
-                elif rng <= self._aggression and not self.locked and not self.locked:
+                elif rng <= self._aggression and not self.locked:
                     self.successful_movement()
 
     def move(self, position: int) -> None:

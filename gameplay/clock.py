@@ -12,10 +12,17 @@ class Clock:
         self.active = True
 
     def start(self, night):
+        self.active = True
         self.night = night
         self.hour = 0
         self.time = 12
         pygame.time.set_timer(CLOCK, self.HOUR_DURATION * 1000)
+
+    def stop(self):
+        self.night = 0
+        self.hour = 0
+        self.time = 12
+        pygame.time.set_timer(CLOCK, 0)
 
     def update_time(self):
         if self.active:

@@ -117,19 +117,34 @@ class Door:
         self.animator = Animator(self.curr_images['animation'], anim_rect)
         self.button_fail_sound = pygame.mixer.Sound('resources/sounds/light_stuck.mp3')
         self.door_toggle_sound.set_volume(.5)
+        self.stinger_sound = pygame.mixer.Sound('resources/sounds/stinger.mp3')
+        self.stung = False
 
     def start(self):
         self.light_status = 'dark'
         self.door_status = 'open'
         self.door_button.active = False
         self.light_button.active = False
+        self.stung = False
 
     def stop(self):
+        self.stinger_sound.stop()
         self.button_fail_sound.stop()
         self.door_toggle_sound.stop()
         self.light_noise.stop()
         self.light_on_sound.stop()
         self.light_off_sound.stop()
+
+    def check_stinger(self):
+        if self._default_images != self.curr_images:
+            if not self.stung:
+                self.stinger()
+        else:
+            self.stung = False
+
+    def stinger(self):
+        self.stinger_sound.play(maxtime=2000)
+        self.stung = True
 
     def reset(self):
         self.curr_images = self._default_images.copy()
@@ -198,6 +213,7 @@ class Door:
         pygame.mixer.find_channel(True).play(self.light_noise, loops=100)
         pygame.mixer.find_channel(True).play(self.light_on_sound)
         self.light_status = 'light'
+        self.check_stinger()
 
     def light_off(self):
         self.light_noise.stop()

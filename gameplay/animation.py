@@ -50,12 +50,13 @@ class Animator:
                     self.active = False
                 case 'jump':
                     self.speed = 1
-                    self.current_frame = self.MAX_FRAME
+                    self.current_frame = self.MAX_FRAME - 1
                     self.direction = 'backward'
 
     def one_backward(self):
         self.current_frame -= int(100 * self.speed)
         if self.type == 'jump' and self.current_frame < (self.MAX_FRAME - 500):
+            self.current_frame += 1
             self.direction = 'forward'
         if self.current_frame < 0:
             match self.type:

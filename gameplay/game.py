@@ -79,6 +79,7 @@ class Game:
         self.office.stop()
         self.save_manager.save_game()
         self.power_manager.stop()
+        self.clock.stop()
         if self.night == 7:
             self.save_manager.data["night"] = 6
         self.save_manager.save_game()

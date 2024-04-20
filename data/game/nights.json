@@ -18,7 +18,7 @@
         "change": [[3, 1], [4, 1]]
       }
     },
-    "power_time": 360000
+    "power_time": 0
   },
   "2": {
     "animatronics": {
@@ -105,6 +105,27 @@
     "power_time": 3000
   },
   "6": {
+    "animatronics": {
+      "Bonnie": {
+        "difficulty": 10,
+        "change": [[2, 1], [3, 1], [4, 1]]
+      },
+      "Chica": {
+        "difficulty": 12,
+        "change": [[3, 1], [4, 1]]
+      },
+      "Lefty": {
+        "difficulty": 4,
+        "change": [[3, 2], [4, 2], [5, 2]]
+      },
+      "Knight": {
+        "difficulty": 6,
+        "change": [[3, 1], [4, 1]]
+      }
+    },
+    "power_time": 3000
+  },
+  "7": {
     "animatronics": {
       "Bonnie": {
         "difficulty": 20,
