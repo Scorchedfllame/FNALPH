@@ -34,6 +34,28 @@ class Camera:
         self.glitch_timer = 0
         self.MAX_GLITCH_TIMER = self.glitch_sound.get_length() * 60
         self.glitch = False
+        self.flicker_counter = 1
+        if self.name == "200-600 Intersection":
+            self.flicker = pygame.image.load('resources/misc/intersection_flicker.png').convert_alpha()
+        else:
+            self.flicker = None
+
+    def get_flicker(self):
+        if self.flicker_counter > 0:
+            if random.randint(self.flicker_counter, 51) >= 50:
+                self.flicker_counter = -1
+                return 'dark'
+
+            else:
+                self.flicker_counter += 1
+                return 'light'
+
+        elif self.flicker_counter < 0:
+            if random.randint(-51, self.flicker_counter) <= -50:
+                self.flicker_counter = 1
+                return 'light'
+            else:
+                return 'dark'
 
     def start(self):
         self.glitch = False
@@ -83,7 +105,12 @@ class Camera:
                 self.glitch_timer = 0
                 self.glitch = False
         if self.active:
+            cache = self.background.copy()
+            if self.flicker is not None:
+                if self.get_flicker() == 'dark':
+                    self.background.blit(self.flicker, (0, 0))
             surface.blit(self.background, (offset, 0))
+            self.background = cache
             if self.glitch:
                 black = pygame.Surface(surface.get_size())
                 black.fill('black')
