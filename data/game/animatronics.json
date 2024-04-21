@@ -1,7 +1,7 @@
 {
   "Bonnie": {
     "menu_label": {
-      "description": "Comes at you from the left side of the school.",
+      "description": "Comes at you from the right side of the school.",
       "image_path": "resources/sprites/animatronics/bonnie.png"
     },
 
@@ -31,7 +31,7 @@
   },
   "Chica": {
     "menu_label": {
-      "description": "Comes at you from the right side of the school.",
+      "description": "Comes at you from the left side of the school.",
       "image_path": "resources/sprites/animatronics/chica.png"
     },
 
@@ -56,7 +56,7 @@
   },
   "Lefty": {
     "menu_label": {
-      "description": "Comes at you from the right side of the school.",
+      "description": "Comes at you from the left side of the school. Keep an eye for where he is; he can be hard to spot on the cameras.",
       "image_path": "resources/sprites/animatronics/lefty.png"
     },
     "cameras": [
@@ -84,7 +84,7 @@
   },
   "Knight": {
     "menu_label": {
-      "description": "Comes at you from the right side of the school.",
+      "description": "Comes at you from the left side of the school. Watch his camera to keep him calm and close the door if he gets too angry",
       "image_path": "resources/sprites/animatronics/knight.png"
     },
     "cameras": [
@@ -98,6 +98,6 @@
       [3],
       [0, 1]
     ],
-    "jumpscare": [2048, 1618, 50]
+    "jumpscare": [1920, 1080, 50]
   }
 }

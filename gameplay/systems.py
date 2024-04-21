@@ -148,7 +148,14 @@ class Cameras(System):
         for frame in os.listdir('resources/animations/static/'):
             image = pygame.image.load(f'resources/animations/static/{frame}').convert_alpha()
             self.static.append(image)
-        self.record_icon = RecordIcon((30, 30), 7, 3)
+        self.record_icon = RecordIcon((30, 30), 10, 3)
+        self.switching = False
+        self.switch_count = 0
+        self.SWITCH_TIME = 4
+        self.switches = []
+        for frame in os.listdir('resources/animations/switch/'):
+            image = pygame.image.load(f"resources/animations/switch/{frame}").convert_alpha()
+            self.switches.append(image)
 
     @staticmethod
     def init_images():
@@ -162,9 +169,14 @@ class Cameras(System):
     def load_camera_buttons(self, data: list[dict]):
         active_path = "resources/ui/buttons/camera_icons/active"
         inactive_path = "resources/ui/buttons/camera_icons/inactive"
+        scale_factor = 2
         for camera in data:
-            self.active_icons.append(pygame.image.load(active_path + "/" + camera['label'] + ".png").convert())
-            self.inactive_icons.append(pygame.image.load(inactive_path + "/" + camera['label'] + ".png").convert())
+            active = pygame.image.load(active_path + "/" + camera['label'] + ".png").convert_alpha()
+            inactive = pygame.image.load(inactive_path + "/" + camera['label'] + ".png").convert_alpha()
+            active = pygame.transform.scale_by(active, scale_factor)
+            inactive = pygame.transform.scale_by(inactive, scale_factor)
+            self.active_icons.append(active)
+            self.inactive_icons.append(inactive)
 
     @staticmethod
     def load_data(data: str) -> any:
@@ -225,6 +237,7 @@ class Cameras(System):
         if self.active:
             self.camera_switch_sound.play(fade_ms=100)
             self.camera_switch_sound.fadeout(200)
+            self.switching = True
         self.disable_cameras()
         camera = self.camera_list[camera_index]
         self.buttons[camera_index].change_surface(self.active_icons[camera_index])
@@ -268,6 +281,12 @@ class Cameras(System):
                                                self.MAX_ROTATION)
                 camera.draw(screen, offset)
             self.draw_static(screen, self.static)
+            if self.switching:
+                screen.blit(self.switches[random.randint(0, len(self.switches) - 1)], (0, 0))
+                self.switch_count += 1
+                if self.switch_count == self.SWITCH_TIME:
+                    self.switching = False
+                    self.switch_count = 0
             for i in self.camera_list:
                 i.draw_text(screen)
             self.draw_map(screen)
@@ -284,6 +303,7 @@ class Cameras(System):
         screen.blit(static[(frame + 1) % len(static)], (0, 0))
 
     def start(self):
+        self.switching = False
         self.current_rotation = 0
         self.animation.start()
         for camera in self.camera_list:
@@ -335,7 +355,7 @@ class RecordIcon:
         size = self.radius * 2
         surface = pygame.Surface((size, size), pygame.SRCALPHA)
         pygame.draw.circle(surface, "red", (size // 2, size // 2), self.radius)
-        surface = pygame.transform.scale_by(surface, 20/self.radius)
+        surface = pygame.transform.scale_by(surface, 30/self.radius)
         return surface
 
     def draw(self, screen):

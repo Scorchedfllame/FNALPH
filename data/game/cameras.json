@@ -1,19 +1,19 @@
 {
   "cameras": [
     {
-      "label": "1a",
+      "label": "1A",
       "position": [1125, 19],
       "name": "UNDGD_Storage",
       "background": "resources/backgrounds/cameras/UNDG_Storage.png"
     },
     {
-      "label": "2a",
+      "label": "2A",
       "position": [963, 250],
       "name": "Room 133 Hallway",
       "background": "resources/backgrounds/cameras/Birrell Hall.png"
     },
     {
-      "label": "2b",
+      "label": "2B",
       "position": [950, 350],
       "name": "Room 133",
       "background": "resources/backgrounds/cameras/Birrell Room.png"
@@ -25,13 +25,13 @@
       "background": "resources/backgrounds/cameras/Lunchroom.png"
     },
     {
-      "label": "4a",
+      "label": "4A",
       "position": [483, 258],
       "name": "W. Commons",
       "background": "resources/backgrounds/cameras/Commons.png"
     },
     {
-      "label": "4b",
+      "label": "4B",
       "position": [503, 328],
       "name": "E. Commons",
       "background": "resources/backgrounds/cameras/LP.png"
@@ -49,31 +49,31 @@
       "background": "resources/backgrounds/cameras/S. 200.png"
     },
     {
-      "label": "7a",
+      "label": "7A",
       "position": [513, 400],
       "name": "Front Office",
       "background": "resources/backgrounds/cameras/Front Office.png"
     },
     {
-      "label": "7b",
+      "label": "7B",
       "position": [513, 478],
       "name": "S. Corner",
       "background": "resources/backgrounds/cameras/S. Corner.png"
     },
     {
-      "label": "8a",
+      "label": "8A",
       "position": [670, 400],
       "name": "Attendance Office",
       "background": "resources/backgrounds/cameras/Attendance Office.png"
     },
     {
-      "label": "8b",
+      "label": "8B",
       "position": [673, 478],
       "name": "N. Corner",
       "background": "resources/backgrounds/cameras/N. Corner.png"
     },
     {
-      "label": "8b",
+      "label": "9",
       "position": [1100, 420],
       "name": "Room 140",
       "background": "resources/backgrounds/cameras/Lee Room.png"
