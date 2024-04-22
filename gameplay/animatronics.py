@@ -311,17 +311,21 @@ class Knight(Animatronic):
                 if self.primed:
                     self.run()
                 elif not self.running:
+                    self.locked = True
                     pygame.time.set_timer(self.TIMER, random.randint(830, 16670))
             if event.type == self.TIMER:
-                pygame.time.set_timer(self.TIMER, self.movement_timer)
-                rng = random.randint(1, 20)
-                if self.primed:
-                    self.run()
-                elif self.running:
-                    self.get_to_door()
-                # Movement Opportunities
-                elif rng <= self._aggression and not self.locked:
-                    self.successful_movement()
+                if self.locked:
+                    self.locked = False
+                else:
+                    pygame.time.set_timer(self.TIMER, self.movement_timer)
+                    rng = random.randint(1, 20)
+                    if self.primed:
+                        self.run()
+                    elif self.running:
+                        self.get_to_door()
+                    # Movement Opportunities
+                    elif rng <= self._aggression and not self.locked:
+                        self.successful_movement()
 
     def move(self, position: int) -> None:
         self.camera.reset_background()
