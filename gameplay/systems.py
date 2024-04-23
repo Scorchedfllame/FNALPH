@@ -160,7 +160,7 @@ class Cameras(System):
     @staticmethod
     def init_images():
         screen = pygame.display.get_surface()
-        map_image = pygame.image.load('resources/ui/map1.png').convert_alpha()
+        map_image = pygame.image.load('resources/ui/map.png').convert_alpha()
         scale_factor = Cameras.get_scaler(screen, map_image)
         map_image = pygame.transform.scale_by(map_image, scale_factor)
         map_image.set_alpha(200)
