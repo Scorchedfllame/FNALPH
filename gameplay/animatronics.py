@@ -340,3 +340,15 @@ class Knight(Animatronic):
 
     def update_images(self) -> None:
         self.camera.background.blit(self._get_image(), (0, 0))
+
+
+class Hitch(Animatronic):
+    def __init__(self, game: any):
+        super().__init__("Hitch", game, 5010, HITCH_TIMER, 0)
+        self.images = None
+        self.img_dict = None
+        self.black = pygame.surface.Surface((1920*2, 1080))
+        self.black.fill('black')
+
+    def update_images(self) -> None:
+        self.camera.background.blit(self.black, (0, 0))

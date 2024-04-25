@@ -23,8 +23,8 @@ class Menu:
 class MainMenu(Menu):
     def __init__(self):
         super().__init__("resources/ui/menus/main_menu/")
-        self.main_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 500)
-        self.secondary_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 50)
+        self.main_font = pygame.font.Font('resources/fonts/Book Antiqua.ttf', 500)
+        self.secondary_font = pygame.font.Font('resources/fonts/Book Antiqua.ttf', 50)
         self.background_sound = pygame.mixer.Sound('resources/sounds/main_menu.mp3')
         self.save_manager = SaveManager()
         self.static = []
@@ -62,7 +62,7 @@ class MainMenu(Menu):
             button.draw(screen)
         night = self.secondary_font.render(f"Night {self.save_manager.data['night']}",
                                            True,
-                                           'white')
+                                           (201, 0, 7))
         night_rect = night.get_rect()
         cont_button = self.buttons['continue']
         night_rect.topleft = cont_button.rect.bottomleft
@@ -84,9 +84,10 @@ class MainMenu(Menu):
         self.start_game()
 
     def init_buttons(self) -> dict[str: Button]:
-        continue_surface = self.main_font.render('Continue', True, 'white')
-        play_surface = self.main_font.render('New Game', True, 'white')
-        quit_surface = self.main_font.render('Quit', True, 'white')
+        color = (201, 0, 7)
+        continue_surface = self.main_font.render('Continue', True, color)
+        play_surface = self.main_font.render('New Game', True, color)
+        quit_surface = self.main_font.render('Quit', True, color)
         continue_button = Button(continue_surface, (140, 800), scale=.2, activate=self.continue_game)
         play_game = Button(play_surface, (140, 900), scale=.2, activate=self.new_game)
         quit_button = Button(quit_surface, (140, 1000), scale=.2, activate=pygame.event.Event(pygame.QUIT))

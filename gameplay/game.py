@@ -194,6 +194,7 @@ class Game:
         self.status = 'killed'
         self.end_function = 'menu'
         self.jump_scare_sound.play(maxtime=1000)
+        pygame.time.set_timer(KILL, 0)
         pygame.time.set_timer(GAME_TIMER, 1000)
 
     def win(self):
