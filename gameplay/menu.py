@@ -23,8 +23,8 @@ class Menu:
 class MainMenu(Menu):
     def __init__(self):
         super().__init__("resources/ui/menus/main_menu/")
-        self.main_font = pygame.font.Font('resources/fonts/Book Antiqua.ttf', 500)
-        self.secondary_font = pygame.font.Font('resources/fonts/Book Antiqua.ttf', 50)
+        self.main_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 500)
+        self.secondary_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 50)
         self.background_sound = pygame.mixer.Sound('resources/sounds/main_menu.mp3')
         self.save_manager = SaveManager()
         self.static = []
