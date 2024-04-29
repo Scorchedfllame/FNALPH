@@ -317,6 +317,24 @@ class Cameras(System):
         self.active = False
         pygame.time.set_timer(CAMERA_ROTATION, 0)
 
+    def calculate_rotation(self):
+        self.rotation_cycle += 1
+        if self.rotation_cycle == 4:
+            self.rotation_cycle = 0
+        match self.rotation_cycle:
+            case 0:
+                self.current_rotation = -90
+                self.camera_pan_sound.play(maxtime=3300)
+            case 1:
+                self.camera_pan_sound.set_volume(0)
+                self.current_rotation = 90
+            case 2:
+                self.current_rotation = 90
+                self.camera_pan_sound.play(maxtime=3300)
+            case 3:
+                self.camera_pan_sound.set_volume(0)
+                self.current_rotation = -90
+
     def tick(self, event: pygame.event.Event):
         for button in self.buttons:
             button.tick(event)
@@ -325,22 +343,7 @@ class Cameras(System):
         if event.type == CAMERA_FLIPPED_DOWN:
             self.deactivate()
         if event.type == CAMERA_ROTATION:
-            self.rotation_cycle += 1
-            if self.rotation_cycle == 4:
-                self.rotation_cycle = 0
-            match self.rotation_cycle:
-                case 0:
-                    self.current_rotation = -90
-                    self.camera_pan_sound.play(maxtime=3300)
-                case 1:
-                    self.camera_pan_sound.set_volume(0)
-                    self.current_rotation = 90
-                case 2:
-                    self.current_rotation = 90
-                    self.camera_pan_sound.play(maxtime=3300)
-                case 3:
-                    self.camera_pan_sound.set_volume(0)
-                    self.current_rotation = -90
+            self.calculate_rotation()
 
 
 class RecordIcon:
