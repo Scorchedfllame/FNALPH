@@ -3,7 +3,7 @@ import gc
 import pygame.display
 from gameplay import *
 # from data.saves.save import SaveManager
-
+import time
 
 def main():
     pygame.init()
@@ -12,8 +12,25 @@ def main():
     pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
     pygame.display.set_caption('Five Nights At Lone Peak High')
     pygame.display.set_icon(pygame.image.load('resources/ui/icon.png').convert())
+    loading_image = pygame.image.load('resources/ui/menus/main_menu/teamLogoScreen.png').convert_alpha()
+    for i in range(255, 0, -1):
+        black = pygame.surface.Surface((1920, 1080))
+        black.fill((0, 0, 0))
+        black.set_alpha(i)
+        pygame.display.get_surface().blit(loading_image, (0, 0))
+        pygame.display.get_surface().blit(black, (0,0))
+        pygame.display.flip()
+    pygame.display.get_surface().blit(loading_image, (0, 0))
+    pygame.display.flip()
     clock = pygame.time.Clock()
     main_menu = MainMenu()
+    for i in range(255):
+        black = pygame.surface.Surface((1920, 1080))
+        black.fill((0, 0, 0))
+        black.set_alpha(i)
+        pygame.display.get_surface().blit(loading_image, (0, 0))
+        pygame.display.get_surface().blit(black, (0,0))
+        pygame.display.flip()
     main_menu.activate()
 
     # Window Loop
