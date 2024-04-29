@@ -79,7 +79,7 @@ class Animatronic:
                                                        jump_data[1]),
                                       scale_to_fit=True,
                                       speed=jump_data[2]/100,
-                                      type='jump')
+                                      type='once')
         else:
             self.jumpscare = None
 
@@ -342,9 +342,9 @@ class Knight(Animatronic):
         self.camera.background.blit(self._get_image(), (0, 0))
 
 
-class Hitch(Animatronic):
+class Trojan(Animatronic):
     def __init__(self, game: any):
-        super().__init__("Hitch", game, 5010, HITCH_TIMER, 0)
+        super().__init__("Trojan", game, 5010, HITCH_TIMER, 0)
         self.images = None
         self.img_dict = None
         self.black = pygame.surface.Surface((1920*2, 1080))
