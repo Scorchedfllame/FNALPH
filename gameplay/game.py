@@ -166,6 +166,8 @@ class Game:
             self.win()
         if self.mute_button is not None and self.mute_button != 'start':
             self.mute_button.tick(event)
+        if event.type == POWER_RESET:
+            self.reset_power()
 
     def resize(self):
         screen = pygame.display.get_surface()
@@ -265,4 +267,15 @@ class Game:
             animatronic.update_images()
 
     def stop_timer(self):
+        pass
+
+
+    def reset_power(self):
+        for i in self.office.doors:
+            i.blackout()
+        self.office.blackout()
+        self.power_manager.update_power(0)
+        self.systems["Cameras"].activate_blackout()
+        #wait 10 - 30 seconds
+        #bright office
         pass

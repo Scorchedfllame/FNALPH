@@ -1,6 +1,6 @@
 import random
 from data.game.constants import *
-from .buttons import ToggleButton
+from .buttons import *
 from .animation import Animator
 import json
 
@@ -12,13 +12,23 @@ class Office:
         self.camera_toggle_sound = pygame.mixer.Sound('resources/sounds/camera_pull.mp3')
         self.doors = Door.generate_doors()
         self.image = pygame.image.load('resources/backgrounds/office.png').convert()
+        self.blackout_image = pygame.image.load('resources/backgrounds/office_blackout.png').convert()
         self.image = pygame.transform.scale_by(self.image,
                                                pygame.display.get_surface().get_height()/self.image.get_size()[1])
+        self._image = self.image.copy()
         self.surface = pygame.surface.Surface(self.image.get_size())
         self.rot_x = 0
         self.MAX_ROTATION = 90
         self.active = True
         self._locked = False
+        self.power_reset_button = Button(pygame.image.load('resources/sprites/animatronics/bonnie/bonbie_jumpscare.png'),
+                                         (50, 50), activate=pygame.event.Event(POWER_RESET), scale=0.1)
+
+    def blackout(self):
+        self.image = self.blackout_image
+
+    def reset(self):
+        self.image = self._image
 
     def start(self):
         self.active = True
@@ -43,6 +53,7 @@ class Office:
 
     def tick(self, event: pygame.event.Event):
         if self.active:
+            self.power_reset_button.tick(event)
             for door in self.doors:
                 door.tick(event)
         if event.type == CAMERA_FLIPPED_UP:
@@ -53,6 +64,7 @@ class Office:
             self.active = True
             self.ambience.set_volume(.2)
             self.camera_toggle_sound.play()
+
 
     def frame(self):
         if self.active:
@@ -85,6 +97,7 @@ class Office:
             screen.blit(self.surface, (self.get_pos_from_rot(), 0))
             for door in self.doors:
                 door.draw(screen, pygame.Vector2(self.get_pos_from_rot(), 0))
+            self.power_reset_button.draw(screen)
 
 
 class Door:
@@ -119,6 +132,19 @@ class Door:
         self.door_toggle_sound.set_volume(.5)
         self.stinger_sound = pygame.mixer.Sound('resources/sounds/stinger.mp3')
         self.stung = False
+        self.blacked_out = False
+
+    def blackout(self):
+        self.blacked_out = True
+        self.open_door()
+        self.light_off()
+        for k, v in self.curr_images.items():
+            self.curr_images[k] = pygame.surface.Surface((10, 10))
+
+
+    def stop_blackout(self):
+        self.reset()
+        self.blacked_out = False
 
     def start(self):
         self.light_status = 'dark'
@@ -126,6 +152,8 @@ class Door:
         self.door_button.active = False
         self.light_button.active = False
         self.stung = False
+        self.blacked_out = False
+        self.reset()
 
     def stop(self):
         self.stinger_sound.stop()
@@ -162,8 +190,9 @@ class Door:
     def tick(self, event: pygame.event.Event):
         if event.type == CAMERA_FLIPPED_UP:
             self.light_button.check_deactivate()
-        self.door_button.tick(event)
-        self.light_button.tick(event)
+        if not self.blacked_out:
+            self.door_button.tick(event)
+            self.light_button.tick(event)
 
     def get_flicker(self):
         if self.light_status == 'light':

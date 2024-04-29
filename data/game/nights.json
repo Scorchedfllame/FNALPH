@@ -145,5 +145,26 @@
       }
     },
     "power_time": 3000
+  },
+  "-1": {
+    "animatronics": {
+      "Bonnie": {
+        "difficulty": 0,
+        "change": [[1, 20]]
+      },
+      "Chica": {
+        "difficulty": 0,
+        "change": [[1, 20]]
+      },
+      "Lefty": {
+        "difficulty": 0,
+        "change": [[1, 20]]
+      },
+      "Knight": {
+        "difficulty": 0,
+        "change": [[1, 20]]
+      }
+    },
+    "power_time": 1000
   }
 }
