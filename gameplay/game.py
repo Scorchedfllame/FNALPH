@@ -162,7 +162,7 @@ class Game:
                 animatronic.tick(event)
             for system in self.systems.values():
                 system.tick(event)
-            if not self.systems['Cameras'].blackout:
+            if not self.systems['Cameras'].blacked_out:
                 self.flick.tick(event)
             self.office.tick(event)
             self.tick(event)
@@ -180,7 +180,7 @@ class Game:
         self.office.draw()
         for system in self.systems.values():
             system.draw()
-        if not self.systems['Cameras'].blackout:
+        if not self.systems['Cameras'].blacked_out:
             self.flick.draw(screen)
         if self.status == 'win':
             screen.fill('black')

@@ -56,7 +56,8 @@ class Camera:
     def draw(self, surface, offset: int = 0) -> None:
         if self.glitch:
             self.glitch_timer += 1
-            if self.glitch_timer > self.MAX_GLITCH_TIMER:
+            if self.glitch_timer + random.randint(0, 50) > self.MAX_GLITCH_TIMER:
+                self.glitch_sound.stop()
                 self.glitch_timer = 0
                 self.glitch = False
         if self.active:
