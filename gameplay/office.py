@@ -8,43 +8,36 @@ import json
 class Office:
     def __init__(self):
         self.ambience = pygame.mixer.Sound('resources/sounds/office_ambience.mp3')
-        self.ambience.set_volume(.2)
         self.camera_toggle_sound = pygame.mixer.Sound('resources/sounds/camera_pull.mp3')
-        self.doors = Door.generate_doors()
         self.image = pygame.image.load('resources/backgrounds/office.png').convert()
         self.blackout_image = pygame.image.load('resources/backgrounds/office_blackout.png').convert()
+        self.doors = Door.generate_doors()
         self.image = pygame.transform.scale_by(self.image,
                                                pygame.display.get_surface().get_height()/self.image.get_size()[1])
         self._image = self.image.copy()
+
+        # Eventually Change the surface to be a rect
+        self.power_reset_button = Button(
+            pygame.image.load('resources/sprites/animatronics/bonnie/bonbie_jumpscare.png'),
+            (50, 50), activate=pygame.event.Event(POWER_RESET), scale=0.1)
+        self.ambience.set_volume(.2)
+
         self.surface = pygame.surface.Surface(self.image.get_size())
-        self.rot_x = 0
-        self.MAX_ROTATION = 90
-        self.active = True
-        self._locked = False
-        self.power_reset_button = Button(pygame.image.load('resources/sprites/animatronics/bonnie/bonbie_jumpscare.png'),
-                                         (50, 50), activate=pygame.event.Event(POWER_RESET), scale=0.1)
 
-    def blackout(self):
-        self.image = self.blackout_image
-
-    def reset(self):
-        self.image = self._image
+        self.MAX_ROTATION = None
+        self.rot_x = None
+        self.active = None
+        self._locked = None
 
     def start(self):
-        self.active = True
+        self.MAX_ROTATION = 90
         self.rot_x = 0
-        self.ambience.play()
+        self.active = True
+        self._locked = False
+
         for door in self.doors:
             door.start()
-
-    def get_power_usage(self):
-        power_usage = 0
-        for i in self.doors:
-            if i.door_status == 'closed':
-                power_usage += 1
-            if i.light_status == 'light':
-                power_usage += 1
-        return power_usage
+        self.ambience.play()
 
     def stop(self):
         self.ambience.stop()
@@ -65,12 +58,33 @@ class Office:
             self.ambience.set_volume(.2)
             self.camera_toggle_sound.play()
 
-
-    def frame(self):
+    def draw(self):
         if self.active:
             self.rot_x += self.get_rot_from_mouse(pygame.mouse.get_pos())
             self.rot_x = max(-self.MAX_ROTATION, self.rot_x)
             self.rot_x = min(self.MAX_ROTATION, self.rot_x)
+
+            screen = pygame.display.get_surface()
+            self.surface.blit(self.image, (0, 0))
+            screen.blit(self.surface, (self.get_pos_from_rot(), 0))
+            for door in self.doors:
+                door.draw(screen, pygame.Vector2(self.get_pos_from_rot(), 0))
+            self.power_reset_button.draw(screen)
+
+    def blackout(self):
+        self.image = self.blackout_image
+
+    def reset(self):
+        self.image = self._image
+
+    def get_power_usage(self):
+        power_usage = 0
+        for i in self.doors:
+            if i.door_status == 'closed':
+                power_usage += 1
+            if i.light_status == 'light':
+                power_usage += 1
+        return power_usage
 
     @staticmethod
     def get_rot_from_mouse(mouse_pos):
@@ -90,70 +104,54 @@ class Office:
         # turn into other stuff
         return normalized * (screen_x - image_x)
 
-    def draw(self):
-        if self.active:
-            screen = pygame.display.get_surface()
-            self.surface.blit(self.image, (0, 0))
-            screen.blit(self.surface, (self.get_pos_from_rot(), 0))
-            for door in self.doors:
-                door.draw(screen, pygame.Vector2(self.get_pos_from_rot(), 0))
-            self.power_reset_button.draw(screen)
-
 
 class Door:
     def __init__(self, image_paths: dict[str], positions: dict):
         self.light_off_sound = pygame.mixer.Sound('resources/sounds/light_stuck.mp3')
         self.light_on_sound = pygame.mixer.Sound('resources/sounds/light_button.mp3')
         self.door_toggle_sound = pygame.mixer.Sound('resources/sounds/door_close.mp3')
+        self.light_noise = pygame.mixer.Sound('resources/sounds/light_noise.mp3')
+        self.stinger_sound = pygame.mixer.Sound('resources/sounds/stinger.mp3')
+        self.button_fail_sound = pygame.mixer.Sound('resources/sounds/light_stuck.mp3')
         self._default_images = {key: pygame.image.load(value).convert_alpha() for key, value in image_paths.items()}
+
         scalar = pygame.display.get_surface().get_height()/self._default_images['open_dark'].get_size()[1]
         for key, image in self._default_images.items():
             self._default_images[key] = pygame.transform.scale_by(image, scalar)
-        self.curr_images = self._default_images.copy()
-        self.light_noise = pygame.mixer.Sound('resources/sounds/light_noise.mp3')
-        self.light_status = 'dark'
-        self.door_status = 'open'
         self.relative_pos = positions
-        self.flicker_counter = 1
-        self.current_surface = self.curr_images[self.get_status()]
-        self.rect = self.current_surface.get_rect()
-        self.rect.topleft = self.relative_pos['door']
+        self.curr_images = self._default_images.copy()
+
         self.light_button = ToggleButton(self.curr_images['button'],
                                          self.relative_pos['light'],
                                          self.light_on,
                                          self.light_off)
+
         self.door_button = ToggleButton(self.curr_images['button'],
                                         self.relative_pos['door'],
                                         self.close_door,
                                         self.open_door)
-        anim_rect = self.current_surface.get_rect()
-        self.animator = Animator(self.curr_images['animation'], anim_rect)
-        self.button_fail_sound = pygame.mixer.Sound('resources/sounds/light_stuck.mp3')
+
         self.door_toggle_sound.set_volume(.5)
-        self.stinger_sound = pygame.mixer.Sound('resources/sounds/stinger.mp3')
-        self.stung = False
-        self.blacked_out = False
 
-    def blackout(self):
-        self.blacked_out = True
-        self.open_door()
-        self.light_off()
-        for k, v in self.curr_images.items():
-            self.curr_images[k] = pygame.surface.Surface((10, 10))
-
-
-    def stop_blackout(self):
-        self.reset()
-        self.blacked_out = False
+        self.stung = None
+        self.blacked_out = None
+        self.light_status = None
+        self.door_status = None
+        self.flicker_counter = None
+        self.current_surface = None
+        self.rect = None
+        self.animator = None
 
     def start(self):
-        self.light_status = 'dark'
-        self.door_status = 'open'
-        self.door_button.active = False
-        self.light_button.active = False
         self.stung = False
         self.blacked_out = False
-        self.reset()
+        self.light_status = 'dark'
+        self.door_status = 'open'
+        self.flicker_counter = 1
+        self.current_surface = self.curr_images[self.get_status()]
+        self.rect = self.current_surface.get_rect()
+        self.rect.topleft = self.relative_pos['door']
+        self.animator = Animator(self.curr_images['animation'], self.current_surface.get_rect())
 
     def stop(self):
         self.stinger_sound.stop()
@@ -162,6 +160,45 @@ class Door:
         self.light_noise.stop()
         self.light_on_sound.stop()
         self.light_off_sound.stop()
+        self.reset()
+
+    def tick(self, event: pygame.event.Event):
+        if event.type == CAMERA_FLIPPED_UP:
+            self.light_button.check_deactivate()
+        if not self.blacked_out:
+            self.door_button.tick(event)
+            self.light_button.tick(event)
+
+    def draw(self, surface: pygame.Surface, vector: pygame.Vector2):
+        if not self.animator.active:
+            light = self.get_flicker()
+            self.current_surface = self.curr_images[f"{self.door_status}_{light}"]
+            light_positions = self.relative_pos['light']
+
+            door_positions = self.relative_pos['door']
+
+            button_positions = self.relative_pos['button']
+            self.rect.topleft = (0, 0)
+            self.rect.move_ip(vector)
+
+            surface.blit(self.current_surface, (self.rect.x + door_positions[0], self.rect.y + door_positions[1]))
+
+            self.door_button.resize((self.rect.x + button_positions[0], self.rect.y + button_positions[1]), scale=1.2)
+            self.light_button.resize((self.rect.x + light_positions[0], self.rect.y + light_positions[1]), scale=1.2)
+        self.animator.draw(surface, vector)
+
+    def blackout(self):
+        self.blacked_out = True
+        if self.door_status == 'open':
+            self.open_door()
+        if self.light_status == 'dark':
+            self.light_off()
+        for k, v in self.curr_images.items():
+            self.curr_images[k] = pygame.surface.Surface((10, 10))
+
+    def stop_blackout(self):
+        self.reset()
+        self.blacked_out = False
 
     def check_stinger(self):
         if self._default_images != self.curr_images:
@@ -187,13 +224,6 @@ class Door:
                     k: tuple(v) for k, v in door['positions'].items()}))
         return door_list
 
-    def tick(self, event: pygame.event.Event):
-        if event.type == CAMERA_FLIPPED_UP:
-            self.light_button.check_deactivate()
-        if not self.blacked_out:
-            self.door_button.tick(event)
-            self.light_button.tick(event)
-
     def get_flicker(self):
         if self.light_status == 'light':
             if self.flicker_counter > 0:
@@ -215,20 +245,6 @@ class Door:
                 else:
                     return 'dark'
         return 'dark'
-
-    def draw(self, surface: pygame.Surface, vector: pygame.Vector2):
-        if not self.animator.active:
-            light = self.get_flicker()
-            self.current_surface = self.curr_images[f"{self.door_status}_{light}"]
-            light_positions = self.relative_pos['light']
-            door_positions = self.relative_pos['door']
-            button_positions = self.relative_pos['button']
-            self.rect.topleft = (0, 0)
-            self.rect.move_ip(vector)
-            surface.blit(self.current_surface, (self.rect.x + door_positions[0], self.rect.y + door_positions[1]))
-            self.door_button.resize((self.rect.x + button_positions[0], self.rect.y + button_positions[1]), scale=1.2)
-            self.light_button.resize((self.rect.x + light_positions[0], self.rect.y + light_positions[1]), scale=1.2)
-        self.animator.draw(surface, vector)
 
     def lock(self):
         def fail():

@@ -47,31 +47,14 @@ class Animatronic:
         self.name = name
         self._difficulty = 0
         self._aggression = self._difficulty
-        description = self.load_data()['menu_label']['description']
-        image_path = self.load_data()['menu_label']['image_path']
-        self.menu_label = MenuLabel(self.name, self._difficulty, description, image_path)
-        self.move_sounds = [pygame.mixer.Sound('resources/sounds/footsteps_' + str(i) + '.mp3') for i in range(1, 5)]
-        for sound in self.move_sounds:
-            sound.set_volume(.25)
-        self.video = None
-        self._office = game.office
-        self.door = game.office.doors[door]
-        self._game = game
-        self._cameras = game.systems["Cameras"].camera_list
-        self._location = 0
-        self._kill_locked = False
-        self._camera_key = self.load_data()['cameras']
-        self._movement_key = self.load_data()['movements']
+        self.movement_timer = movement_timer_length
+        self.TIMER = timer
+
         self.FILE_LOCATION = f'resources/sprites/animatronics/{name}/'
         self.images = os.listdir(self.FILE_LOCATION)
         self.img_dict = {}
         for image in self.images:
             self.img_dict[image.removesuffix('.png')] = pygame.image.load(self.FILE_LOCATION + image).convert_alpha()
-        self.TIMER = timer
-        self.movement_timer = movement_timer_length
-        self.OFFICE_LOCATION = len(self._camera_key)
-        self.active = False
-        self.camera = self._cameras[self._camera_key[0]]
         if 'jumpscare' in self.load_data().keys():
             jump_data = self.load_data()['jumpscare']
             self.jumpscare = Animator(pygame.image.load(self.FILE_LOCATION + "jumpscare.png").convert_alpha(),
@@ -82,6 +65,55 @@ class Animatronic:
                                       type='once')
         else:
             self.jumpscare = None
+        self._camera_key = self.load_data()['cameras']
+        self._movement_key = self.load_data()['movements']
+        description = self.load_data()['menu_label']['description']
+        image_path = self.load_data()['menu_label']['image_path']
+        self.menu_label = MenuLabel(self.name, self._difficulty, description, image_path)
+
+        self.move_sounds = [pygame.mixer.Sound('resources/sounds/footsteps_' + str(i) + '.mp3') for i in range(1, 5)]
+        for sound in self.move_sounds:
+            sound.set_volume(.25)
+
+        self._cameras = game.systems["Cameras"].camera_list
+        self._office = game.office
+        self._game = game
+        self.door = game.office.doors[door]
+        self.OFFICE_LOCATION = len(self._camera_key)
+
+        self.video = None
+        self._location = None
+        self._kill_locked = None
+        self.active = None
+        self.camera = None
+
+    def start(self) -> None:
+        self.video = None
+        self._location = 0
+        self._kill_locked = False
+        self.active = True
+        self.camera = self._cameras[self._camera_key[0]]
+
+        self.reset_aggression()
+        self.update_images()
+        pygame.time.set_timer(self.TIMER, self.movement_timer)
+
+    def stop(self) -> None:
+        self._location = -1
+        self.active = False
+        pygame.time.set_timer(self.TIMER, 0)
+
+    def tick(self, event: pygame.event.Event) -> None:
+        if self.active:
+            if event.type == self.TIMER:
+                if self._kill_locked:
+                    self.kill()
+                # Movement Opportunities
+                rng = random.randint(1, 20)
+                if rng <= self._aggression:
+                    self.successful_movement()
+            if event.type == CAMERA_FLIPPED_DOWN and self._kill_locked:
+                self.kill()
 
     def load_data(self) -> dict:
         with open('data/game/animatronics.json', 'r') as f:
@@ -101,30 +133,6 @@ class Animatronic:
 
     def reset_aggression(self) -> None:
         self._aggression = self._difficulty
-
-    def start(self) -> None:
-        self.active = True
-        pygame.time.set_timer(self.TIMER, self.movement_timer)
-        self._location = 0
-        self.reset_aggression()
-        self.update_images()
-
-    def stop(self) -> None:
-        pygame.time.set_timer(self.TIMER, 0)
-        self._location = -1
-        self.active = False
-
-    def tick(self, event: pygame.event.Event) -> None:
-        if self.active:
-            if event.type == self.TIMER:
-                if self._kill_locked:
-                    self.kill()
-                # Movement Opportunities
-                rng = random.randint(1, 20)
-                if rng <= self._aggression:
-                    self.successful_movement()
-            if event.type == CAMERA_FLIPPED_DOWN and self._kill_locked:
-                self.kill()
 
     def successful_movement(self):
         if self._location == self.OFFICE_LOCATION:
@@ -173,7 +181,6 @@ class Animatronic:
                 self.door.curr_images['open_light'] = self.img_dict[self.name.lower() + '_' + 'open_light']
                 self.door.curr_images['closed_light'] = self.img_dict[self.name.lower() + '_' + 'closed_light']
 
-    # Some sort of dictionary with all the images and stages that bonnie possesses
     def _get_image(self) -> any:
         return self.img_dict[self.name.lower() + '_' + str(self._location)]
 
@@ -275,6 +282,7 @@ class Knight(Animatronic):
         self.OFFICE_LOCATION = 3
 
     def start(self):
+        super().start()
         self.active = True
         self.primed = False
         self.running = False

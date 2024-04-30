@@ -6,23 +6,28 @@ class PowerManager:
     def __init__(self, power_penalty):
         self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 55)
         self.large_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
-        self.percentage = 100
-        self.power_remaining = 100000
-        self.usage = Usage(self.font, self.large_font)
-        self.DIFFICULTY = 10 # set back to 10 when done testing
-        self.active = False
         self.power_penalty = power_penalty
+        self.usage = Usage(self.font, self.large_font)
+
+        self.DIFFICULTY = None
+        self.active = None
+        self.percentage = None
+        self.power_remaining = None
 
     def start(self):
+        # set back to 10 when done testing
+        self.DIFFICULTY = 10
         self.active = True
         self.percentage = 100
         self.power_remaining = 100000
+
         self.usage.start()
         pygame.time.set_timer(UPDATE_POWER, 100)
         pygame.time.set_timer(POWER_PENALTY, self.power_penalty)
 
     def stop(self):
         self.active = False
+
         pygame.time.set_timer(UPDATE_POWER, 0)
         pygame.time.set_timer(POWER_PENALTY, 0)
 
@@ -71,7 +76,6 @@ class PowerManager:
 
 class Usage:
     def __init__(self, font, large_font):
-        self.usage = 1
         self.large_font = large_font
         self.width = 25
         self.height = 40
@@ -81,8 +85,15 @@ class Usage:
         self.text_rect = self.text.get_rect()
         self.resize()
 
+        self.usage = None
+
     def start(self):
         self.usage = 1
+
+    def draw(self, surface):
+        surface.blit(self.text, self.text_rect)
+        self.draw_ghost(surface)
+        self.draw_color(surface)
 
     def resize(self):
         screen = pygame.display.get_surface()
@@ -120,11 +131,6 @@ class Usage:
                 shade_color = (198, 0, 0)
             pygame.draw.rect(surface, color, usage_bar)
             pygame.draw.rect(surface, shade_color, shader)
-
-    def draw(self, surface):
-        surface.blit(self.text, self.text_rect)
-        self.draw_ghost(surface)
-        self.draw_color(surface)
 
     def __int__(self):
         return self.usage

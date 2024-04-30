@@ -3,19 +3,23 @@ from data.game.constants import *
 
 class Clock:
     def __init__(self, night):
-        self.night = night
-        self.time = 12
-        self.hour = 0
-        self.HOUR_DURATION = 60
         self.HOUR_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 100)
         self.NIGHT_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 50)
-        self.active = True
+
+        self.night = night
+
+        self.HOUR_DURATION = None
+        self.time = None
+        self.hour = None
+        self.active = None
 
     def start(self, night):
-        self.active = True
-        self.night = night
-        self.hour = 0
+        self.HOUR_DURATION = 60
         self.time = 12
+        self.hour = 0
+        self.active = True
+
+        self.night = night
         pygame.time.set_timer(CLOCK, self.HOUR_DURATION * 1000)
 
     def stop(self):
@@ -23,14 +27,6 @@ class Clock:
         self.hour = 0
         self.time = 12
         pygame.time.set_timer(CLOCK, 0)
-
-    def update_time(self):
-        if self.active:
-            self.hour += 1
-            self.time = int((self.hour - 1) % 12 + 1)
-            if self.time == 6:
-                pygame.event.post(pygame.event.Event(WIN))
-                self.active = False
 
     def tick(self, event: pygame.event.Event):
         if event.type == CLOCK:
@@ -47,3 +43,10 @@ class Clock:
         night_rect.topright = (width - 15, rect.height - 5)
         screen.blit(night, night_rect)
 
+    def update_time(self):
+        if self.active:
+            self.hour += 1
+            self.time = int((self.hour - 1) % 12 + 1)
+            if self.time == 6:
+                pygame.event.post(pygame.event.Event(WIN))
+                self.active = False

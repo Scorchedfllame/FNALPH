@@ -36,6 +36,17 @@ def create_mute_call() -> pygame.Surface:
     return surface
 
 
+def init_flick(image: pygame.surface.Surface):
+    screen = pygame.display.get_surface()
+    camera_flick = Flick(image,
+                         (int(screen.get_width() * 4 / 11), screen.get_height() - 25),
+                         pygame.event.Event(CAMERA_FLIPPED_UP),
+                         pygame.event.Event(CAMERA_FLIPPED_DOWN),
+                         draw_type='midbottom',
+                         scale=screen.get_width() / (screen.get_width() * 1.4))
+    return camera_flick
+
+
 class Game:
     def __init__(self, save_manager: SaveManager):
         # Loading Resources
@@ -46,13 +57,13 @@ class Game:
         self.jump_scare_sound = pygame.mixer.Sound('resources/sounds/jump_scare.mp3')
         self.GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 55)
         self.BIGGER_GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
-        with open('data/game/nights.json', 'r') as f:
-            self.night_dict = json.loads(f.read())
-            self.night_data = self.night_dict[str(self.night)]
 
         # Initialize Managers and Systems
         self.save_manager = save_manager
         self.night = self.save_manager.load_data()['night']
+        with open('data/game/nights.json', 'r') as f:
+            self.night_dict = json.loads(f.read())
+            self.night_data = self.night_dict[str(self.night)]
         self.power_manager = PowerManager(self.night_data['power_time'])
         self.clock = Clock(self.night)
 
@@ -77,7 +88,7 @@ class Game:
         self.mute_button = None
 
         self.jump_scare_sound.set_volume(0.3)
-        self.flick = self.init_flick()
+        self.flick = init_flick(self.flick_up_image)
 
     def start(self):
         # Setup Variables
@@ -93,18 +104,17 @@ class Game:
 
         # Start Systems
         self.flick.start()
-        self.power_manager.start()
-        self.power_manager.start()
         self.office.start()
         self.clock.start(self.night)
         for system in self.systems.values():
             system.start()
         self.night = self.save_manager.data['night']
+        self.power_manager.start()
 
         # Start Animatronics
         self.night_data = self.night_dict[str(self.night)]
         for i, animatronic in enumerate(self.animatronics):
-            animatronic.set_difficulty(self.night_data['animatronics'][animatronic]['difficulty'])
+            animatronic.set_difficulty(self.night_data['animatronics'][animatronic.name]['difficulty'])
         for animatronic in self.animatronics:
             animatronic.start()
 
@@ -164,7 +174,6 @@ class Game:
                         if change[0] == self.clock.hour:
                             animatronic.update_aggression(change[1])
                             break
-        self.office.frame()
 
     def global_draw(self):
         screen = pygame.display.get_surface()
@@ -173,18 +182,18 @@ class Game:
             system.draw()
         if not self.systems['Cameras'].blackout:
             self.flick.draw(screen)
-        self.power_manager.draw(screen)
-        self.clock.draw(screen)
         if self.status == 'win':
             screen.fill('black')
             text = pygame.transform.scale_by(self.BIGGER_GLOBAL_FONT.render("6:00 AM", True, "white"), 3)
             rect = text.get_rect()
             rect.center = (screen.get_width() / 2, screen.get_height() / 2)
             screen.blit(text, rect)
-        if self.kill_anim is not None:
-            self.kill_anim.draw(screen)
         if self.mute_button is not None and self.mute_button != 'start':
             self.mute_button.draw(screen)
+        self.power_manager.draw(screen)
+        self.clock.draw(screen)
+        if self.kill_anim is not None:
+            self.kill_anim.draw(screen)
 
     def tick(self, event: pygame.event.Event):
         if event.type == MUTE_TIME:
@@ -225,16 +234,6 @@ class Game:
     def next_night(self):
         self.save_manager.save_game()
 
-    def init_flick(self):
-        screen = pygame.display.get_surface()
-        camera_flick = Flick(self.flick_up_image,
-                             (int(screen.get_width() * 4 / 11), screen.get_height() - 25),
-                             pygame.event.Event(CAMERA_FLIPPED_UP),
-                             pygame.event.Event(CAMERA_FLIPPED_DOWN),
-                             draw_type='midbottom',
-                             scale=screen.get_width() / (screen.get_width() * 1.4))
-        return camera_flick
-
     def get_power_usage(self) -> int:
         power_usage = 1
         power_usage += self.office.get_power_usage()
@@ -250,7 +249,7 @@ class Game:
         self.office.image = pygame.transform.scale_by(self.office.image,
                                                       pygame.display.get_surface().get_height() /
                                                       self.office.image.get_size()[1])
-        self.systems['Cameras'].activate_blackout()
+        self.systems['Cameras'].blackout()
         pygame.time.set_timer(pygame.event.Event(KILL, {'animation': self.animatronics[3].jumpscare}),
                               random.randint(5000, 40000))
         self.animatronics = []
@@ -283,11 +282,14 @@ class Game:
         pass
 
     def reset_power(self):
+        # Ok Charlie... Ideally we don't have any system have a variable called "Blacked out". Only the ones
+        # like the office, doors, and power need the function, and then we use the Game class to eliminate
+        # the possibility of even activating any of the other systems like removing the flick button.
         for i in self.office.doors:
             i.blackout()
         self.office.blackout()
         self.power_manager.update_power(0)
-        self.systems["Cameras"].activate_blackout()
+        self.systems["Cameras"].blackout()
         # wait 10 - 30 seconds
         # bright office
         pass

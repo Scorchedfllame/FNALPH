@@ -6,8 +6,8 @@ from data.saves.save import SaveManager
 
 class Menu:
     def __init__(self, directory: str):
-        self.directory = directory
-        self.background = pygame.image.load(self.directory + "background.png").convert()
+        self.background = pygame.image.load(directory + "background.png").convert()
+
         scalar = pygame.display.get_surface().get_width()/self.background.get_width()
         self.background = pygame.transform.scale_by(self.background, scalar)
         self.buttons = []
@@ -26,21 +26,14 @@ class MainMenu(Menu):
         self.main_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 500)
         self.secondary_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 50)
         self.background_sound = pygame.mixer.Sound('resources/sounds/main_menu.mp3')
-        self.save_manager = SaveManager()
         self.static = []
         for frame in os.listdir('resources/animations/static/'):
             image = pygame.image.load(f'resources/animations/static/{frame}').convert_alpha()
             self.static.append(image)
-        self.buttons = self.init_buttons()
+
+        self.save_manager = SaveManager()
         self.game = Game(self.save_manager)
-
-    def activate(self):
-        self.background_sound.play(loops=10)
-        self.active = True
-
-    def deactivate(self):
-        self.background_sound.stop()
-        self.active = False
+        self.buttons = self.init_buttons()
 
     def tick(self):
         events = pygame.event.get()
@@ -68,6 +61,14 @@ class MainMenu(Menu):
         night_rect.topleft = cont_button.rect.bottomleft
         night_rect.y -= 25
         screen.blit(night, night_rect)
+
+    def activate(self):
+        self.background_sound.play(loops=10)
+        self.active = True
+
+    def deactivate(self):
+        self.background_sound.stop()
+        self.active = False
 
     def new_game(self):
         self.save_manager.reset_save()
