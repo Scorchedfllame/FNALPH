@@ -143,6 +143,8 @@ class Door:
         self.animator = None
 
     def start(self):
+        self.light_button.activate, self.light_button.deactivate = self.light_on, self.light_off
+        self.door_button.activate, self.door_button.deactivate = self.close_door, self.open_door
         self.stung = False
         self.blacked_out = False
         self.light_status = 'dark'

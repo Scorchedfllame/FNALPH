@@ -75,7 +75,6 @@ class MainMenu(Menu):
         self.start_game()
 
     def start_game(self):
-        self.save_manager.load_data()
         self.deactivate()
         pygame.display.get_surface().fill('black')
         pygame.display.flip()

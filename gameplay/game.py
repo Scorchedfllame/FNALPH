@@ -102,13 +102,14 @@ class Game:
         self.phone_call = None
         self.active = True
 
+        self.night = self.save_manager.data['night']
+
         # Start Systems
         self.flick.start()
         self.office.start()
         self.clock.start(self.night)
         for system in self.systems.values():
             system.start()
-        self.night = self.save_manager.data['night']
         self.power_manager.start()
 
         # Start Animatronics
