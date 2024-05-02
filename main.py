@@ -1,9 +1,9 @@
-import gc
+# import gc
 
 import pygame.display
 from gameplay import *
 # from data.saves.save import SaveManager
-import time
+# import time
 
 
 def fade_image(image: pygame.surface.Surface, screen: pygame.surface.Surface, len_dir: range):
@@ -20,7 +20,7 @@ def main():
     pygame.init()
     pygame.mixer.init()
     pygame.mixer.set_num_channels(10)
-    pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
+    pygame.display.set_mode((1920, 1080))
     pygame.display.set_caption('Five Nights At Lone Peak High')
     pygame.display.set_icon(pygame.image.load('resources/ui/icon.png').convert())
     loading_image = pygame.image.load('resources/ui/menus/main_menu/teamLogoScreen.png').convert_alpha()

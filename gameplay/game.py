@@ -68,7 +68,7 @@ class Game:
         self.clock = Clock(self.night)
 
         self.systems = {"Cameras": Cameras()}
-        self.office = Office()
+        self.office = Office(self)
 
         # Initialize Animatronics
         self.animatronics = []
@@ -86,6 +86,9 @@ class Game:
         self.kill_anim = None
         self.phone_call = None
         self.mute_button = None
+        self.blacked_out = None
+        self.reset_counter = None
+        self.reset_time = None
 
         self.jump_scare_sound.set_volume(0.3)
         self.flick = init_flick(self.flick_up_image)
@@ -101,8 +104,11 @@ class Game:
         self.kill_anim = None
         self.phone_call = None
         self.active = True
+        self.blacked_out = False
+        self.reset_counter = 0
+        self.reset_time = 0
 
-        self.night = self.save_manager.data['night']
+        self.night = self.save_manager.load_data()['night']
 
         # Start Systems
         self.flick.start()
@@ -129,6 +135,7 @@ class Game:
     def stop(self):
         pygame.time.set_timer(MUTE_TIME, 0)
         pygame.time.set_timer(GAME_TIMER, 0)
+        pygame.time.set_timer(POWER_RESET, 0)
 
         pygame.mixer.stop()
         self.office.stop()
@@ -155,19 +162,20 @@ class Game:
                 for system in self.systems.values():
                     system.resize()
                 self.power_manager.resize()
-            if event.type == BLACKOUT:
-                self.blackout()
+            if event.type == POWER_OUT:
+                self.power_out()
             if event.type == WIN:
                 self.win()
             for animatronic in self.animatronics:
                 animatronic.tick(event)
             for system in self.systems.values():
                 system.tick(event)
-            if not self.systems['Cameras'].blacked_out:
+            if not self.blacked_out:
                 self.flick.tick(event)
             self.office.tick(event)
             self.tick(event)
             self.clock.tick(event)
+            self.power_manager.tick(event)
             if event.type == CLOCK:
                 for animatronic in self.animatronics:
                     change_list = self.night_data['animatronics'][animatronic.name]['change']
@@ -181,7 +189,7 @@ class Game:
         self.office.draw()
         for system in self.systems.values():
             system.draw()
-        if not self.systems['Cameras'].blacked_out:
+        if not self.blacked_out:
             self.flick.draw(screen)
         if self.status == 'win':
             screen.fill('black')
@@ -191,7 +199,10 @@ class Game:
             screen.blit(text, rect)
         if self.mute_button is not None and self.mute_button != 'start':
             self.mute_button.draw(screen)
-        self.power_manager.draw(screen)
+        if not self.blacked_out:
+            self.power_manager.draw(screen)
+        else:
+            self.power_manager.draw_reset(screen, self.reset_counter, self.reset_time)
         self.clock.draw(screen)
         if self.kill_anim is not None:
             self.kill_anim.draw(screen)
@@ -222,7 +233,13 @@ class Game:
         if self.mute_button is not None and self.mute_button != 'start':
             self.mute_button.tick(event)
         if event.type == POWER_RESET:
-            self.reset_power()
+            if self.blacked_out:
+                if self.reset_counter >= self.reset_time:
+                    self.un_black_out()
+                else:
+                    self.reset_counter += 1
+            else:
+                self.reset_power()
         if event.type == CAMERA_FLIPPED_UP:
             self.flick.change_surface(self.flick_down_image)
         if event.type == CAMERA_FLIPPED_DOWN:
@@ -236,25 +253,15 @@ class Game:
         self.save_manager.save_game()
 
     def get_power_usage(self) -> int:
-        power_usage = 1
+        if not self.blacked_out:
+            power_usage = 1
+        else:
+            power_usage = 0
         power_usage += self.office.get_power_usage()
         for system in self.systems.values():
             if system.active:
                 power_usage += 1
         return min(power_usage, 5)
-
-    def blackout(self):
-        pygame.mixer.stop()
-        pygame.mixer.Sound('resources/sounds/power_off.mp3').play()
-        self.office.image = pygame.image.load('resources/backgrounds/office_blackout.png').convert()
-        self.office.image = pygame.transform.scale_by(self.office.image,
-                                                      pygame.display.get_surface().get_height() /
-                                                      self.office.image.get_size()[1])
-        self.systems['Cameras'].blackout()
-        pygame.time.set_timer(pygame.event.Event(KILL, {'animation': self.animatronics[3].jumpscare}),
-                              random.randint(5000, 40000))
-        self.animatronics = []
-        self.office.doors = []
 
     def kill(self, animation):
         self.kill_anim = animation
@@ -286,11 +293,29 @@ class Game:
         # Ok Charlie... Ideally we don't have any system have a variable called "Blacked out". Only the ones
         # like the office, doors, and power need the function, and then we use the Game class to eliminate
         # the possibility of even activating any of the other systems like removing the flick button.
-        for i in self.office.doors:
-            i.blackout()
-        self.office.blackout()
-        self.power_manager.update_power(0)
-        self.systems["Cameras"].blackout()
+        self.black_out()
+        self.reset_time = 150
+        pygame.time.set_timer(POWER_RESET, 100, self.reset_time + 1)
         # wait 10 - 30 seconds
         # bright office
-        pass
+
+    def un_black_out(self):
+        self.reset_counter = 0
+        self.reset_time = 0
+        self.power_manager.reset_count = 0
+        self.office.reset()
+        self.blacked_out = False
+        self.update_animatronics()
+
+    def black_out(self):
+        pygame.mixer.Sound('resources/sounds/power_off.mp3').play()
+        self.blacked_out = True
+        self.office.blackout()
+        self.systems["Cameras"].blackout()
+
+    def power_out(self):
+        self.black_out()
+        pygame.time.set_timer(pygame.event.Event(KILL, {'animation': self.animatronics[3].jumpscare}),
+                              random.randint(5000, 40000))
+        self.animatronics = []
+        self.office.doors = []

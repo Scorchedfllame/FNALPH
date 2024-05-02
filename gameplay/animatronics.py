@@ -105,6 +105,8 @@ class Animatronic:
 
     def tick(self, event: pygame.event.Event) -> None:
         if self.active:
+            if self._kill_locked and self._game.blacked_out:
+                self.kill()
             if event.type == self.TIMER:
                 if self._kill_locked:
                     self.kill()
@@ -144,6 +146,8 @@ class Animatronic:
     def at_door(self):
         if self.door.door_status == 'closed':
             self.blocked()
+        elif self._game.blacked_out:
+            self.kill()
         else:
             self.door.lock()
             self._kill_locked = True
@@ -239,6 +243,8 @@ class Lefty(Animatronic):
         if self.active:
             if self.camera.active:
                 pygame.time.set_timer(self.TIMER, self.movement_timer)
+            if self._kill_locked and self._game.blacked_out:
+                self.kill()
             if event.type == self.TIMER:
                 if self._kill_locked:
                     self.kill()

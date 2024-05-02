@@ -25,6 +25,6 @@ MUTE_TIME = pygame.USEREVENT + 18
 
 #   Game States
 KILL = pygame.USEREVENT + 2
-BLACKOUT = pygame.USEREVENT + 6
+POWER_OUT = pygame.USEREVENT + 6
 WIN = pygame.USEREVENT + 10
 POWER_RESET = pygame.USEREVENT + 20

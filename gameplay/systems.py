@@ -158,7 +158,6 @@ class Cameras(System):
         self.MAX_ROTATION = None
         self.enabled = None
         self.active = None
-        self.blacked_out = None
         self._last_camera = None
         self.current_rotation = None
         self.rotation_cycle = None
@@ -170,7 +169,6 @@ class Cameras(System):
         self.MAX_ROTATION = 90
         self.enabled = True
         self.active = False
-        self.blacked_out = False
         self._last_camera = 0
         self.current_rotation = 0
         self.rotation_cycle = 0
@@ -257,8 +255,8 @@ class Cameras(System):
         return normalized * (screen_x - image_x)
 
     def blackout(self):
-        self.blacked_out = True
-        pygame.event.post(pygame.event.Event(CAMERA_FLIPPED_DOWN))
+        if self.active:
+            pygame.event.post(pygame.event.Event(CAMERA_FLIPPED_DOWN))
 
     def disable_cameras(self):
         for i, camera in enumerate(self.camera_list):

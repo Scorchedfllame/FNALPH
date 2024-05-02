@@ -6,7 +6,7 @@ import json
 
 
 class Office:
-    def __init__(self):
+    def __init__(self, game):
         self.ambience = pygame.mixer.Sound('resources/sounds/office_ambience.mp3')
         self.camera_toggle_sound = pygame.mixer.Sound('resources/sounds/camera_pull.mp3')
         self.image = pygame.image.load('resources/backgrounds/office.png').convert()
@@ -18,11 +18,12 @@ class Office:
 
         # Eventually Change the surface to be a rect
         self.power_reset_button = Button(
-            pygame.image.load('resources/sprites/animatronics/bonnie/bonbie_jumpscare.png'),
-            (50, 50), activate=pygame.event.Event(POWER_RESET), scale=0.1)
+            pygame.image.load('resources/ui/buttons/reset_button.png').convert_alpha(),
+            (0, 570), activate=pygame.event.Event(POWER_RESET))
         self.ambience.set_volume(.2)
 
         self.surface = pygame.surface.Surface(self.image.get_size())
+        self.game = game
 
         self.MAX_ROTATION = None
         self.rot_x = None
@@ -37,7 +38,7 @@ class Office:
 
         for door in self.doors:
             door.start()
-        self.ambience.play()
+        self.reset()
 
     def stop(self):
         self.ambience.stop()
@@ -46,9 +47,10 @@ class Office:
 
     def tick(self, event: pygame.event.Event):
         if self.active:
-            self.power_reset_button.tick(event)
-            for door in self.doors:
-                door.tick(event)
+            if not self.game.blacked_out:
+                self.power_reset_button.tick(event)
+                for door in self.doors:
+                    door.tick(event)
         if event.type == CAMERA_FLIPPED_UP:
             self.active = False
             self.ambience.set_volume(.1)
@@ -66,16 +68,23 @@ class Office:
 
             screen = pygame.display.get_surface()
             self.surface.blit(self.image, (0, 0))
-            screen.blit(self.surface, (self.get_pos_from_rot(), 0))
-            for door in self.doors:
-                door.draw(screen, pygame.Vector2(self.get_pos_from_rot(), 0))
-            self.power_reset_button.draw(screen)
+            pos = self.get_pos_from_rot()
+            screen.blit(self.surface, (pos, 0))
+            self.power_reset_button.rect.x = 1355 + pos
+            if not self.game.blacked_out:
+                for door in self.doors:
+                    door.draw(screen, pygame.Vector2(pos, 0))
+                self.power_reset_button.draw(screen)
 
     def blackout(self):
         self.image = self.blackout_image
+        self.ambience.stop()
+        for door in self.doors:
+            door.blackout()
 
     def reset(self):
         self.image = self._image
+        self.ambience.play()
 
     def get_power_usage(self):
         power_usage = 0
@@ -134,7 +143,6 @@ class Door:
         self.door_toggle_sound.set_volume(.5)
 
         self.stung = None
-        self.blacked_out = None
         self.light_status = None
         self.door_status = None
         self.flicker_counter = None
@@ -146,7 +154,6 @@ class Door:
         self.light_button.activate, self.light_button.deactivate = self.light_on, self.light_off
         self.door_button.activate, self.door_button.deactivate = self.close_door, self.open_door
         self.stung = False
-        self.blacked_out = False
         self.light_status = 'dark'
         self.door_status = 'open'
         self.flicker_counter = 1
@@ -167,9 +174,8 @@ class Door:
     def tick(self, event: pygame.event.Event):
         if event.type == CAMERA_FLIPPED_UP:
             self.light_button.check_deactivate()
-        if not self.blacked_out:
-            self.door_button.tick(event)
-            self.light_button.tick(event)
+        self.door_button.tick(event)
+        self.light_button.tick(event)
 
     def draw(self, surface: pygame.Surface, vector: pygame.Vector2):
         if not self.animator.active:
@@ -190,17 +196,13 @@ class Door:
         self.animator.draw(surface, vector)
 
     def blackout(self):
-        self.blacked_out = True
-        if self.door_status == 'open':
+        if self.door_status == 'closed':
             self.open_door()
-        if self.light_status == 'dark':
+        if self.light_status == 'light':
             self.light_off()
-        for k, v in self.curr_images.items():
-            self.curr_images[k] = pygame.surface.Surface((10, 10))
 
     def stop_blackout(self):
         self.reset()
-        self.blacked_out = False
 
     def check_stinger(self):
         if self._default_images != self.curr_images:
