@@ -365,7 +365,6 @@ class Cameras(System):
     def draw_static(screen: pygame.surface.Surface, static):
         frame = random.randint(0, len(static) - 1)
         screen.blit(static[frame], (0, 0))
-        screen.blit(static[(frame + 1) % len(static)], (0, 0))
 
 
 class RecordIcon:

@@ -50,7 +50,6 @@ class MainMenu(Menu):
     def draw(self):
         screen = pygame.display.get_surface()
         screen.blit(self.background, (0, 0))
-        Cameras.draw_static(screen, self.static)
         for button in self.buttons.values():
             button.draw(screen)
         night = self.secondary_font.render(f"Night {self.save_manager.data['night']}",
