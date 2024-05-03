@@ -216,9 +216,12 @@ class Game:
                 self.active = False
                 pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'menu'}))
         if event.type == GAME_TIMER:
-            self.victory_sound.fadeout(1000)
-            self.active = False
-            self.stop()
+            if self.status == 'killed':
+                pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'menu'}))
+            else:
+                self.victory_sound.fadeout(1000)
+                self.active = False
+                self.stop()
         if event.type == UPDATE_POWER:
             self.power_manager.update_power(self.get_power_usage())
         if event.type == KILL and self.status == 'playing':
@@ -264,7 +267,6 @@ class Game:
         pygame.mixer.stop()
         self.stop()
         self.status = 'killed'
-        pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'menu'}))
         self.jump_scare_sound.play(maxtime=1000)
         pygame.time.set_timer(KILL, 0)
         pygame.time.set_timer(GAME_TIMER, 1000)

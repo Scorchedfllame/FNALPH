@@ -141,6 +141,7 @@ class Cameras(System):
         self.static = []
         for frame in os.listdir('resources/animations/static/'):
             image = pygame.image.load(f'resources/animations/static/{frame}').convert_alpha()
+            image.set_alpha(100)
             self.static.append(image)
         self.switches = []
         for frame in os.listdir('resources/animations/switch/'):
@@ -364,8 +365,7 @@ class Cameras(System):
     @staticmethod
     def draw_static(screen: pygame.surface.Surface, static):
         frame = random.randint(0, len(static) - 1)
-        image = static[frame].copy()
-        image.set_alpha(100)
+        image = static[frame]
         screen.blit(image, (0, 0))
 
 
