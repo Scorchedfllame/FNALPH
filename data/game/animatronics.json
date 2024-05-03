@@ -1,7 +1,7 @@
 {
   "Bonnie": {
     "menu_label": {
-      "description": "Comes at you from the left side of the school.",
+      "description": "Comes at you from the right side of the school.",
       "image_path": "resources/sprites/animatronics/bonnie.png"
     },
 
@@ -18,19 +18,20 @@
     ],
     "movements": [
             [1],
-            [2, 2, 3, 3],
-            [3, 3, 4, 4],
-            [4],
-            [3, 2, 5],
-            [6],
-            [7],
-            [8],
+            [2, 2, 2, 2, 4, 4, 3, 3, 3],
+            [3, 3, 3, 3, 3, 4, 4, 5, 1],
+            [4, 4, 4, 4, 4, 6, 5, 5, 2],
+            [5, 5, 5, 5, 6, 6, 6, 3, 3],
+            [6, 6, 6, 6, 6, 6, 6, 6, 4],
+            [7, 7, 7, 7, 7, 7, 7, 7, 5],
+            [8, 8, 8, 8, 8, 8, 8, 8, 8],
             [1, 2]
-    ]
+    ],
+    "jumpscare": [1200, 540, 50]
   },
   "Chica": {
     "menu_label": {
-      "description": "Comes at you from the right side of the school.",
+      "description": "Comes at you from the left side of the school.",
       "image_path": "resources/sprites/animatronics/chica.png"
     },
 
@@ -45,16 +46,17 @@
     "movements": [
             [1],
             [2],
-            [3],
-            [4],
-            [5],
+            [3, 3, 3, 3, 3, 3, 3, 3, 1],
+            [4, 4, 4, 4, 4, 4, 4, 4, 2],
+            [5, 5, 5, 5, 5, 5, 5, 5, 3],
             [6],
             [1]
-    ]
+    ],
+    "jumpscare": [498, 374, 40]
   },
   "Lefty": {
     "menu_label": {
-      "description": "Comes at you from the right side of the school.",
+      "description": "Comes at you from the left side of the school. Keep an eye for where he is; he can be hard to spot on the cameras.",
       "image_path": "resources/sprites/animatronics/lefty.png"
     },
     "cameras": [
@@ -62,8 +64,8 @@
       3,
       4,
       6,
-      10,
       7,
+      10,
       8,
       9
     ],
@@ -76,13 +78,50 @@
       [6],
       [7],
       [8],
-      [5]
-    ]
+      [6, 5]
+    ],
+    "jumpscare": [1920, 1080, 50]
   },
   "Knight": {
     "menu_label": {
-      "description": "Comes at you from the right side of the school.",
+      "description": "Comes at you from the left side of the school. Watch his camera to keep him calm and close the door if he gets too angry",
       "image_path": "resources/sprites/animatronics/knight.png"
-    }
+    },
+    "cameras": [
+      4,
+      4,
+      4
+    ],
+    "movements": [
+      [1],
+      [2],
+      [3],
+      [0, 1]
+    ],
+    "jumpscare": [1920, 1080, 50]
+  },
+  "Trojan": {
+    "menu_label": {
+      "description": "Glitches cameras and slowly moves to attack you. Restart the power to make him go away.",
+      "image_path": "resources/sprites/animatronics/trojan.png"
+    },
+    "cameras": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "movements": [
+      []
+    ]
   }
 }

@@ -3,19 +3,57 @@ from math import ceil
 
 
 class PowerManager:
-    def __init__(self):
+    def __init__(self, power_penalty):
         self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 55)
         self.large_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
+        self.beep_sounds = []
+        for i in range(1, 6):
+            self.beep_sounds.append(pygame.mixer.Sound(f'resources/sounds/beep_{i}.mp3'))
+        self.power_penalty = power_penalty
+        self.usage = Usage(self.font, self.large_font)
+
+        self.DIFFICULTY = None
+        self.active = None
+        self.percentage = None
+        self.power_remaining = None
+        self.reset_count = None
+
+    def start(self):
+        # set back to 10 when done testing
+        self.DIFFICULTY = 10
+        self.active = True
         self.percentage = 100
         self.power_remaining = 100000
-        self.usage = Usage(self.font, self.large_font)
-        self.DIFFICULTY = 5  # set back to 7 when done testing
-        self.active = True
+        self.reset_count = 0
+
+        self.usage.start()
+        pygame.time.set_timer(UPDATE_POWER, 100)
+        pygame.time.set_timer(POWER_PENALTY, self.power_penalty)
+
+    def stop(self):
+        self.active = False
+
+        pygame.time.set_timer(UPDATE_POWER, 0)
+        pygame.time.set_timer(POWER_PENALTY, 0)
+
+    def tick(self, event: pygame.event.Event):
+        if event.type == POWER_PENALTY:
+            if self.usage.usage != 0:
+                self.power_remaining -= 100
 
     def draw(self, surface):
         if self.active:
-            self.draw_power_percentage(surface)
+            self.draw_power_percentage(surface, self.percentage)
             self.usage.draw(surface)
+
+    def draw_reset(self, surface, itter, time):
+        if self.active:
+            frac = itter/time
+            self.draw_power_percentage(surface, int(frac * 100))
+            if int(frac * 5) > self.reset_count:
+                self.beep_sounds[self.reset_count].play()
+                self.reset_count = int(frac * 5)
+            self.usage.draw_reset(surface, self.reset_count)
 
     def resize(self):
         self.usage.resize()
@@ -23,19 +61,19 @@ class PowerManager:
     def update_power(self, usage: int):
         if self.active:
             self.usage.usage = usage
-            self.power_remaining = max(self.power_remaining - self.DIFFICULTY * (2 ** int(self.usage)), 0)
+            self.power_remaining = max(self.power_remaining - self.DIFFICULTY * usage, 0)
             self.percentage = ceil(self.power_remaining / 1000)
             if self.power_remaining <= 0:
-                pygame.event.post(pygame.event.Event(BLACKOUT))
+                pygame.event.post(pygame.event.Event(POWER_OUT))
                 self.active = False
 
-    def draw_power_percentage(self, surface):
-        LINEUP_OFFSET = 5
+    def draw_power_percentage(self, surface, percentage: int):
+        lineup_offset = 5
         screen_y = pygame.display.get_surface().get_height()
 
         # Get text
         power_left_text = self.font.render(f"Power Left: ", True, 'White')
-        power_percentage = self.large_font.render(f"{self.percentage}", True, 'White')
+        power_percentage = self.large_font.render(f"{percentage}", True, 'White')
         power_percent = self.font.render(f"%", True, 'White')
 
         # Creating rectangles
@@ -44,20 +82,19 @@ class PowerManager:
         power_percent_rect = power_percent.get_rect()
 
         # Setting rectangles
-        power_left_text_rect.bottomleft = (30, screen_y - 30)
+        power_left_text_rect.bottomleft = (30, screen_y - 15)
         power_percentage_rect.bottomleft = power_left_text_rect.bottomright
         power_percent_rect.bottomleft = (power_percentage_rect.width + power_left_text_rect.bottomright[0],
                                          power_left_text_rect.bottomright[1])
 
         # Drawing
         surface.blit(power_left_text, power_left_text_rect)
-        surface.blit(power_percentage, (power_percentage_rect.x, power_left_text_rect.y - LINEUP_OFFSET))
+        surface.blit(power_percentage, (power_percentage_rect.x, power_left_text_rect.y - lineup_offset))
         surface.blit(power_percent, power_percent_rect)
 
 
 class Usage:
     def __init__(self, font, large_font):
-        self.usage = 1
         self.large_font = large_font
         self.width = 25
         self.height = 40
@@ -67,9 +104,19 @@ class Usage:
         self.text_rect = self.text.get_rect()
         self.resize()
 
+        self.usage = None
+
+    def start(self):
+        self.usage = 1
+
+    def draw(self, surface):
+        surface.blit(self.text, self.text_rect)
+        self.draw_ghost(surface)
+        self.draw_color(surface)
+
     def resize(self):
         screen = pygame.display.get_surface()
-        x_offset = (30 + self.height + self.padding + self.large_font.size('100')[1])
+        x_offset = (15 + self.height + self.padding + self.large_font.size('100')[1])
         self.text_rect.topleft = (self.y_offset,
                                   screen.get_height() - x_offset)
 
@@ -83,6 +130,21 @@ class Usage:
             draw = pygame.surface.Surface(usage_bar.size, pygame.SRCALPHA)
             pygame.draw.rect(draw, color, draw.get_rect())
             surface.blit(draw, usage_bar)
+
+    def draw_reset(self, surface, amount):
+        surface.blit(self.text, self.text_rect)
+        self.draw_ghost(surface)
+        for i in range(amount):
+            usage_bar = pygame.Rect(self.text_rect.midright[0] + i*(self.width + self.padding),
+                                    self.text_rect.topright[1] - (self.text_rect.height - self.height)/2,
+                                    self.width,
+                                    self.height)
+            shader = pygame.Rect(0, 0, int(self.width/4), self.height)
+            shader.midright = usage_bar.midright
+            color = (217, 249, 255)
+            shade_color = (128, 204, 255)
+            pygame.draw.rect(surface, color, usage_bar)
+            pygame.draw.rect(surface, shade_color, shader)
 
     def draw_color(self, surface):
         for i in range(self.usage):
@@ -103,11 +165,6 @@ class Usage:
                 shade_color = (198, 0, 0)
             pygame.draw.rect(surface, color, usage_bar)
             pygame.draw.rect(surface, shade_color, shader)
-
-    def draw(self, surface):
-        surface.blit(self.text, self.text_rect)
-        self.draw_ghost(surface)
-        self.draw_color(surface)
 
     def __int__(self):
         return self.usage

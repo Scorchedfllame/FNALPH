@@ -19,6 +19,10 @@ class Button:
         self.deactivate = deactivate
         self.kwargs = kwargs
         self.resize(pos, scale)
+        self.active = False
+
+    def start(self):
+        self.active = False
 
     def resize(self, pos: tuple[int, int], scale: float = 1):
         self.base = pygame.transform.scale_by(self._base, scale)
@@ -72,6 +76,11 @@ class Flick(Button):
         self.activated = False
         self.hovering = False
 
+    def start(self):
+        self.active = False
+        self.activated = False
+        self.hovering = False
+
     def check_activate(self, event: pygame.event.Event):
         if self.last_mouse_pos[1] < pygame.mouse.get_pos()[1] and not self.activated:
             self.activated = True
@@ -105,14 +114,16 @@ class ToggleButton(Button):
         self.active = False
 
     def check_activate(self, event=None):
-        self.active = True
-        if self.activate is not None:
-            self.check_type(self.activate)
+        if not self.active:
+            self.active = True
+            if self.activate is not None:
+                self.check_type(self.activate)
 
     def check_deactivate(self, event=None):
-        self.active = False
-        if self.deactivate is not None:
-            self.check_type(self.deactivate)
+        if self.active:
+            self.active = False
+            if self.deactivate is not None:
+                self.check_type(self.deactivate)
 
     def toggle(self):
         if self.active:

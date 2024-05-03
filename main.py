@@ -1,48 +1,73 @@
+# import gc
+
 import pygame.display
 from gameplay import *
 # from data.saves.save import SaveManager
+# import time
+
+
+def fade_image(image: pygame.surface.Surface, screen: pygame.surface.Surface, len_dir: range):
+    for i in len_dir:
+        black = pygame.surface.Surface((1920, 1080))
+        black.fill((0, 0, 0))
+        black.set_alpha(i)
+        screen.blit(image, (0, 0))
+        screen.blit(black, (0, 0))
+        pygame.display.flip()
 
 
 def main():
     pygame.init()
     pygame.mixer.init()
-    pygame.mixer.Channel(0)
-    pygame.mixer.Channel(1)
-    pygame.mixer.Channel(2)
-    pygame.mixer.Channel(3)
-    pygame.mixer.Channel(4)
-    pygame.mixer.Channel(5)
-
-    info = pygame.display.Info()
     pygame.mixer.set_num_channels(10)
-    screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
+    pygame.display.set_mode((1920, 1080))
     pygame.display.set_caption('Five Nights At Lone Peak High')
     pygame.display.set_icon(pygame.image.load('resources/ui/icon.png').convert())
+    loading_image = pygame.image.load('resources/ui/menus/main_menu/LogoLoadingScreen.png').convert_alpha()
+    background_sound = pygame.mixer.Sound('resources/sounds/main_menu.mp3')
+    fade_image(loading_image, pygame.display.get_surface(), range(255, 0, -1))
+    pygame.display.get_surface().blit(loading_image, (0, 0))
+    pygame.display.flip()
     clock = pygame.time.Clock()
-    debugger = True
-    main_menu = MainMenu()
-    main_menu.activate()
+    menus = [MainMenu(), Options(0), Cheat(1)]
+    game = Game()
+    active_menu = menus[0]
+    active_menu.start()
+    playing = False
+    fade_image(loading_image, pygame.display.get_surface(), range(255))
+    background_sound.play(loops=10)
 
     # Window Loop
     while True:
         pygame.display.get_surface().fill("black")
-        if main_menu.active:
-            # Menu loop
-            main_menu.tick()
-            main_menu.draw()
-        else:
-            if main_menu.game_round.active:
-                # Game loop
-                main_menu.game_round.global_tick()
-                main_menu.game_round.global_draw()
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == MENU_CHANGE:
+                if event.func == 'menu':
+                    background_sound.play(loops=10)
+                    playing = False
+                    active_menu = menus[0]
+                    active_menu.start()
+                elif event.func == 'next':
+                    menus[0].continue_game()
+                elif event.func == 'change':
+                    active_menu = menus[event.target]
+                    active_menu.start()
+                elif event.func == 'start_game':
+                    background_sound.stop()
+                    playing = True
+                    game.start()
+            if playing:
+                game.global_tick(event)
             else:
-                main_menu = MainMenu()
-                main_menu.activate()
-        if debugger:
-            screen.blit(pygame.font.SysFont('minecraftten', 25).render("%.1f" % clock.get_fps(),
-                                                                       True,
-                                                                       'pink'),
-                        (0, 0))
+                active_menu.tick(event)
+        if playing:
+            game.global_draw()
+        else:
+            active_menu.draw(pygame.display.get_surface())
         pygame.display.update()
         clock.tick(60)
 
