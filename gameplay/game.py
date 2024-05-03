@@ -223,6 +223,7 @@ class Game:
                 self.victory_sound.fadeout(1000)
                 self.active = False
                 self.stop()
+                pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'next'}))
         if event.type == UPDATE_POWER:
             self.power_manager.update_power(self.get_power_usage())
         if event.type == KILL and self.status == 'playing':
