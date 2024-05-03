@@ -321,7 +321,7 @@ class Knight(Animatronic):
         self.running = False
         pygame.time.set_timer(self.TIMER, self.movement_timer)
         self.move(self.get_movement())
-        self._game.power_manager.power_remaining -= (5 ** self.attack_num) * 1000
+        self._game.power_manager.power_remaining -= (5 * self.attack_num + 1) * 1000
         self.attack_num += 1
 
     def tick(self, event: pygame.event.Event) -> None:
