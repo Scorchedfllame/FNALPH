@@ -48,7 +48,7 @@ def init_flick(image: pygame.surface.Surface):
 
 
 class Game:
-    def __init__(self, save_manager: SaveManager):
+    def __init__(self):
         # Loading Resources
         self.phone_calls = create_phone_calls('resources/sounds/night_')
         self.flick_up_image = pygame.image.load('resources/ui/buttons/flick_up.png').convert_alpha()
@@ -59,7 +59,7 @@ class Game:
         self.BIGGER_GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
 
         # Initialize Managers and Systems
-        self.save_manager = save_manager
+        self.save_manager = SaveManager()
         self.night = self.save_manager.load_data()['night']
         with open('data/game/nights.json', 'r') as f:
             self.night_dict = json.loads(f.read())
@@ -152,37 +152,32 @@ class Game:
             self.save_manager.data["night"] = 6
         self.save_manager.save_game()
 
-    def global_tick(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.mixer.quit()
-                pygame.quit()
-                exit()
-            if event.type == pygame.WINDOWRESIZED:
-                for system in self.systems.values():
-                    system.resize()
-                self.power_manager.resize()
-            if event.type == POWER_OUT:
-                self.power_out()
-            if event.type == WIN:
-                self.win()
-            for animatronic in self.animatronics:
-                animatronic.tick(event)
+    def global_tick(self, event: pygame.event.Event):
+        if event.type == pygame.WINDOWRESIZED:
             for system in self.systems.values():
-                system.tick(event)
-            if not self.blacked_out:
-                self.flick.tick(event)
-            self.office.tick(event)
-            self.tick(event)
-            self.clock.tick(event)
-            self.power_manager.tick(event)
-            if event.type == CLOCK:
-                for animatronic in self.animatronics:
-                    change_list = self.night_data['animatronics'][animatronic.name]['change']
-                    for change in change_list:
-                        if change[0] == self.clock.hour:
-                            animatronic.update_aggression(change[1])
-                            break
+                system.resize()
+            self.power_manager.resize()
+        if event.type == POWER_OUT:
+            self.power_out()
+        if event.type == WIN:
+            self.win()
+        for animatronic in self.animatronics:
+            animatronic.tick(event)
+        for system in self.systems.values():
+            system.tick(event)
+        if not self.blacked_out:
+            self.flick.tick(event)
+        self.office.tick(event)
+        self.tick(event)
+        self.clock.tick(event)
+        self.power_manager.tick(event)
+        if event.type == CLOCK:
+            for animatronic in self.animatronics:
+                change_list = self.night_data['animatronics'][animatronic.name]['change']
+                for change in change_list:
+                    if change[0] == self.clock.hour:
+                        animatronic.update_aggression(change[1])
+                        break
 
     def global_draw(self):
         screen = pygame.display.get_surface()
@@ -219,7 +214,7 @@ class Game:
             if event.key == pygame.K_ESCAPE:
                 self.stop()
                 self.active = False
-                self.end_function = 'menu'
+                pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'menu'}))
         if event.type == GAME_TIMER:
             self.victory_sound.fadeout(1000)
             self.active = False
@@ -269,7 +264,7 @@ class Game:
         pygame.mixer.stop()
         self.stop()
         self.status = 'killed'
-        self.end_function = 'menu'
+        pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'menu'}))
         self.jump_scare_sound.play(maxtime=1000)
         pygame.time.set_timer(KILL, 0)
         pygame.time.set_timer(GAME_TIMER, 1000)

@@ -6,12 +6,15 @@ class SaveManager:
     def __init__(self):
         self.data = {}
 
-    def save_game(self) -> bool:
+    def save_game(self):
         self.save_data(self.data)
-        return True
+
+    def reset_night(self):
+        self.data["night"] = 1
+        self.save_data(self.data)
 
     def reset_save(self):
-        self.save_data({"night": 1})
+        self.data = {"night": 1, "stars": 0}
 
     @staticmethod
     def save_data(data: dict) -> None:

@@ -162,6 +162,11 @@ class Animatronic:
         self._kill_locked = False
         self.move(self.get_movement())
 
+    def play_move_sound(self, position):
+        move_sound = self.move_sounds[random.randint(0, len(self.move_sounds) - 1)]
+        move_sound.set_volume(0.25 * (position / len(self._movement_key)))
+        move_sound.play()
+
     def move(self, position: int) -> None:
         if self.camera.active:
             self.camera.small_glitch()
@@ -170,7 +175,7 @@ class Animatronic:
         self.camera.reset_background()
         self._location = position
         self._game.update_animatronics()
-        self.move_sounds[random.randint(0, len(self.move_sounds)-1)].play()
+        self.play_move_sound(position)
         pygame.time.set_timer(self.TIMER, self.movement_timer)
         if self.camera.active:
             self.camera.small_glitch()
@@ -215,7 +220,7 @@ class Chica(Animatronic):
             self.camera.reset_background()
             self._location = position
             self._game.update_animatronics()
-            self.move_sounds[random.randint(0, len(self.move_sounds)-1)].play()
+            self.play_move_sound(position)
             pygame.time.set_timer(self.TIMER, self.movement_timer)
             if self.camera.active:
                 self.camera.small_glitch()
@@ -267,7 +272,7 @@ class Lefty(Animatronic):
             self.camera.reset_background()
             self._location = position
             self._game.update_animatronics()
-            self.move_sounds[random.randint(0, len(self.move_sounds) - 1)].play()
+            self.play_move_sound(position)
             pygame.time.set_timer(self.TIMER, self.movement_timer)
             if self.camera.active:
                 self.camera.small_glitch()
