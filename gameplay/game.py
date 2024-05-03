@@ -108,7 +108,8 @@ class Game:
         self.reset_counter = 0
         self.reset_time = 0
 
-        self.night = self.save_manager.load_data()['night']
+        self.save_manager.load_data()
+        self.night = self.save_manager.data['night']
 
         # Start Systems
         self.flick.start()

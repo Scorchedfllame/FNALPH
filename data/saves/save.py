@@ -15,6 +15,7 @@ class SaveManager:
 
     def reset_save(self):
         self.data = {"night": 1, "stars": 0}
+        self.save_data(self.data)
 
     @staticmethod
     def save_data(data: dict) -> None:
