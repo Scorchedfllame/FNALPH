@@ -131,6 +131,8 @@ class Game:
 
         self.save_manager.load_data()
         self.night = self.save_manager.data['night']
+        if self.save_manager.data['stars'] == -1:
+            self.save_manager.data['stars'] = 0
 
         # Start Systems
         self.flick.start()

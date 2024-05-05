@@ -11,6 +11,7 @@ class Menu:
 
         self.main_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 500)
         self.secondary_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 50)
+        self.tertiary_font = pygame.font.Font('resources/fonts/Book Antiqua.ttf', 25)
 
         scalar = pygame.display.get_surface().get_width()/self.background.get_width()
         self.background = pygame.transform.scale_by(self.background, scalar)
@@ -33,6 +34,7 @@ class MainMenu(Menu):
 
         self.secret_background = pygame.image.load('resources/ui/menus/main_menu/secret_background.png').convert()
 
+
         self.static = []
         for frame in os.listdir('resources/animations/static/'):
             image = pygame.image.load(f'resources/animations/static/{frame}').convert_alpha()
@@ -40,6 +42,14 @@ class MainMenu(Menu):
             self.static.append(image)
 
         self.save_manager = SaveManager()
+
+        self.save_manager.load_data()
+        data = self.save_manager.data
+        if data['night'] == 1 and data['stars'] == -1:
+            self.new = True
+        else:
+            self.new = False
+
         self.buttons = self.init_buttons()
 
     def tick(self, event: pygame.event.Event):
@@ -51,20 +61,31 @@ class MainMenu(Menu):
 
     def start(self):
         self.save_manager.load_data()
+        data = self.save_manager.data
+        if data['night'] == 1 and data['stars'] == -1:
+            self.new = True
+        else:
+            self.new = False
+        self.buttons = self.init_buttons()
 
     def draw(self, screen: pygame.surface.Surface):
         screen.blit(self.background, (0, 0))
         screen.blit(random.choice(self.static), (0, 0))
         for button in self.buttons.values():
             button.draw(screen)
-        night = self.secondary_font.render(f"Night {self.save_manager.data['night']}",
-                                           True,
-                                           self.color)
-        night_rect = night.get_rect()
-        cont_button = self.buttons['continue']
-        night_rect.topleft = cont_button.rect.bottomleft
-        night_rect.y -= 25
-        screen.blit(night, night_rect)
+        if not self.new:
+            night = self.secondary_font.render(f"Night {self.save_manager.data['night']}",
+                                               True,
+                                               self.color)
+            night_rect = night.get_rect()
+            cont_button = self.buttons['continue']
+            night_rect.topleft = cont_button.rect.bottomleft
+            night_rect.y -= 25
+            screen.blit(night, night_rect)
+        version_text = self.tertiary_font.render('v0.0.1', True, self.color)
+        version_rect = version_text.get_rect()
+        version_rect.bottomright = (1900, 1060)
+        screen.blit(version_text, version_rect)
 
     def cheat_background(self):
         self.background = self.secret_background
@@ -76,20 +97,22 @@ class MainMenu(Menu):
         self.start_game()
 
     def start_game(self):
-        pygame.display.get_surface().fill('black')
-        pygame.display.flip()
         pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'start_game'}))
 
     def continue_game(self):
         self.start_game()
 
     def init_buttons(self) -> dict[str: Button]:
-        continue_surface = self.main_font.render('Continue', True, self.color)
+        if self.new:
+            continue_surface = self.main_font.render('Continue', True, (41, 25, 27))
+            continue_button = Button(continue_surface, (960, 600), scale=.2, draw_type='center')
+        else:
+            continue_surface = self.main_font.render('Continue', True, self.color)
+            continue_button = Button(continue_surface, (960, 600), scale=.2,
+                                     activate=self.continue_game, draw_type='center')
         play_surface = self.main_font.render('New Game', True, self.color)
         quit_surface = self.main_font.render('Quit', True, self.color)
         options_surface = self.main_font.render('Options', True, self.color)
-        continue_button = Button(continue_surface, (960, 600), scale=.2,
-                                 activate=self.continue_game, draw_type='center')
         play_game = Button(play_surface, (960, 700), scale=.2,
                            activate=self.new_game, draw_type='center')
         options_button = Button(options_surface, (960, 800), scale=.2,
