@@ -209,9 +209,10 @@ class Game:
 
         for system in self.systems.values():
             system.tick(event)
-        if not self.blacked_out:
+        if not self.power_out_stage > 0:
             for animatronic in self.animatronics:
                 animatronic.tick(event)
+        if not self.blacked_out:
             self.flick.tick(event)
         self.office.tick(event)
         self.tick(event)
