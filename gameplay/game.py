@@ -239,7 +239,7 @@ class Game:
             rect = text.get_rect()
             rect.center = (screen.get_width() / 2, screen.get_height() / 2)
             screen.blit(text, rect)
-        else:
+        if not self.blacked_out and self.status == 'playing':
             self.clock.draw(screen)
         if self.mute_button is not None and self.mute_button != 'start':
             self.mute_button.draw(screen)

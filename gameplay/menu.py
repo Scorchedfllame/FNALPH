@@ -17,6 +17,8 @@ class Menu:
         self.buttons = []
         self.parent = None
 
+        self.color = (201, 0, 7)
+
     def start(self):
         pass
 
@@ -28,6 +30,8 @@ class Menu:
 class MainMenu(Menu):
     def __init__(self):
         super().__init__("resources/ui/menus/main_menu/")
+
+        self.secret_background = pygame.image.load('resources/ui/menus/main_menu/secret_background.png').convert()
 
         self.static = []
         for frame in os.listdir('resources/animations/static/'):
@@ -55,12 +59,17 @@ class MainMenu(Menu):
             button.draw(screen)
         night = self.secondary_font.render(f"Night {self.save_manager.data['night']}",
                                            True,
-                                           (201, 0, 7))
+                                           self.color)
         night_rect = night.get_rect()
         cont_button = self.buttons['continue']
         night_rect.topleft = cont_button.rect.bottomleft
         night_rect.y -= 25
         screen.blit(night, night_rect)
+
+    def cheat_background(self):
+        self.background = self.secret_background
+        self.color = (255, 255, 255)
+        self.buttons = self.init_buttons()
 
     def new_game(self):
         self.save_manager.reset_night()
@@ -75,11 +84,10 @@ class MainMenu(Menu):
         self.start_game()
 
     def init_buttons(self) -> dict[str: Button]:
-        color = (201, 0, 7)
-        continue_surface = self.main_font.render('Continue', True, color)
-        play_surface = self.main_font.render('New Game', True, color)
-        quit_surface = self.main_font.render('Quit', True, color)
-        options_surface = self.main_font.render('Options', True, color)
+        continue_surface = self.main_font.render('Continue', True, self.color)
+        play_surface = self.main_font.render('New Game', True, self.color)
+        quit_surface = self.main_font.render('Quit', True, self.color)
+        options_surface = self.main_font.render('Options', True, self.color)
         continue_button = Button(continue_surface, (960, 600), scale=.2,
                                  activate=self.continue_game, draw_type='center')
         play_game = Button(play_surface, (960, 700), scale=.2,
@@ -96,9 +104,9 @@ class Options(Menu):
     def __init__(self, parent):
         super().__init__('resources/ui/menus/options_menu/')
         self.parent = parent
-        self.back_button = Button(self.main_font.render("Back", True, 'white'),
+        self.back_button = Button(self.main_font.render("Back", True, self.color),
                                   (140, 800), scale=.2, activate=self.back)
-        self.cheat_button = Button(self.main_font.render("Cheats", True, 'white'),
+        self.cheat_button = Button(self.main_font.render("Cheats", True, self.color),
                                    (140, 900), scale=.2, activate=pygame.event.Event(MENU_CHANGE, {'func': 'change', 'target': 2}))
 
     def tick(self, event: pygame.event.Event):
@@ -117,18 +125,25 @@ class Options(Menu):
 class Cheat(Menu):
     def __init__(self, parent):
         super().__init__('resources/ui/menus/cheat_menu/')
+        self.background.fill('black')
+        border = pygame.Rect(10, 10, 1900, 1060)
+        pygame.draw.rect(self.background, self.color, border, 5)
         self.parent = parent
         self.input = StrInput()
         self.save_manager = SaveManager()
-        self.night_input = Button(self.main_font.render("Night", True, "white"),
+        self.night_input = Button(self.main_font.render("Night", True, self.color),
                                   (140, 900), scale=.2, activate=self.input.start)
-        self.back_button = Button(self.main_font.render("Back", True, 'white'),
+        self.back_button = Button(self.main_font.render("Back", True, self.color),
                                   (140, 800), scale=.2, activate=self.back)
+        self.change_background = Button(self.main_font.render("Background", True, self.color),
+                                        (140, 1000), scale=.2, activate=self.edit_background)
 
     def tick(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.back()
+            if event.key == pygame.K_BACKSPACE:
+                self.input.input = self.input.input[:-1]
             if event.key == pygame.K_RETURN:
                 self.input.stop()
                 try:
@@ -140,15 +155,20 @@ class Cheat(Menu):
         self.input.tick(event)
         self.night_input.tick(event)
         self.back_button.tick(event)
+        self.change_background.tick(event)
 
     def draw(self, surface):
         surface.blit(self.background, (0, 0))
         self.back_button.draw(surface)
         self.night_input.draw(surface)
-        inp = self.secondary_font.render(self.input.input, True, 'white')
+        self.change_background.draw(surface)
+        inp = self.secondary_font.render(self.input.input, True, self.color)
         inp_rect = inp.get_rect()
-        inp_rect.bottomleft = (0, 1080)
+        inp_rect.bottomright = (1900, 1070)
         surface.blit(inp, inp_rect)
+
+    def edit_background(self):
+        pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'background'}))
 
 
 class StrInput:
@@ -169,4 +189,7 @@ class StrInput:
 
     def tick(self, event: pygame.event.Event):
         if event.type == pygame.TEXTINPUT:
-            self.input += event.text
+            try:
+                self.input += event.text
+            except TypeError:
+                pass

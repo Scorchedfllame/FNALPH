@@ -59,6 +59,8 @@ def main():
                     background_sound.stop()
                     playing = True
                     game.start()
+                elif event.func == 'background':
+                    menus[0].cheat_background()
             if playing:
                 game.global_tick(event)
             else:
