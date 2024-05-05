@@ -11,6 +11,7 @@ class Office:
         self.camera_toggle_sound = pygame.mixer.Sound('resources/sounds/camera_pull.mp3')
         self.image = pygame.image.load('resources/backgrounds/office.png').convert()
         self.blackout_image = pygame.image.load('resources/backgrounds/office_blackout.png').convert()
+        self.knight_blackout = pygame.image.load('resources/backgrounds/knight_blackout.png')
         self.doors = Door.generate_doors()
         self.image = pygame.transform.scale_by(self.image,
                                                pygame.display.get_surface().get_height()/self.image.get_size()[1])
@@ -81,6 +82,17 @@ class Office:
         self.ambience.stop()
         for door in self.doors:
             door.blackout()
+
+    def set_regular(self):
+        self.image = self.blackout_image
+
+    def set_black(self):
+        surface = pygame.surface.Surface((2000, 1080))
+        surface.fill("black")
+        self.image = surface
+
+    def set_knight(self):
+        self.image = self.knight_blackout
 
     def reset(self):
         self.image = self._image

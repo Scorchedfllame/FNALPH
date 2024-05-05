@@ -1,3 +1,4 @@
+import pygame.surface
 from .clock import Clock
 from gameplay.office import Office
 from gameplay.systems import Cameras
@@ -8,6 +9,7 @@ from data.game.constants import *
 import json
 from data.saves.save import SaveManager
 import random
+import os
 
 
 def create_phone_calls(path: str):
@@ -57,6 +59,16 @@ class Game:
         self.jump_scare_sound = pygame.mixer.Sound('resources/sounds/jump_scare.mp3')
         self.GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 55)
         self.BIGGER_GLOBAL_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
+        self.static_sound = pygame.mixer.Sound('resources/sounds/static.mp3')
+        self.cheer_sound = pygame.mixer.Sound('resources/sounds/cheer.mp3')
+        self.static_sound.set_volume(.2)
+        self.static = []
+        for frame in os.listdir('resources/animations/static/'):
+            image = pygame.image.load(f'resources/animations/static/{frame}').convert_alpha()
+            surface = pygame.surface.Surface((1920, 1080))
+            surface.fill('black')
+            surface.blit(image, (0, 0))
+            self.static.append(surface)
 
         # Initialize Managers and Systems
         self.save_manager = SaveManager()
@@ -89,6 +101,8 @@ class Game:
         self.blacked_out = None
         self.reset_counter = None
         self.reset_time = None
+        self.power_out_stage = None
+        self.power_out_counter = None
 
         self.jump_scare_sound.set_volume(0.3)
         self.flick = init_flick(self.flick_up_image)
@@ -107,6 +121,8 @@ class Game:
         self.blacked_out = False
         self.reset_counter = 0
         self.reset_time = 0
+        self.power_out_stage = 0
+        self.power_out_counter = 0
 
         self.save_manager.load_data()
         self.night = self.save_manager.data['night']
@@ -153,20 +169,49 @@ class Game:
             self.save_manager.data["night"] = 6
         self.save_manager.save_game()
 
+    def power_out_sequence(self):
+        if self.power_out_stage == 1:
+            if random.randint(1, 5) == 5 or self.power_out_counter == 4:
+                self.power_out_counter = 0
+                self.power_out_stage = 2
+                pygame.time.set_timer(POWER_OUT, 2000, 1)
+                self.cheer_sound.play()
+            else:
+                self.power_out_counter += 1
+                pygame.time.set_timer(POWER_OUT, 5000, 1)
+        elif self.power_out_stage == 2:
+            if random.randint(1, 5) == 5 or self.power_out_counter == 4:
+                self.power_out_counter = 0
+                self.power_out_stage = 3
+                self.cheer_sound.stop()
+                self.office.set_black()
+                pygame.time.set_timer(POWER_OUT, 2000, 1)
+            else:
+                self.power_out_counter += 1
+                pygame.time.set_timer(POWER_OUT, 5000, 1)
+        elif self.power_out_stage == 3:
+            if random.randint(1, 5) == 5:
+                pygame.event.post(pygame.event.Event(KILL, {'animation': self.animatronics[3].jumpscare}))
+            else:
+                pygame.time.set_timer(pygame.event.Event(POWER_OUT), 2000, 1)
+        else:
+            self.power_out()
+
     def global_tick(self, event: pygame.event.Event):
         if event.type == pygame.WINDOWRESIZED:
             for system in self.systems.values():
                 system.resize()
             self.power_manager.resize()
         if event.type == POWER_OUT:
-            self.power_out()
+            self.power_out_sequence()
         if event.type == WIN:
             self.win()
-        for animatronic in self.animatronics:
-            animatronic.tick(event)
+
         for system in self.systems.values():
             system.tick(event)
         if not self.blacked_out:
+            for animatronic in self.animatronics:
+                animatronic.tick(event)
             self.flick.tick(event)
         self.office.tick(event)
         self.tick(event)
@@ -204,6 +249,13 @@ class Game:
 
         if self.kill_anim is not None:
             self.kill_anim.draw(screen)
+        if self.power_out_stage == 2:
+            if random.randint(0, 1):
+                self.office.set_knight()
+            else:
+                self.office.set_regular()
+        if self.status == 'static':
+            screen.blit(random.choice(self.static), (0, 0))
 
     def tick(self, event: pygame.event.Event):
         if event.type == MUTE_TIME:
@@ -220,6 +272,11 @@ class Game:
                 pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'menu'}))
         if event.type == GAME_TIMER:
             if self.status == 'killed':
+                self.static_sound.play()
+                self.static_sound.fadeout(2000)
+                self.status = 'static'
+                pygame.time.set_timer(GAME_TIMER, 2000)
+            elif self.status == 'static':
                 pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'menu'}))
             else:
                 self.victory_sound.fadeout(1000)
@@ -316,7 +373,5 @@ class Game:
 
     def power_out(self):
         self.black_out()
-        pygame.time.set_timer(pygame.event.Event(KILL, {'animation': self.animatronics[3].jumpscare}),
-                              random.randint(5000, 40000))
-        self.animatronics = []
-        self.office.doors = []
+        self.power_out_stage = 1
+        pygame.time.set_timer(POWER_OUT, random.randint(0000, 5000), 1)
