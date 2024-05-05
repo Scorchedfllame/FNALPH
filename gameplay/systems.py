@@ -180,7 +180,7 @@ class Cameras(System):
         self.disable_cameras()
         for camera in self.camera_list:
             camera.start()
-        pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 4000)
+        pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 3000)
 
     def stop(self):
         self.active = False

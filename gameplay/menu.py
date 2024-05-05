@@ -2,6 +2,7 @@ import os
 from gameplay import Cameras, Game, Button
 from data.game.constants import *
 from data.saves.save import SaveManager
+import random
 
 
 class Menu:
@@ -31,6 +32,7 @@ class MainMenu(Menu):
         self.static = []
         for frame in os.listdir('resources/animations/static/'):
             image = pygame.image.load(f'resources/animations/static/{frame}').convert_alpha()
+            image.set_alpha(50)
             self.static.append(image)
 
         self.save_manager = SaveManager()
@@ -48,6 +50,7 @@ class MainMenu(Menu):
 
     def draw(self, screen: pygame.surface.Surface):
         screen.blit(self.background, (0, 0))
+        screen.blit(random.choice(self.static), (0, 0))
         for button in self.buttons.values():
             button.draw(screen)
         night = self.secondary_font.render(f"Night {self.save_manager.data['night']}",
@@ -77,10 +80,15 @@ class MainMenu(Menu):
         play_surface = self.main_font.render('New Game', True, color)
         quit_surface = self.main_font.render('Quit', True, color)
         options_surface = self.main_font.render('Options', True, color)
-        continue_button = Button(continue_surface, (140, 800), scale=.2, activate=self.continue_game)
-        play_game = Button(play_surface, (140, 900), scale=.2, activate=self.new_game)
-        quit_button = Button(quit_surface, (140, 1000), scale=.2, activate=pygame.event.Event(pygame.QUIT))
-        options_button = Button(options_surface, (340, 1000), scale=.2, activate=pygame.event.Event(MENU_CHANGE, {'func': 'change', 'target': 1}))
+        continue_button = Button(continue_surface, (960, 600), scale=.2,
+                                 activate=self.continue_game, draw_type='center')
+        play_game = Button(play_surface, (960, 700), scale=.2,
+                           activate=self.new_game, draw_type='center')
+        options_button = Button(options_surface, (960, 800), scale=.2,
+                                activate=pygame.event.Event(MENU_CHANGE, {'func': 'change', 'target': 1}),
+                                draw_type='center')
+        quit_button = Button(quit_surface, (960, 900), scale=.2,
+                             activate=pygame.event.Event(pygame.QUIT), draw_type='center')
         return {"play": play_game, "continue": continue_button, "quit": quit_button, "options": options_button}
 
 

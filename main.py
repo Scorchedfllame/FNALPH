@@ -18,8 +18,7 @@ def fade_image(image: pygame.surface.Surface, screen: pygame.surface.Surface, le
 
 def main():
     pygame.init()
-    pygame.mixer.init()
-    pygame.mixer.set_num_channels(10)
+    pygame.mixer.init(channels=10)
     pygame.display.set_mode((1920, 1080))
     pygame.display.set_caption('Five Nights At Lone Peak High')
     pygame.display.set_icon(pygame.image.load('resources/ui/icon.png').convert())

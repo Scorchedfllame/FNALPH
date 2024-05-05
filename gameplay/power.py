@@ -8,7 +8,9 @@ class PowerManager:
         self.large_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
         self.beep_sounds = []
         for i in range(1, 6):
-            self.beep_sounds.append(pygame.mixer.Sound(f'resources/sounds/beep_{i}.mp3'))
+            beep = pygame.mixer.Sound(f'resources/sounds/beep_{i}.mp3')
+            beep.set_volume(.25)
+            self.beep_sounds.append(beep)
         self.power_penalty = power_penalty
         self.usage = Usage(self.font, self.large_font)
 
