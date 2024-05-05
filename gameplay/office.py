@@ -101,6 +101,8 @@ class Office:
 
     def reset(self):
         self.image = self._image
+        for door in self.doors:
+            door.reset()
         # self.ambience.play()
         self.drone_noise.play(10000)
 
@@ -216,11 +218,10 @@ class Door:
     def blackout(self):
         if self.door_status == 'closed':
             self.open_door()
+            self.door_button.active = False
         if self.light_status == 'light':
             self.light_off()
-
-    def stop_blackout(self):
-        self.reset()
+            self.light_button.active = False
 
     def check_stinger(self):
         if self._default_images != self.curr_images:
