@@ -62,6 +62,11 @@ class Game:
         self.static_sound = pygame.mixer.Sound('resources/sounds/static.mp3')
         self.cheer_sound = pygame.mixer.Sound('resources/sounds/cheer.mp3')
         self.static_sound.set_volume(.2)
+        self.res = []
+        for i in range(1, 3):
+            sound = pygame.mixer.Sound('resources/sounds/res_' + str(i) + '.mp3')
+            sound.set_volume(.15)
+            self.res.append(sound)
         self.static = []
         for frame in os.listdir('resources/animations/static/'):
             image = pygame.image.load(f'resources/animations/static/{frame}').convert_alpha()
@@ -149,6 +154,8 @@ class Game:
             pygame.mixer.find_channel(True).play(self.phone_call)
             self.mute_button = 'start'
 
+        pygame.time.set_timer(RANDOM_EVENT_SOUND, random.randint(5000, 15000), 1)
+
     def stop(self):
         pygame.time.set_timer(MUTE_TIME, 0)
         pygame.time.set_timer(GAME_TIMER, 0)
@@ -206,6 +213,12 @@ class Game:
             self.power_out_sequence()
         if event.type == WIN:
             self.win()
+
+        if event.type == RANDOM_EVENT_SOUND:
+            if not self.blacked_out and self.status == 'playing':
+                sound = random.choice(self.res)
+                pygame.time.set_timer(RANDOM_EVENT_SOUND, int(sound.get_length() * 1000) + random.randint(5000, 15000), 1)
+                sound.play()
 
         for system in self.systems.values():
             system.tick(event)
@@ -365,9 +378,12 @@ class Game:
         self.office.reset()
         self.blacked_out = False
         self.update_animatronics()
+        pygame.time.set_timer(RANDOM_EVENT_SOUND, random.randint(5000, 15000), 1)
 
     def black_out(self):
         pygame.mixer.Sound('resources/sounds/power_off.mp3').play()
+        for sound in self.res:
+            sound.stop()
         self.blacked_out = True
         self.office.blackout()
         self.systems["Cameras"].blackout()
