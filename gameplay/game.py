@@ -63,7 +63,7 @@ class Game:
         self.cheer_sound = pygame.mixer.Sound('resources/sounds/cheer.mp3')
         self.static_sound.set_volume(.2)
         self.res = []
-        for i in range(1, 3):
+        for i in range(0, 11):
             sound = pygame.mixer.Sound('resources/sounds/res_' + str(i) + '.mp3')
             sound.set_volume(.15)
             self.res.append(sound)
