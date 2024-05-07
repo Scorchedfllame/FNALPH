@@ -34,7 +34,6 @@ class MainMenu(Menu):
 
         self.secret_background = pygame.image.load('resources/ui/menus/main_menu/secret_background.png').convert()
 
-
         self.static = []
         for frame in os.listdir('resources/animations/static/'):
             image = pygame.image.load(f'resources/animations/static/{frame}').convert_alpha()
@@ -45,7 +44,7 @@ class MainMenu(Menu):
 
         self.save_manager.load_data()
         data = self.save_manager.data
-        if data['night'] == 1 and data['stars'] == -1:
+        if data['night'] == 0:
             self.new = True
         else:
             self.new = False
@@ -62,7 +61,7 @@ class MainMenu(Menu):
     def start(self):
         self.save_manager.load_data()
         data = self.save_manager.data
-        if data['night'] == 1 and data['stars'] == -1:
+        if data['night'] == 0:
             self.new = True
         else:
             self.new = False
@@ -155,11 +154,11 @@ class Cheat(Menu):
         self.input = StrInput()
         self.save_manager = SaveManager()
         self.night_input = Button(self.main_font.render("Night", True, self.color),
-                                  (140, 900), scale=.2, activate=self.input.start)
+                                  (140, 800), scale=.2, activate=self.input.start)
         self.back_button = Button(self.main_font.render("Back", True, self.color),
-                                  (140, 800), scale=.2, activate=self.back)
+                                  (140, 700), scale=.2, activate=self.back)
         self.change_background = Button(self.main_font.render("Background", True, self.color),
-                                        (140, 1000), scale=.2, activate=self.edit_background)
+                                        (140, 900), scale=.2, activate=self.edit_background)
 
     def tick(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:

@@ -60,6 +60,15 @@ def main():
                 elif event.func == 'change':
                     active_menu = menus[event.target]
                     active_menu.start()
+                elif event.func == 'continue_game':
+                    for i in range(0, 255):
+                        black = pygame.surface.Surface((1920, 1080))
+                        black.set_alpha(i)
+                        pygame.display.get_surface().blit(black, (0, 0))
+                        pygame.display.flip()
+                        clock.tick(60)
+                    playing = True
+                    game.start()
                 elif event.func == 'start_game':
                     background_sound.fadeout(4000)
                     for i in range(0, 255):

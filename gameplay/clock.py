@@ -2,12 +2,11 @@ from data.game.constants import *
 
 
 class Clock:
-    def __init__(self, night):
+    def __init__(self):
         self.HOUR_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 100)
         self.NIGHT_FONT = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 50)
 
-        self.night = night
-
+        self.night = None
         self.HOUR_DURATION = None
         self.time = None
         self.hour = None
@@ -18,8 +17,8 @@ class Clock:
         self.time = 12
         self.hour = 0
         self.active = True
-
         self.night = night
+
         pygame.time.set_timer(CLOCK, self.HOUR_DURATION * 1000)
 
     def stop(self):

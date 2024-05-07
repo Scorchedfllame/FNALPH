@@ -77,21 +77,21 @@ class Game:
 
         # Initialize Managers and Systems
         self.save_manager = SaveManager()
-        self.night = self.save_manager.load_data()['night']
-        with open('data/game/nights.json', 'r') as f:
-            self.night_dict = json.loads(f.read())
-            self.night_data = self.night_dict[str(self.night)]
-        self.power_manager = PowerManager(self.night_data['power_time'])
-        self.clock = Clock(self.night)
+        self.power_manager = PowerManager()
+        self.clock = Clock()
 
         self.systems = {"Cameras": Cameras()}
         self.office = Office(self)
 
-        # Initialize Animatronics
+        with open('data/game/nights.json', 'r') as f:
+            self.night_dict = json.loads(f.read())
+
         self.animatronics = []
         animatronic_key = {"Bonnie": Bonnie, "Chica": Chica, "Lefty": Lefty, "Knight": Knight}
-        for animatronic, data in self.night_data['animatronics'].items():
-            self.animatronics.append(animatronic_key[animatronic](self))
+        for name, clas in animatronic_key.items():
+            self.animatronics.append(clas(self))
+
+        # Initialize Animatronics
 
         # Define Variables
         self.status = None
@@ -108,6 +108,8 @@ class Game:
         self.reset_time = None
         self.power_out_stage = None
         self.power_out_counter = None
+        self.night = None
+        self.night_data = None
 
         self.jump_scare_sound.set_volume(0.3)
         self.flick = init_flick(self.flick_up_image)
@@ -130,9 +132,12 @@ class Game:
         self.power_out_counter = 0
 
         self.save_manager.load_data()
+        if self.save_manager.data['night'] == 0:
+            self.save_manager.data['night'] = 1
+            self.save_manager.save_game()
         self.night = self.save_manager.data['night']
-        if self.save_manager.data['stars'] == -1:
-            self.save_manager.data['stars'] = 0
+
+        self.night_data = self.night_dict[str(self.night)]
 
         # Start Systems
         self.flick.start()
@@ -140,10 +145,9 @@ class Game:
         self.clock.start(self.night)
         for system in self.systems.values():
             system.start()
-        self.power_manager.start()
+        self.power_manager.start(self.night_data['power_time'])
 
         # Start Animatronics
-        self.night_data = self.night_dict[str(self.night)]
         for i, animatronic in enumerate(self.animatronics):
             animatronic.set_difficulty(self.night_data['animatronics'][animatronic.name]['difficulty'])
         for animatronic in self.animatronics:
@@ -298,7 +302,7 @@ class Game:
                 self.victory_sound.fadeout(1000)
                 self.active = False
                 self.stop()
-                pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'next'}))
+                pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'continue_game'}))
         if event.type == UPDATE_POWER:
             self.power_manager.update_power(self.get_power_usage())
         if event.type == KILL and self.status == 'playing':
