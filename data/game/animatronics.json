@@ -100,28 +100,26 @@
     ],
     "jumpscare": [1920, 1080, 50]
   },
-  "Trojan": {
+  "Garble": {
     "menu_label": {
       "description": "Glitches cameras and slowly moves to attack you. Restart the power to make him go away.",
       "image_path": "resources/sprites/animatronics/trojan.png"
     },
     "cameras": [
-      0,
-      1,
-      2,
-      3,
+      12,
       4,
-      5,
+      3,
       6,
-      7,
-      8,
-      9,
       10,
-      11,
-      12
+      11
     ],
     "movements": [
-      []
+      [1],
+      [2],
+      [3],
+      [4],
+      [5],
+      [0]
     ]
   }
 }
