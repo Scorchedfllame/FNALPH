@@ -44,7 +44,7 @@
       },
       "Garble": {
         "difficulty": 0,
-        "change": []
+        "change": [4, 1]
       }
     },
     "power_time": 6000
@@ -93,8 +93,8 @@
         "change": [[3, 1], [4, 1]]
       },
       "Garble": {
-        "difficulty": 0,
-        "change": [[1, 2], [4, 1]]
+        "difficulty": 2,
+        "change": [[2, 2], [3, 1]]
       }
     },
     "power_time": 4000
@@ -118,7 +118,7 @@
         "change": [[3, 1], [4, 1]]
       },
       "Garble": {
-        "difficulty": 0,
+        "difficulty": 5,
         "change": [[1, 2], [4, 1]]
       }
     },
@@ -143,7 +143,7 @@
         "change": [[3, 1], [4, 1]]
       },
       "Garble": {
-        "difficulty": 0,
+        "difficulty": 10,
         "change": [[1, 2], [4, 1]]
       }
     },
@@ -168,7 +168,7 @@
         "change": [[3, 1], [4, 1]]
       },
       "Garble": {
-        "difficulty": 0,
+        "difficulty": 20,
         "change": [[1, 2], [4, 1]]
       }
     },
@@ -194,7 +194,7 @@
       },
       "Garble": {
         "difficulty": 0,
-        "change": [[1, 2], [4, 1]]
+        "change": [[1, 20]]
       }
     },
     "power_time": 1000

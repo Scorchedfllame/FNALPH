@@ -1,5 +1,4 @@
 # import gc
-
 import pygame.display
 from gameplay import *
 # from data.saves.save import SaveManager
