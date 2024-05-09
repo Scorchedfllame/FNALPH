@@ -1,5 +1,6 @@
 # import gc
 import pygame.display
+import pygame_widgets
 from gameplay import *
 # from data.saves.save import SaveManager
 # import time
@@ -57,6 +58,7 @@ def main():
                 elif event.func == 'next':
                     menus[0].continue_game()
                 elif event.func == 'change':
+                    active_menu.stop()
                     active_menu = menus[event.target]
                     active_menu.start()
                 elif event.func == 'continue_game':
@@ -79,8 +81,10 @@ def main():
                         clock.tick(60)
                     playing = True
                     game.start()
-                elif event.func == 'background':
+                elif event.func == 'go_background':
                     menus[0].cheat_background()
+                elif event.func == 'end_background':
+                    menus[0].end_cheat_background()
             if playing:
                 game.global_tick(event)
             else:
@@ -89,6 +93,7 @@ def main():
             game.global_draw()
         else:
             active_menu.draw(pygame.display.get_surface())
+        pygame_widgets.update(events)
         pygame.display.update()
         clock.tick(60)
 

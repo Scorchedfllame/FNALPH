@@ -1,11 +1,13 @@
 import os
-from gameplay import Cameras, Game, Button
+from gameplay import Cameras, Game, Button, ToggleButton
 from data.game.constants import *
 from data.saves.save import SaveManager
+from pygame_widgets.textbox import TextBox
 import random
 
 
 class Menu:
+    red = (201, 0, 7)
     def __init__(self, directory: str):
         self.background = pygame.image.load(directory + "background.png").convert()
 
@@ -23,6 +25,9 @@ class Menu:
     def start(self):
         pass
 
+    def stop(self):
+        pass
+
     def back(self):
         if self.parent is not None:
             pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'change', 'target': self.parent}))
@@ -31,6 +36,7 @@ class Menu:
 class MainMenu(Menu):
     def __init__(self):
         super().__init__("resources/ui/menus/main_menu/")
+        self._background = self.background.copy()
 
         self.secret_background = pygame.image.load('resources/ui/menus/main_menu/secret_background.png').convert()
 
@@ -89,6 +95,11 @@ class MainMenu(Menu):
     def cheat_background(self):
         self.background = self.secret_background
         self.color = (255, 255, 255)
+        self.buttons = self.init_buttons()
+
+    def end_cheat_background(self):
+        self.background = self._background
+        self.color = Menu.red
         self.buttons = self.init_buttons()
 
     def new_game(self):
@@ -151,67 +162,55 @@ class Cheat(Menu):
         border = pygame.Rect(10, 10, 1900, 1060)
         pygame.draw.rect(self.background, self.color, border, 5)
         self.parent = parent
-        self.input = StrInput()
+        self.night_input = TextBox(pygame.display.get_surface(), 140, 800, 300, 60, borderColour=Menu.red,
+                                   textColour=Menu.red, placeholderText='night', font=self.secondary_font, fontSize=10,
+                                   placeholderTextColour=Menu.red,
+                                   placeholderTextSize=Menu.red, colour=(0, 0, 0), onSubmit=self.submit_night_input)
+        self.night_input.disable()
+        self.night_input.hide()
         self.save_manager = SaveManager()
-        self.night_input = Button(self.main_font.render("Night", True, self.color),
-                                  (140, 800), scale=.2, activate=self.input.start)
         self.back_button = Button(self.main_font.render("Back", True, self.color),
                                   (140, 700), scale=.2, activate=self.back)
-        self.change_background = Button(self.main_font.render("Background", True, self.color),
-                                        (140, 900), scale=.2, activate=self.edit_background)
+        self.change_background = ToggleButton(self.main_font.render("Background", True, self.color),
+                                        (140, 900), scale=.2, activate=self.go_background,
+                                            deactivate=self.end_background)
+
+    def start(self):
+        self.night_input.enable()
+        self.night_input.show()
+        super().start()
+
+    def stop(self):
+        self.night_input.disable()
+        self.night_input.hide()
+        super().stop()
+
+    def submit_night_input(self):
+        try:
+            self.save_manager.load_data()
+            self.save_manager.data['night'] = int(self.night_input.getText())
+            self.night_input.text = []
+            self.save_manager.save_game()
+        except ValueError:
+            pass
 
     def tick(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.back()
-            if event.key == pygame.K_BACKSPACE:
-                self.input.input = self.input.input[:-1]
-            if event.key == pygame.K_RETURN:
-                self.input.stop()
-                try:
-                    self.save_manager.load_data()
-                    self.save_manager.data['night'] = int(self.input.final)
-                    self.save_manager.save_game()
-                except ValueError:
-                    pass
-        self.input.tick(event)
-        self.night_input.tick(event)
         self.back_button.tick(event)
         self.change_background.tick(event)
 
     def draw(self, surface):
         surface.blit(self.background, (0, 0))
         self.back_button.draw(surface)
-        self.night_input.draw(surface)
         self.change_background.draw(surface)
-        inp = self.secondary_font.render(self.input.input, True, self.color)
-        inp_rect = inp.get_rect()
-        inp_rect.bottomright = (1900, 1070)
-        surface.blit(inp, inp_rect)
+        self.night_input.draw()
 
-    def edit_background(self):
-        pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'background'}))
+    def go_background(self):
+        pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'go_background'}))
+        self.change_background.change_surface(self.main_font.render("Background", True, 'white'))
 
-
-class StrInput:
-    def __init__(self):
-        self.input = None
-        self.final = None
-
-    def start(self):
-        self.input = ''
-        self.final = ''
-        pygame.key.start_text_input()
-
-    def stop(self):
-        pygame.key.stop_text_input()
-        self.final = self.input
-        self.input = ''
-        return self.final
-
-    def tick(self, event: pygame.event.Event):
-        if event.type == pygame.TEXTINPUT:
-            try:
-                self.input += event.text
-            except TypeError:
-                pass
+    def end_background(self):
+        pygame.event.post(pygame.event.Event(MENU_CHANGE, {'func': 'end_background'}))
+        self.change_background.change_surface(self.main_font.render("Background", True, Menu.red))
