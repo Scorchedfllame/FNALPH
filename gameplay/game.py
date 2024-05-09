@@ -220,6 +220,14 @@ class Game:
         if event.type == WIN:
             self.win()
 
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_s:
+                if not self.blacked_out and self.status == 'playing':
+                    if self.office.active:
+                        pygame.event.post(pygame.event.Event(CAMERA_FLIPPED_UP))
+                    else:
+                        pygame.event.post(pygame.event.Event(CAMERA_FLIPPED_DOWN))
+
         if event.type == RANDOM_EVENT_SOUND:
             if not self.blacked_out and self.status == 'playing':
                 sound = random.choice(self.res)
