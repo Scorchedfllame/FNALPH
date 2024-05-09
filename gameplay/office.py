@@ -11,6 +11,8 @@ class Office:
         self.camera_toggle_sound = pygame.mixer.Sound('resources/sounds/camera_pull.mp3')
         self.image = pygame.image.load('resources/backgrounds/office.png').convert()
         self.blackout_image = pygame.image.load('resources/backgrounds/office_blackout.png').convert()
+        self.knight_blackout = pygame.image.load('resources/backgrounds/knight_blackout.png')
+        self.drone_noise = pygame.mixer.Sound('resources/sounds/drone_noise.mp3')
         self.doors = Door.generate_doors()
         self.image = pygame.transform.scale_by(self.image,
                                                pygame.display.get_surface().get_height()/self.image.get_size()[1])
@@ -20,7 +22,6 @@ class Office:
         self.power_reset_button = Button(
             pygame.image.load('resources/ui/buttons/reset_button.png').convert_alpha(),
             (0, 570), activate=pygame.event.Event(POWER_RESET))
-        self.ambience.set_volume(.2)
 
         self.surface = pygame.surface.Surface(self.image.get_size())
         self.game = game
@@ -31,6 +32,8 @@ class Office:
         self._locked = None
 
     def start(self):
+        self.drone_noise.set_volume(.2)
+        self.ambience.set_volume(.2)
         self.MAX_ROTATION = 90
         self.rot_x = 0
         self.active = True
@@ -52,10 +55,12 @@ class Office:
                 for door in self.doors:
                     door.tick(event)
         if event.type == CAMERA_FLIPPED_UP:
+            self.drone_noise.set_volume(.1)
             self.active = False
             self.ambience.set_volume(.1)
             self.camera_toggle_sound.play()
         if event.type == CAMERA_FLIPPED_DOWN:
+            self.drone_noise.set_volume(.2)
             self.active = True
             self.ambience.set_volume(.2)
             self.camera_toggle_sound.play()
@@ -79,12 +84,27 @@ class Office:
     def blackout(self):
         self.image = self.blackout_image
         self.ambience.stop()
+        self.drone_noise.stop()
         for door in self.doors:
             door.blackout()
 
+    def set_regular(self):
+        self.image = self.blackout_image
+
+    def set_black(self):
+        surface = pygame.surface.Surface((2000, 1080))
+        surface.fill("black")
+        self.image = surface
+
+    def set_knight(self):
+        self.image = self.knight_blackout
+
     def reset(self):
         self.image = self._image
-        self.ambience.play()
+        for door in self.doors:
+            door.reset()
+        # self.ambience.play()
+        self.drone_noise.play(10000)
 
     def get_power_usage(self):
         power_usage = 0
@@ -198,11 +218,10 @@ class Door:
     def blackout(self):
         if self.door_status == 'closed':
             self.open_door()
+            self.door_button.active = False
         if self.light_status == 'light':
             self.light_off()
-
-    def stop_blackout(self):
-        self.reset()
+            self.light_button.active = False
 
     def check_stinger(self):
         if self._default_images != self.curr_images:

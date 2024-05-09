@@ -229,7 +229,7 @@ class Chica(Animatronic):
 
 class Bonnie(Animatronic):
     """
-    Starts in the lunchroom, moves around the left side and attacks at the left door.
+    Starts in the UNDG_Storage, moves around the right side and attacks at the left door.
     """
 
     def __init__(self, game: any):
@@ -321,7 +321,7 @@ class Knight(Animatronic):
         self.running = False
         pygame.time.set_timer(self.TIMER, self.movement_timer)
         self.move(self.get_movement())
-        self._game.power_manager.power_remaining -= (5 ** self.attack_num) * 1000
+        self._game.power_manager.power_remaining -= (5 * self.attack_num + 1) * 1000
         self.attack_num += 1
 
     def tick(self, event: pygame.event.Event) -> None:
@@ -361,13 +361,14 @@ class Knight(Animatronic):
         self.camera.background.blit(self._get_image(), (0, 0))
 
 
-class Trojan(Animatronic):
+class Garble(Animatronic):
     def __init__(self, game: any):
-        super().__init__("Trojan", game, 5010, HITCH_TIMER, 0)
+        super().__init__("Garble", game, 5010, HITCH_TIMER, 0)
         self.images = None
         self.img_dict = None
         self.black = pygame.surface.Surface((1920*2, 1080))
         self.black.fill('black')
 
     def update_images(self) -> None:
-        self.camera.background.blit(self.black, (0, 0))
+        if self._difficulty > 0:
+            self.camera.background.blit(self.black, (0, 0))

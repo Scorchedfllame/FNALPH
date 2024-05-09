@@ -2,31 +2,31 @@
   "cameras": [
     {
       "label": "1A",
-      "position": [1125, 19],
+      "position": [775, 39],
       "name": "UNDGD_Storage",
       "background": "resources/backgrounds/cameras/UNDG_Storage.png"
     },
     {
       "label": "2A",
-      "position": [963, 250],
+      "position": [1000, 295],
       "name": "Room 133 Hallway",
       "background": "resources/backgrounds/cameras/Birrell Hall.png"
     },
     {
       "label": "2B",
-      "position": [950, 350],
+      "position": [980, 350],
       "name": "Room 133",
       "background": "resources/backgrounds/cameras/Birrell Room.png"
     },
     {
       "label": "3",
-      "position": [440, 100],
+      "position": [440, 133],
       "name": "Lunchroom",
       "background": "resources/backgrounds/cameras/Lunchroom.png"
     },
     {
       "label": "4A",
-      "position": [483, 258],
+      "position": [481, 260],
       "name": "W. Commons",
       "background": "resources/backgrounds/cameras/Commons.png"
     },
@@ -38,43 +38,43 @@
     },
     {
       "label": "5",
-      "position": [686, 247],
+      "position": [686, 260],
       "name": "200-600 Intersection",
       "background": "resources/backgrounds/cameras/200-600.png"
     },
     {
       "label": "6",
-      "position": [253, 358],
+      "position": [253, 395],
       "name": "S. 200 Hall",
       "background": "resources/backgrounds/cameras/S. 200.png"
     },
     {
       "label": "7A",
-      "position": [513, 400],
+      "position": [543, 423],
       "name": "Front Office",
       "background": "resources/backgrounds/cameras/Front Office.png"
     },
     {
       "label": "7B",
-      "position": [513, 478],
+      "position": [543, 478],
       "name": "S. Corner",
       "background": "resources/backgrounds/cameras/S. Corner.png"
     },
     {
       "label": "8A",
-      "position": [670, 400],
+      "position": [643, 430],
       "name": "Attendance Office",
       "background": "resources/backgrounds/cameras/Attendance Office.png"
     },
     {
       "label": "8B",
-      "position": [673, 478],
+      "position": [633, 480],
       "name": "N. Corner",
       "background": "resources/backgrounds/cameras/N. Corner.png"
     },
     {
       "label": "9",
-      "position": [1100, 420],
+      "position": [1100, 433],
       "name": "Room 140",
       "background": "resources/backgrounds/cameras/Lee Room.png"
     }

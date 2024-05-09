@@ -1,25 +1,28 @@
 # import gc
-
 import pygame.display
 from gameplay import *
 # from data.saves.save import SaveManager
 # import time
 
 
-def fade_image(image: pygame.surface.Surface, screen: pygame.surface.Surface, len_dir: range):
+def fade_image(image: pygame.surface.Surface, screen: pygame.surface.Surface, len_dir: range, color=False):
     for i in len_dir:
+        img = image.copy()
         black = pygame.surface.Surface((1920, 1080))
         black.fill((0, 0, 0))
         black.set_alpha(i)
-        screen.blit(image, (0, 0))
+        screen.blit(img, (0, 0))
+        if color:
+            img.fill((207, 0, 7), special_flags=pygame.BLEND_RGB_MULT)
+            img.set_alpha(i)
+            screen.blit(img, (0, 0))
         screen.blit(black, (0, 0))
         pygame.display.flip()
 
 
 def main():
     pygame.init()
-    pygame.mixer.init()
-    pygame.mixer.set_num_channels(10)
+    pygame.mixer.init(channels=10)
     pygame.display.set_mode((1920, 1080))
     pygame.display.set_caption('Five Nights At Lone Peak High')
     pygame.display.set_icon(pygame.image.load('resources/ui/icon.png').convert())
@@ -34,7 +37,7 @@ def main():
     active_menu = menus[0]
     active_menu.start()
     playing = False
-    fade_image(loading_image, pygame.display.get_surface(), range(255))
+    fade_image(loading_image, pygame.display.get_surface(), range(255), True)
     background_sound.play(loops=10)
 
     # Window Loop
@@ -56,10 +59,28 @@ def main():
                 elif event.func == 'change':
                     active_menu = menus[event.target]
                     active_menu.start()
-                elif event.func == 'start_game':
-                    background_sound.stop()
+                elif event.func == 'continue_game':
+                    for i in range(0, 255):
+                        black = pygame.surface.Surface((1920, 1080))
+                        black.set_alpha(i)
+                        pygame.display.get_surface().blit(black, (0, 0))
+                        pygame.display.flip()
+                        clock.tick(60)
                     playing = True
                     game.start()
+                elif event.func == 'start_game':
+                    background_sound.fadeout(4000)
+                    for i in range(0, 255):
+                        black = pygame.surface.Surface((1920, 1080))
+                        black.set_alpha(i)
+                        menus[0].draw(pygame.display.get_surface())
+                        pygame.display.get_surface().blit(black, (0, 0))
+                        pygame.display.flip()
+                        clock.tick(60)
+                    playing = True
+                    game.start()
+                elif event.func == 'background':
+                    menus[0].cheat_background()
             if playing:
                 game.global_tick(event)
             else:

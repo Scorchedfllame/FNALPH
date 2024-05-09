@@ -16,6 +16,10 @@
       "Knight": {
         "difficulty": 0,
         "change": [[3, 1], [4, 1]]
+      },
+      "Garble": {
+        "difficulty": 0,
+        "change": []
       }
     },
     "power_time": 0
@@ -37,6 +41,10 @@
       "Knight": {
         "difficulty": 1,
         "change": [[3, 1], [4, 1]]
+      },
+      "Garble": {
+        "difficulty": 0,
+        "change": [4, 1]
       }
     },
     "power_time": 6000
@@ -58,6 +66,10 @@
       "Knight": {
         "difficulty": 2,
         "change": [[3, 1], [4, 1]]
+      },
+      "Garble": {
+        "difficulty": 0,
+        "change": [[1, 2], [4, 1]]
       }
     },
     "power_time": 5000
@@ -79,6 +91,10 @@
       "Knight": {
         "difficulty": 6,
         "change": [[3, 1], [4, 1]]
+      },
+      "Garble": {
+        "difficulty": 2,
+        "change": [[2, 2], [3, 1]]
       }
     },
     "power_time": 4000
@@ -100,6 +116,10 @@
       "Knight": {
         "difficulty": 5,
         "change": [[3, 1], [4, 1]]
+      },
+      "Garble": {
+        "difficulty": 5,
+        "change": [[1, 2], [4, 1]]
       }
     },
     "power_time": 3000
@@ -121,6 +141,10 @@
       "Knight": {
         "difficulty": 6,
         "change": [[3, 1], [4, 1]]
+      },
+      "Garble": {
+        "difficulty": 10,
+        "change": [[1, 2], [4, 1]]
       }
     },
     "power_time": 3000
@@ -142,6 +166,10 @@
       "Knight": {
         "difficulty": 20,
         "change": [[3, 1], [4, 1]]
+      },
+      "Garble": {
+        "difficulty": 20,
+        "change": [[1, 2], [4, 1]]
       }
     },
     "power_time": 3000
@@ -161,6 +189,10 @@
         "change": [[1, 20]]
       },
       "Knight": {
+        "difficulty": 0,
+        "change": [[1, 20]]
+      },
+      "Garble": {
         "difficulty": 0,
         "change": [[1, 20]]
       }

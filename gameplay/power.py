@@ -3,13 +3,14 @@ from math import ceil
 
 
 class PowerManager:
-    def __init__(self, power_penalty):
+    def __init__(self):
         self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 55)
         self.large_font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 65)
         self.beep_sounds = []
         for i in range(1, 6):
-            self.beep_sounds.append(pygame.mixer.Sound(f'resources/sounds/beep_{i}.mp3'))
-        self.power_penalty = power_penalty
+            beep = pygame.mixer.Sound(f'resources/sounds/beep_{i}.mp3')
+            beep.set_volume(.25)
+            self.beep_sounds.append(beep)
         self.usage = Usage(self.font, self.large_font)
 
         self.DIFFICULTY = None
@@ -17,9 +18,11 @@ class PowerManager:
         self.percentage = None
         self.power_remaining = None
         self.reset_count = None
+        self.power_penalty = None
 
-    def start(self):
+    def start(self, power_penalty):
         # set back to 10 when done testing
+        self.power_penalty = power_penalty
         self.DIFFICULTY = 10
         self.active = True
         self.percentage = 100
