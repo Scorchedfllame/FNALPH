@@ -133,6 +133,7 @@ class Cameras(System):
         self.camera_pan_sound = pygame.mixer.Sound('resources/sounds/camera_pan.mp3')
         self.font = pygame.font.Font('resources/fonts/five-nights-at-freddys.ttf', 90)
         self.camera_switch_sound = pygame.mixer.Sound('resources/sounds/static.mp3')
+        self.camera_switch_sound.set_volume(1)
         self.animation = Animator(pygame.image.load('resources/animations/Camera_Flip.png').convert_alpha(),
                                   pygame.rect.Rect(0, 0, 1920, 1080),
                                   speed=.5)

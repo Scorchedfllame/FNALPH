@@ -23,7 +23,8 @@ def fade_image(image: pygame.surface.Surface, screen: pygame.surface.Surface, le
 
 def main():
     pygame.init()
-    pygame.mixer.init(channels=10)
+    pygame.mixer.pre_init(44100, -16, 2, 512)
+    pygame.mixer.set_num_channels(64)
     pygame.display.set_mode((1920, 1080))
     pygame.display.set_caption('Five Nights At Lone Peak High')
     pygame.display.set_icon(pygame.image.load('resources/ui/icon.png').convert())
@@ -33,13 +34,17 @@ def main():
     pygame.display.get_surface().blit(loading_image, (0, 0))
     pygame.display.flip()
     clock = pygame.time.Clock()
-    menus = [MainMenu(), Options(0), Cheat(1)]
+    menus = [MainMenu(), Options(0), Cheat(1), Credits(1)]
     game = Game()
+    save_manager = SaveManager()
     active_menu = menus[0]
     active_menu.start()
     playing = False
     fade_image(loading_image, pygame.display.get_surface(), range(255), True)
-    background_sound.play(loops=10)
+    save_manager.load_data()
+    background_sound.play(loops=-1)
+    for i in range(64):
+        pygame.mixer.Channel(i).set_volume(save_manager.data['volume']/100)
 
     # Window Loop
     while True:
@@ -51,7 +56,10 @@ def main():
                 exit()
             if event.type == MENU_CHANGE:
                 if event.func == 'menu':
-                    background_sound.play(loops=10)
+                    save_manager.load_data()
+                    background_sound.play(loops=-1)
+                    for i in range(64):
+                        pygame.mixer.Channel(i).set_volume(save_manager.data['volume']/100)
                     playing = False
                     active_menu = menus[0]
                     active_menu.start()

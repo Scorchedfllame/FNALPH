@@ -110,11 +110,14 @@ class Game:
         self.power_out_counter = None
         self.night = None
         self.night_data = None
+        self.global_volume = None
 
         self.jump_scare_sound.set_volume(0.3)
         self.flick = init_flick(self.flick_up_image)
 
     def start(self):
+        self.save_manager.load_data()
+
         # Setup Variables
         self.status = 'playing'
         self.debugger = False
@@ -130,8 +133,8 @@ class Game:
         self.reset_time = 0
         self.power_out_stage = 0
         self.power_out_counter = 0
+        self.global_volume = self.save_manager.data['volume']/100
 
-        self.save_manager.load_data()
         if self.save_manager.data['night'] == 0:
             self.save_manager.data['night'] = 1
             self.save_manager.save_game()
@@ -211,6 +214,8 @@ class Game:
             self.power_out()
 
     def global_tick(self, event: pygame.event.Event):
+        for i in range(pygame.mixer.get_num_channels()):
+            pygame.mixer.Channel(i).set_volume(self.global_volume)
         if event.type == pygame.WINDOWRESIZED:
             for system in self.systems.values():
                 system.resize()
