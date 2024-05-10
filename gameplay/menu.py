@@ -90,7 +90,7 @@ class MainMenu(Menu):
             night_rect.topleft = cont_button.rect.bottomleft
             night_rect.y -= 25
             screen.blit(night, night_rect)
-        version_text = self.tertiary_font.render('v0.0.1', True, self.color)
+        version_text = self.tertiary_font.render('v0.2.1', True, self.color)
         version_rect = version_text.get_rect()
         version_rect.bottomright = (1900, 1060)
         screen.blit(version_text, version_rect)

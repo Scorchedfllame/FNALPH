@@ -371,4 +371,5 @@ class Garble(Animatronic):
 
     def update_images(self) -> None:
         if self._difficulty > 0:
+            self._update_camera()
             self.camera.background.blit(self.black, (0, 0))
