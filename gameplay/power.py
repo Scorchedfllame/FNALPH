@@ -23,7 +23,7 @@ class PowerManager:
     def start(self, power_penalty):
         # set back to 10 when done testing
         self.power_penalty = power_penalty
-        self.DIFFICULTY = 10
+        self.DIFFICULTY = 11
         self.active = True
         self.percentage = 100
         self.power_remaining = 100000
