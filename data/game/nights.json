@@ -44,7 +44,7 @@
       },
       "Garble": {
         "difficulty": 0,
-        "change": [4, 1]
+        "change": [[4, 1]]
       }
     },
     "power_time": 6000

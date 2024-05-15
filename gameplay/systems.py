@@ -155,7 +155,7 @@ class Cameras(System):
         self.disable_cameras()
         for camera in self.camera_list:
             camera.start()
-        pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 3000)
+        pygame.time.set_timer(pygame.event.Event(CAMERA_ROTATION), 3300)
 
     def stop(self):
         self.active = False
@@ -262,13 +262,13 @@ class Cameras(System):
         match self.rotation_cycle:
             case 0:
                 self.current_rotation = -90
-                self.camera_pan_sound.play(maxtime=3300)
+                self.camera_pan_sound.play(maxtime=3600)
             case 1:
                 self.camera_pan_sound.set_volume(0)
                 self.current_rotation = 90
             case 2:
                 self.current_rotation = 90
-                self.camera_pan_sound.play(maxtime=3300)
+                self.camera_pan_sound.play(maxtime=3600)
             case 3:
                 self.camera_pan_sound.set_volume(0)
                 self.current_rotation = -90
